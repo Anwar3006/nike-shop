@@ -1,15 +1,52 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import nextFontLocal from "next/font/local";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const fontSans = nextFontLocal({
+  src: [
+    {
+      path: "../../public/fonts/Bevellier-Thin.otf",
+      weight: "100",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/Bevellier-Extralight.otf",
+      weight: "200",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/Bevellier-Light.otf",
+      weight: "300",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/Bevellier-Regular.otf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/Bevellier-Medium.otf",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/Bevellier-Semibold.otf",
+      weight: "600",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/Bevellier-Bold.otf",
+      weight: "700",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/Bevellier-Black.otf",
+      weight: "900",
+      style: "normal",
+    },
+  ],
+  variable: "--font-sans",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -24,11 +61,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
+      <body className={`${fontSans.variable} antialiased`}>{children}</body>
     </html>
   );
 }
