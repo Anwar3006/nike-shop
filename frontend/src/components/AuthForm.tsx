@@ -1,12 +1,13 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Eye, EyeOff } from 'lucide-react';
+import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
+import SocialProviders from "./SocialProviders";
 
-const AuthForm = ({ type }: { type: 'sign-in' | 'sign-up' }) => {
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+const AuthForm = ({ type }: { type: "sign-in" | "sign-up" }) => {
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -16,20 +17,22 @@ const AuthForm = ({ type }: { type: 'sign-in' | 'sign-up' }) => {
 
   return (
     <form onSubmit={handleSubmit} className="w-full">
-      <h2 className="mb-2 text-3xl font-bold text-foreground">
-        {type === 'sign-in' ? 'Sign In' : 'Join Nike Today!'}
+      <h2 className="mb-2 text-3xl font-bold text-foreground text-center text-heading-3 font-bevellier">
+        {type === "sign-in" ? "Sign In" : "Join Nike Today!"}
       </h2>
-      <p className="mb-8 text-muted-foreground">
-        {type === 'sign-in'
-          ? 'Welcome back to your account'
-          : 'Create your account to start your fitness journey'}
+      <p className="mb-8 text-muted-foreground text-center text-body font-bevellier">
+        {type === "sign-in"
+          ? "Welcome back to your account"
+          : "Create your account to start your fitness journey"}
       </p>
 
-      {type === 'sign-up' && (
+      <SocialProviders />
+
+      {type === "sign-up" && (
         <div className="mb-4">
           <label
             htmlFor="full-name"
-            className="mb-2 block text-sm font-medium text-muted-foreground"
+            className="mb-2 block font-medium text-muted-foreground text-body-medium font-bevellier"
           >
             Full Name
           </label>
@@ -38,7 +41,7 @@ const AuthForm = ({ type }: { type: 'sign-in' | 'sign-up' }) => {
             id="full-name"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
-            className="w-full rounded-md border border-input bg-transparent p-3 text-foreground"
+            className="w-full rounded-md border border-input bg-transparent p-3 text-foreground text-body font-bevellier"
             placeholder="Enter your full name"
             required
           />
@@ -48,7 +51,7 @@ const AuthForm = ({ type }: { type: 'sign-in' | 'sign-up' }) => {
       <div className="mb-4">
         <label
           htmlFor="email"
-          className="mb-2 block text-sm font-medium text-muted-foreground"
+          className="mb-2 block font-medium text-muted-foreground text-body-medium font-bevellier"
         >
           Email
         </label>
@@ -57,7 +60,7 @@ const AuthForm = ({ type }: { type: 'sign-in' | 'sign-up' }) => {
           id="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full rounded-md border border-input bg-transparent p-3 text-foreground"
+          className="w-full rounded-md border border-input bg-transparent p-3 text-foreground text-body font-bevellier"
           placeholder="johndoe@gmail.com"
           required
         />
@@ -65,16 +68,16 @@ const AuthForm = ({ type }: { type: 'sign-in' | 'sign-up' }) => {
       <div className="relative mb-6">
         <label
           htmlFor="password"
-          className="mb-2 block text-sm font-medium text-muted-foreground"
+          className="mb-2 block font-medium text-muted-foreground text-body-medium font-bevellier"
         >
           Password
         </label>
         <input
-          type={showPassword ? 'text' : 'password'}
+          type={showPassword ? "text" : "password"}
           id="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full rounded-md border border-input bg-transparent p-3 text-foreground"
+          className="w-full rounded-md border border-input bg-transparent p-3 text-foreground text-body font-bevellier"
           placeholder="minimum 8 characters"
           required
         />
@@ -88,9 +91,9 @@ const AuthForm = ({ type }: { type: 'sign-in' | 'sign-up' }) => {
       </div>
       <button
         type="submit"
-        className="w-full rounded-full bg-black px-5 py-3 text-center font-medium text-white hover:bg-gray-800"
+        className="w-full rounded-full bg-black px-5 py-3 text-center font-medium text-white hover:bg-gray-800 text-lead font-bevellier"
       >
-        {type === 'sign-in' ? 'Sign In' : 'Sign Up'}
+        {type === "sign-in" ? "Sign In" : "Sign Up"}
       </button>
     </form>
   );

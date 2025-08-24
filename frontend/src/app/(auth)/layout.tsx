@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import Image from "next/image";
 
 export default function AuthLayout({
   children,
@@ -25,13 +25,17 @@ export default function AuthLayout({
           </svg>
         </div>
         <div>
-          <h1 className="text-5xl font-bold">Just Do It</h1>
-          <p className="mt-4 text-lg text-gray-400">
+          <h1 className="font-bold text-heading-2 font-bevellier">
+            Just Do It
+          </h1>
+          <p className="mt-4 text-lead font-bevellier text-gray-400">
             Join millions of athletes and fitness enthusiasts who trust Nike for
             their performance needs.
           </p>
         </div>
-        <p className="text-sm text-gray-500">© 2024 Nike. All rights reserved.</p>
+        <p className="text-sm text-gray-500 text-footnote font-bevellier">
+          © {new Date().getFullYear()} Nike. All rights reserved.
+        </p>
       </div>
       <div className="flex w-full lg:w-1/2 items-center justify-center p-6">
         <div className="w-full max-w-md">{children}</div>
