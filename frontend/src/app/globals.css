@@ -167,6 +167,7 @@
   --text-footnote--line-height: 18px;
   --text-footnote--font-weight: 400;
 }
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

@@ -8,21 +8,15 @@ export default function AuthLayout({
   return (
     <div className="flex min-h-screen">
       <div className="hidden lg:flex lg:w-1/2 flex-col justify-between bg-black p-12 text-white">
-        <div className="text-2xl font-bold">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="32"
-            height="32"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
-            <path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" />
-          </svg>
+        {/* Logo */}
+        <div className="bg-gradient-to-br from-white to-gray-400 rounded-2xl p-2 w-12 h-12">
+          <Image
+            src="/logo-black.svg"
+            alt="Logo"
+            width={40} // Adjust based on your needs
+            height={40} // Adjust based on your needs
+            className="w-full h-full object-contain"
+          />
         </div>
         <div>
           <h1 className="font-bold text-heading-2 font-bevellier">

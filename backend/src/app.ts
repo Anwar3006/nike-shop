@@ -1,6 +1,5 @@
 import "dotenv";
-import { db, testDb } from "./db";
-import { products } from "./schema";
+import { testDb } from "./db";
 
 import createServer from "./createServer";
 import { logger } from "./utils/logger";

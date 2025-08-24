@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import nextFontLocal from "next/font/local";
 import "./globals.css";
+import { Toaster } from "@/components/ui/sonner";
 
 const fontSans = nextFontLocal({
   src: [
@@ -61,7 +62,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${fontSans.variable} antialiased`}>{children}</body>
+      <body className={`${fontSans.variable} antialiased`}>
+        {children}
+        <Toaster position="top-right" />
+      </body>
     </html>
   );
 }
