@@ -5,47 +5,47 @@ import "./globals.css";
 const fontSans = nextFontLocal({
   src: [
     {
-      path: "../../public/fonts/Bevellier-Thin.otf",
+      path: "../../public/fonts/Bevellier-Thin.woff",
       weight: "100",
       style: "normal",
     },
     {
-      path: "../../public/fonts/Bevellier-Extralight.otf",
+      path: "../../public/fonts/Bevellier-Extralight.woff",
       weight: "200",
       style: "normal",
     },
     {
-      path: "../../public/fonts/Bevellier-Light.otf",
+      path: "../../public/fonts/Bevellier-Light.woff",
       weight: "300",
       style: "normal",
     },
     {
-      path: "../../public/fonts/Bevellier-Regular.otf",
+      path: "../../public/fonts/Bevellier-Regular.woff",
       weight: "400",
       style: "normal",
     },
     {
-      path: "../../public/fonts/Bevellier-Medium.otf",
+      path: "../../public/fonts/Bevellier-Medium.woff",
       weight: "500",
       style: "normal",
     },
     {
-      path: "../../public/fonts/Bevellier-Semibold.otf",
+      path: "../../public/fonts/Bevellier-Semibold.woff",
       weight: "600",
       style: "normal",
     },
     {
-      path: "../../public/fonts/Bevellier-Bold.otf",
+      path: "../../public/fonts/Bevellier-Bold.woff",
       weight: "700",
       style: "normal",
     },
     {
-      path: "../../public/fonts/Bevellier-Black.otf",
+      path: "../../public/fonts/Bevellier-Black.woff",
       weight: "900",
       style: "normal",
     },
   ],
-  variable: "--font-sans",
+  variable: "--font-bevellier",
   display: "swap",
 });
 
