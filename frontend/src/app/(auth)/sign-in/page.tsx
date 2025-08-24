@@ -2,6 +2,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
+import { Suspense } from "react";
 
 import { signInSchema, SignInSchemaType } from "@/schemas/auth.schema";
 import AuthForm from "@/components/AuthForm";
@@ -12,7 +13,11 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { extractRedirectUrl } from "@/utils/auth-redirect";
 
-const SignInPage = () => {
+// Separate component that uses useSearchParams
+// we did this differently from the sign-up page because we needed to use the searchParams to get the redirect url
+// and the useSearchParams hook will hydration mismatches between server and client rendering, so Next.js requires
+// you to explicitly handle the loading state with Suspense.
+const SignInContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [redirectUrl, setRedirectUrl] = useState("/");
@@ -78,7 +83,9 @@ const SignInPage = () => {
   return (
     <div className="flex w-full flex-col items-center justify-center">
       <div className="mb-8 self-center text-base font-bevellier">
-        <span className="text-muted-foreground">Don't have an account? </span>
+        <span className="text-muted-foreground">
+          Don&apos;t have an account?{" "}
+        </span>
         <Link
           href={signUpHref}
           className="font-medium text-primary hover:underline"
@@ -89,6 +96,44 @@ const SignInPage = () => {
 
       <AuthForm type="sign-in" form={form} onSubmit={handleSignIn} />
     </div>
+  );
+};
+
+// Loading fallback component
+const SignInLoading = () => (
+  <div className="flex w-full flex-col items-center justify-center">
+    <div className="mb-8 self-center text-base font-bevellier">
+      <span className="text-muted-foreground">
+        Don&apos;t have an account?{" "}
+      </span>
+      <Link
+        href="/sign-up"
+        className="font-medium text-primary hover:underline"
+      >
+        Sign Up
+      </Link>
+    </div>
+
+    <div className="w-full max-w-md">
+      <div className="animate-pulse">
+        <div className="h-8 bg-gray-200 rounded mb-2"></div>
+        <div className="h-4 bg-gray-200 rounded mb-8"></div>
+        <div className="space-y-4">
+          <div className="h-12 bg-gray-200 rounded"></div>
+          <div className="h-12 bg-gray-200 rounded"></div>
+          <div className="h-12 bg-gray-200 rounded"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+// Main component with Suspense boundary
+const SignInPage = () => {
+  return (
+    <Suspense fallback={<SignInLoading />}>
+      <SignInContent />
+    </Suspense>
   );
 };
 

@@ -1,5 +1,5 @@
 import { signIn } from "@/lib/auth-client";
-import { FaApple, FaGithub, FaGoogle } from "react-icons/fa";
+import { FaGithub, FaGoogle } from "react-icons/fa";
 
 const SocialProviders = () => {
   const handleGoogle = async (e: React.MouseEvent<HTMLButtonElement>) => {
