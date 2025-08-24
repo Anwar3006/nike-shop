@@ -1,10 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
 
 const AuthForm = ({ type }: { type: 'sign-in' | 'sign-up' }) => {
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -12,13 +15,36 @@ const AuthForm = ({ type }: { type: 'sign-in' | 'sign-up' }) => {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="w-full max-w-md rounded-lg bg-card p-8 shadow-lg"
-    >
-      <h2 className="mb-6 text-center text-2xl font-bold text-foreground">
-        {type === 'sign-in' ? 'Welcome Back' : 'Create an Account'}
+    <form onSubmit={handleSubmit} className="w-full">
+      <h2 className="mb-2 text-3xl font-bold text-foreground">
+        {type === 'sign-in' ? 'Sign In' : 'Join Nike Today!'}
       </h2>
+      <p className="mb-8 text-muted-foreground">
+        {type === 'sign-in'
+          ? 'Welcome back to your account'
+          : 'Create your account to start your fitness journey'}
+      </p>
+
+      {type === 'sign-up' && (
+        <div className="mb-4">
+          <label
+            htmlFor="full-name"
+            className="mb-2 block text-sm font-medium text-muted-foreground"
+          >
+            Full Name
+          </label>
+          <input
+            type="text"
+            id="full-name"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            className="w-full rounded-md border border-input bg-transparent p-3 text-foreground"
+            placeholder="Enter your full name"
+            required
+          />
+        </div>
+      )}
+
       <div className="mb-4">
         <label
           htmlFor="email"
@@ -31,11 +57,12 @@ const AuthForm = ({ type }: { type: 'sign-in' | 'sign-up' }) => {
           id="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full rounded-md border bg-input p-2.5 text-foreground focus:border-primary focus:ring-primary"
+          className="w-full rounded-md border border-input bg-transparent p-3 text-foreground"
+          placeholder="johndoe@gmail.com"
           required
         />
       </div>
-      <div className="mb-6">
+      <div className="relative mb-6">
         <label
           htmlFor="password"
           className="mb-2 block text-sm font-medium text-muted-foreground"
@@ -43,17 +70,25 @@ const AuthForm = ({ type }: { type: 'sign-in' | 'sign-up' }) => {
           Password
         </label>
         <input
-          type="password"
+          type={showPassword ? 'text' : 'password'}
           id="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full rounded-md border bg-input p-2.5 text-foreground focus:border-primary focus:ring-primary"
+          className="w-full rounded-md border border-input bg-transparent p-3 text-foreground"
+          placeholder="minimum 8 characters"
           required
         />
+        <button
+          type="button"
+          onClick={() => setShowPassword(!showPassword)}
+          className="absolute inset-y-0 right-0 flex items-center pr-3 pt-8 text-gray-400"
+        >
+          {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+        </button>
       </div>
       <button
         type="submit"
-        className="w-full rounded-lg bg-primary px-5 py-3 text-center text-sm font-medium text-primary-foreground hover:bg-primary/90 focus:outline-none focus:ring-4 focus:ring-primary/50"
+        className="w-full rounded-full bg-black px-5 py-3 text-center font-medium text-white hover:bg-gray-800"
       >
         {type === 'sign-in' ? 'Sign In' : 'Sign Up'}
       </button>
