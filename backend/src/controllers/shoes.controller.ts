@@ -1,6 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import { catchAsync } from "../errors/errorHandler";
-import { CreateShoeSchemaType } from "../schemas/shoe.schema";
+import {
+  CreateShoeSchemaType,
+  GetShoesSchemaType,
+} from "../schemas/shoe.schema";
 import { ShoesService } from "../services/shoe.service";
 
 export const ShoesController = {
@@ -34,14 +37,44 @@ export const ShoesController = {
   ),
 
   getShoeById: catchAsync(
-    async (req: Request, res: Response, next: NextFunction) => {
+    async (
+      req: Request<{ id: string }, {}, {}>,
+      res: Response,
+      next: NextFunction
+    ) => {
       const shoeId = req.params.id;
       const shoe = await ShoesService.getShoeById(shoeId);
-      res.status(200).json(shoe);
+      res.status(200).json({ success: true, data: shoe });
     }
   ),
 
   getAllShoes: catchAsync(
-    async (req: Request, res: Response, next: NextFunction) => {}
+    async (
+      req: Request<{}, {}, {}, GetShoesSchemaType["query"]>,
+      res: Response,
+      next: NextFunction
+    ) => {
+      const {
+        limit = "6",
+        page = "1",
+        sortBy,
+        categoryId,
+        minPrice,
+        maxPrice,
+      } = req.query;
+
+      const options = {
+        limit: parseInt(limit),
+        page: Number(page),
+        sortBy,
+        categoryId: categoryId ? parseInt(categoryId) : undefined,
+        minPrice: minPrice ? parseInt(minPrice) : undefined,
+        maxPrice: maxPrice ? parseInt(maxPrice) : undefined,
+      };
+
+      const shoes = await ShoesService.getShoes(options);
+
+      res.status(200).json({ success: true, ...shoes });
+    }
   ),
 };

@@ -43,6 +43,11 @@ export const shoes = pgTable(
       .references(() => category.id),
     styleNumber: varchar("style_number").unique(), // "HM9451-600"
     basePrice: integer("base_price"), // Base price before size variations
+    baseImage: varchar("base_image")
+      .notNull()
+      .default(
+        "https://atlas-content-cdn.pixelsquid.com/stock-images/nike-shoe-box-open-shoebox-047RRRB-600.jpg"
+      ),
   },
   (table) => [
     index("name_index").on(table.name),

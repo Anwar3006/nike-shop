@@ -46,8 +46,10 @@ export const ShoesService = {
     }
   },
 
-  getShoes: async (data: any) => {
+  getShoes: async (options: GetShoesOptions) => {
     try {
+      const shoes = await ShoeRepository.getShoes(options);
+      return shoes;
     } catch (error) {
       logger.error(error, "Error when getting shoes");
       throw error;

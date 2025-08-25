@@ -1,6 +1,6 @@
-import { and, eq, or } from "drizzle-orm";
+import { and, between, eq, gte, lte, or } from "drizzle-orm";
 import { db } from "../db";
-import { colorVariant, images, shoes, shoeSizes } from "../models";
+import { category, colorVariant, images, shoes, shoeSizes } from "../models";
 import {
   CreateShoeSchemaType,
   UpdateShoeSchemaType,
@@ -133,6 +133,114 @@ export const ShoeRepository = {
       const [found] = await db.select().from(shoes).where(eq(shoes.id, shoeId));
 
       return found;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  getShoes: async (options: GetShoesOptions) => {
+    try {
+      const {
+        limit = 8,
+        page = 1,
+        sortBy,
+        categoryId,
+        minPrice,
+        maxPrice,
+      } = options;
+
+      const offset = (page - 1) * limit;
+      // const sorting =
+      let query = [];
+      if (categoryId) {
+        query.push(eq(shoes.categoryId, categoryId));
+      }
+      if (minPrice && maxPrice) {
+        query.push(between(shoes.basePrice, minPrice, maxPrice));
+      } else if (minPrice) {
+        query.push(gte(shoes.basePrice, minPrice));
+      } else if (maxPrice) {
+        query.push(lte(shoes.basePrice, maxPrice));
+      }
+
+      const queryString = query.length > 0 ? and(...query) : and();
+
+      const [shoeRecords, totalItems] = await Promise.all([
+        db
+          .select({
+            id: shoes.id,
+            name: shoes.name,
+            basePrice: shoes.basePrice,
+            category: category.name,
+            baseImage: shoes.baseImage,
+          })
+          .from(shoes)
+          .where(queryString)
+          .limit(limit)
+          .offset(offset)
+          .leftJoin(category, eq(shoes.categoryId, category.id)),
+
+        db.$count(shoes, ...query),
+      ]);
+
+      // Add color variants
+      let shoesWithVariants = [];
+      for (const shoe of shoeRecords) {
+        const colorVariantCount = await db.$count(
+          colorVariant,
+          eq(colorVariant.shoeId, shoe.id)
+        );
+        // .select({
+        //   id: colorVariant.id,
+        //   name: colorVariant.name,
+        //   dominantColor: colorVariant.dominantColor,
+        // })
+        // .from(colorVariant)
+        // .where(eq(colorVariant.shoeId, shoe.id));
+
+        // const [variantImages, variantSizes] = await Promise.all([
+        //   db
+        //     .select({
+        //       url: images.imageUrl,
+        //       altText: images.altText,
+        //     })
+        //     .from(images)
+        //     .where(eq(images.colorVariantId, colorVariants.id)),
+
+        //   // TODO: adding this quickly bloats the returned data and it is not optimal, see if we can do something about it later
+        //   db
+        //     .select({
+        //       sizeId: shoeSizes.sizeId,
+        //       price: shoeSizes.price,
+        //       quantity: shoeSizes.quantity,
+        //     })
+        //     .from(shoeSizes)
+        //     .where(eq(shoeSizes.colorVariantId, colorVariants.id)),
+        // ]);
+
+        shoesWithVariants.push({
+          ...shoe,
+          colors: colorVariantCount,
+          // variantImages,
+          // variantSizes,
+        });
+      }
+
+      const totalPages = Math.ceil(totalItems / limit);
+      const hasNextPage = page < totalPages;
+      const hasPrevPage = page > 1;
+
+      return {
+        data: shoesWithVariants,
+        meta: {
+          totalItems,
+          totalPages,
+          perPage: limit,
+          currentPage: page,
+          hasNextPage,
+          hasPrevPage,
+        },
+      };
     } catch (error) {
       throw error;
     }

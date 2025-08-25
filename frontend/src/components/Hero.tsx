@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "./ui/button";
 import Image from "next/image";
-import { heros } from "@/types/heroUrls";
 
 const images = [
   "https://mir-s3-cdn-cf.behance.net/project_modules/max_3840_webp/76b53e201177537.667007b77c74f.jpg",
