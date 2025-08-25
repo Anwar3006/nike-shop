@@ -1,6 +1,8 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { FaXTwitter } from "react-icons/fa6";
+import { FaFacebook, FaInstagram } from "react-icons/fa";
 
 const footerLinks = {
   featured: [
@@ -28,9 +30,9 @@ const footerLinks = {
 };
 
 const socialLinks = [
-  { href: "#", icon: "/x.svg", alt: "X Logo" },
-  { href: "#", icon: "/facebook.svg", alt: "Facebook Logo" },
-  { href: "#", icon: "/instagram.svg", alt: "Instagram Logo" },
+  { href: "#", icon: FaXTwitter, alt: "X Logo" },
+  { href: "#", icon: FaFacebook, alt: "Facebook Logo" },
+  { href: "#", icon: FaInstagram, alt: "Instagram Logo" },
 ];
 
 const legalLinks = [
@@ -43,7 +45,7 @@ const legalLinks = [
 const Footer = () => {
   return (
     <footer className="bg-black text-white">
-      <div className="container mx-auto px-6 py-12">
+      <div className="container mx-auto px-6 pt-12 pb-8">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
           {/* Logo */}
           <div className="col-span-1 mb-8 md:mb-0">
@@ -53,15 +55,17 @@ const Footer = () => {
           </div>
 
           {/* Links */}
-          <div className="col-span-1 md:col-span-3 grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="col-span-1 md:col-span-3 grid grid-cols-2 md:grid-cols-4 gap-5">
             <div>
-              <h4 className="font-bold mb-4">Featured</h4>
+              <h4 className="font-bold mb-4 font-bevellier text-lead">
+                Featured
+              </h4>
               <ul>
                 {footerLinks.featured.map((link) => (
                   <li key={link.label} className="mb-2">
                     <Link
                       href={link.href}
-                      className="text-gray-400 hover:text-white"
+                      className="text-gray-400 hover:text-white font-bevellier text-body-medium"
                     >
                       {link.label}
                     </Link>
@@ -70,13 +74,13 @@ const Footer = () => {
               </ul>
             </div>
             <div>
-              <h4 className="font-bold mb-4">Shoes</h4>
+              <h4 className="font-bold mb-4 font-bevellier text-lead">Shoes</h4>
               <ul>
                 {footerLinks.shoes.map((link) => (
                   <li key={link.label} className="mb-2">
                     <Link
                       href={link.href}
-                      className="text-gray-400 hover:text-white"
+                      className="text-gray-400 hover:text-white font-bevellier text-body-medium"
                     >
                       {link.label}
                     </Link>
@@ -85,13 +89,15 @@ const Footer = () => {
               </ul>
             </div>
             <div>
-              <h4 className="font-bold mb-4">Clothing</h4>
+              <h4 className="font-bold mb-4 font-bevellier text-lead">
+                Clothing
+              </h4>
               <ul>
                 {footerLinks.clothing.map((link) => (
                   <li key={link.label} className="mb-2">
                     <Link
                       href={link.href}
-                      className="text-gray-400 hover:text-white"
+                      className="text-gray-400 hover:text-white font-bevellier text-body-medium"
                     >
                       {link.label}
                     </Link>
@@ -100,13 +106,15 @@ const Footer = () => {
               </ul>
             </div>
             <div>
-              <h4 className="font-bold mb-4">Kids&apos;</h4>
+              <h4 className="font-bold mb-4 font-bevellier text-lead">
+                Kids&apos;
+              </h4>
               <ul>
                 {footerLinks.kids.map((link) => (
                   <li key={link.label} className="mb-2">
                     <Link
                       href={link.href}
-                      className="text-gray-400 hover:text-white"
+                      className="text-gray-400 hover:text-white font-bevellier text-body-medium"
                     >
                       {link.label}
                     </Link>
@@ -122,16 +130,16 @@ const Footer = () => {
               <a
                 key={link.alt}
                 href={link.href}
-                className="text-gray-400 hover:text-white"
+                className="bg-white p-2 rounded-full text-black w-10 h-10 hover:bg-white/80 transition-colors duration-500 inline-flex items-center justify-center"
               >
-                <Image src={link.icon} alt={link.alt} width={24} height={24} />
+                <link.icon size={24} />
               </a>
             ))}
           </div>
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-12 pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
+        <div className="mt-12 pt-4 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
           <p>
             &copy; {new Date().getFullYear()} Nike, Inc. All Rights Reserved
           </p>

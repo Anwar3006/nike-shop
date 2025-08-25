@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "tsx watch src/app.ts",
     "db:push": "drizzle-kit push:pg",
-    "seed": "ts-node src/seed.ts"
+    "seed": "tsx src/db/seed/runner.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.1",

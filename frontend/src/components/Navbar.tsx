@@ -6,11 +6,11 @@ import Link from "next/link";
 import { Menu, X } from "lucide-react";
 
 const navLinks = [
-  { href: "#", label: "Men" },
-  { href: "#", label: "Women" },
-  { href: "#", label: "Kids" },
-  { href: "#", label: "Collections" },
-  { href: "#", label: "Contact" },
+  { href: "/collections/men", label: "Men" },
+  { href: "/collections/women", label: "Women" },
+  { href: "/collections/kids", label: "Kids" },
+  { href: "/collections", label: "Collections" },
+  { href: "/contact-us", label: "Contact" },
 ];
 
 const Navbar = () => {
@@ -26,7 +26,12 @@ const Navbar = () => {
         {/* Logo */}
         <div className="flex-shrink-0">
           <Link href="/" className="flex items-center">
-            <Image src="/logo.svg" alt="Nike Logo" width={60} height={60} />
+            <Image
+              src="/logo-black.svg"
+              alt="Nike Logo"
+              width={60}
+              height={60}
+            />
           </Link>
         </div>
 
@@ -37,7 +42,7 @@ const Navbar = () => {
               <li key={link.label}>
                 <Link
                   href={link.href}
-                  className="text-base text-gray-600 hover:text-black"
+                  className="text-lg text-gray-600 hover:text-black font-bevellier text-heading-3"
                 >
                   {link.label}
                 </Link>
@@ -48,10 +53,16 @@ const Navbar = () => {
 
         {/* Right side icons */}
         <div className="hidden md:flex items-center space-x-6">
-          <Link href="#" className="text-base text-gray-600 hover:text-black">
+          <Link
+            href="#"
+            className="text-base text-gray-600 hover:text-black text-lead font-bevellier"
+          >
             Search
           </Link>
-          <Link href="#" className="text-base text-gray-600 hover:text-black">
+          <Link
+            href="#"
+            className="text-base text-gray-600 hover:text-black font-bevellier text-lead"
+          >
             My Cart (2)
           </Link>
         </div>
@@ -75,17 +86,18 @@ const Navbar = () => {
               <li key={link.label}>
                 <Link
                   href={link.href}
-                  className="text-base text-gray-600 hover:text-black"
+                  className="text-lg text-gray-600 hover:text-black font-bevellier text-heading-3"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {link.label}
                 </Link>
               </li>
             ))}
+
             <li className="pt-4">
               <Link
                 href="#"
-                className="text-base text-gray-600 hover:text-black"
+                className="text-base text-gray-600 hover:text-black font-bevellier text-lead"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Search
@@ -94,7 +106,7 @@ const Navbar = () => {
             <li>
               <Link
                 href="#"
-                className="text-base text-gray-600 hover:text-black"
+                className="text-base text-gray-600 hover:text-black font-bevellier text-lead"
                 onClick={() => setIsMenuOpen(false)}
               >
                 My Cart (2)

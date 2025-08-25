@@ -1,4 +1,5 @@
 import Card from "@/components/Card";
+import Hero from "@/components/Hero";
 
 const dummyData = [
   {
@@ -28,21 +29,26 @@ const dummyData = [
 
 export default function Home() {
   return (
-    <div className="container mx-auto px-6 py-8">
-      <h1 className="text-3xl font-bold mb-8">Featured Products</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {dummyData.map((card) => (
-          <Card
-            key={card.name}
-            imgSrc={card.imgSrc}
-            badgeText={card.badgeText}
-            name={card.name}
-            category={card.category}
-            price={card.price}
-            colorCount={card.colorCount}
-          />
-        ))}
+    <>
+      <Hero />
+      <div className="container mx-auto px-6 py-8">
+        <h1 className="font-bevellier text-heading-2 font-bold mb-8">
+          Featured Products
+        </h1>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {dummyData.map((card) => (
+            <Card
+              key={card.name}
+              imgSrc={card.imgSrc}
+              badgeText={card.badgeText}
+              name={card.name}
+              category={card.category}
+              price={card.price}
+              colorCount={card.colorCount}
+            />
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
