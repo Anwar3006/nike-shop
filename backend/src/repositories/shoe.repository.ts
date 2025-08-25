@@ -150,7 +150,6 @@ export const ShoeRepository = {
       } = options;
 
       const offset = (page - 1) * limit;
-      // const sorting =
       let query = [];
       if (categoryId) {
         query.push(eq(shoes.categoryId, categoryId));
@@ -163,77 +162,56 @@ export const ShoeRepository = {
         query.push(lte(shoes.basePrice, maxPrice));
       }
 
-      const queryString = query.length > 0 ? and(...query) : and();
+      const queryString = query.length > 0 ? and(...query) : undefined;
 
       const [shoeRecords, totalItems] = await Promise.all([
-        db
-          .select({
-            id: shoes.id,
-            name: shoes.name,
-            basePrice: shoes.basePrice,
-            category: category.name,
-            baseImage: shoes.baseImage,
-          })
-          .from(shoes)
-          .where(queryString)
-          .limit(limit)
-          .offset(offset)
-          .leftJoin(category, eq(shoes.categoryId, category.id)),
-
-        db.$count(shoes, ...query),
+        db.query.shoes.findMany({
+          where: queryString,
+          limit,
+          offset,
+          with: {
+            category: true,
+            colorVariants: {
+              with: {
+                images: true,
+                shoeSizes: true,
+              },
+            },
+          },
+        }),
+        db.select({ count: sql`count(*)` }).from(shoes).where(queryString),
       ]);
 
-      // Add color variants
-      let shoesWithVariants = [];
-      for (const shoe of shoeRecords) {
-        const colorVariantCount = await db.$count(
-          colorVariant,
-          eq(colorVariant.shoeId, shoe.id)
-        );
-        // .select({
-        //   id: colorVariant.id,
-        //   name: colorVariant.name,
-        //   dominantColor: colorVariant.dominantColor,
-        // })
-        // .from(colorVariant)
-        // .where(eq(colorVariant.shoeId, shoe.id));
-
-        // const [variantImages, variantSizes] = await Promise.all([
-        //   db
-        //     .select({
-        //       url: images.imageUrl,
-        //       altText: images.altText,
-        //     })
-        //     .from(images)
-        //     .where(eq(images.colorVariantId, colorVariants.id)),
-
-        //   // TODO: adding this quickly bloats the returned data and it is not optimal, see if we can do something about it later
-        //   db
-        //     .select({
-        //       sizeId: shoeSizes.sizeId,
-        //       price: shoeSizes.price,
-        //       quantity: shoeSizes.quantity,
-        //     })
-        //     .from(shoeSizes)
-        //     .where(eq(shoeSizes.colorVariantId, colorVariants.id)),
-        // ]);
-
-        shoesWithVariants.push({
-          ...shoe,
-          colors: colorVariantCount,
-          // variantImages,
-          // variantSizes,
-        });
-      }
-
-      const totalPages = Math.ceil(totalItems / limit);
+      const totalPages = Math.ceil(Number(totalItems[0].count) / limit);
       const hasNextPage = page < totalPages;
       const hasPrevPage = page > 1;
 
+      const transformedData = shoeRecords.map((shoe) => {
+        const gender = shoe.category.name.split("'")[0].toLowerCase();
+        const baseImage = shoe.colorVariants[0]?.images[0]?.imageUrl || shoe.baseImage;
+
+        return {
+          id: shoe.id,
+          name: shoe.name,
+          basePrice: shoe.basePrice,
+          category: shoe.category.name,
+          gender,
+          baseImage,
+          colors: shoe.colorVariants.length,
+          colorVariants: shoe.colorVariants.map((variant) => ({
+            id: variant.id,
+            name: variant.name,
+            dominantColor: variant.dominantColor,
+            images: variant.images.map((img) => ({ url: img.imageUrl, altText: img.altText })),
+            sizes: variant.shoeSizes.map((size) => ({ sizeId: size.sizeId, price: size.price, quantity: size.quantity })),
+          })),
+        };
+      });
+
       return {
-        data: shoesWithVariants,
+        data: transformedData,
         meta: {
-          totalItems,
+          totalItems: Number(totalItems[0].count),
           totalPages,
           perPage: limit,
           currentPage: page,
