@@ -6,4 +6,10 @@ export {
   shoeSizes,
   colorVariant,
   images,
+  categoriesRelations,
+  shoeSizesRelations,
+  sizesRelations,
+  imagesRelations,
+  shoesRelations,
+  colorVariantRelations,
 } from "./shoes.model";

@@ -1,4 +1,5 @@
 "use client";
+import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React from "react";
@@ -10,6 +11,7 @@ interface CardProps {
   category: string;
   price: number;
   colorCount: number;
+  className?: string;
 }
 
 const Card: React.FC<CardProps> = ({
@@ -19,6 +21,7 @@ const Card: React.FC<CardProps> = ({
   category,
   price,
   colorCount,
+  className,
 }) => {
   const router = useRouter();
 
@@ -31,9 +34,14 @@ const Card: React.FC<CardProps> = ({
     router.push(`/collections/${slugCategory}/${slugName}`);
   };
 
+  const formattedPrice = Number(Math.round(price / 100)).toFixed(2);
+
   return (
     <div
-      className="max-w-sm rounded-lg overflow-hidden bg-gray-50 shadow-2xs hover:shadow-xl hover:cursor-pointer"
+      className={cn(
+        "max-w-sm rounded-lg overflow-hidden bg-gray-50 shadow-2xs hover:shadow-xl hover:cursor-pointer",
+        className
+      )}
       onClick={handleClick}
     >
       <div className="relative">
@@ -64,7 +72,7 @@ const Card: React.FC<CardProps> = ({
 
         <div>
           <p className="text-heading-3 font-semibold font-bevellier">
-            ${price.toFixed(2)}
+            ${formattedPrice}
           </p>
         </div>
       </div>

@@ -82,10 +82,13 @@ export type UpdateShoeSchemaType = output<typeof updateShoeSchema>;
 
 export const getShoesSchema = object({
   query: object({
-    limit: string().optional(),
-    page: string().optional(),
-    sortBy: string().optional(),
-    categoryId: string().optional(),
+    limit: string().nonoptional(),
+    offset: string().nonoptional(),
+
+    sort: string().optional(),
+    color: string().optional(),
+    gender: string().optional(),
+    size: string().optional(),
     minPrice: string().optional(),
     maxPrice: string().optional(),
   }),

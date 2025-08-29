@@ -6,6 +6,8 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       new URL("https://mir-s3-cdn-cf.behance.net/**"),
       new URL("https://static.nike.com/**"),
+      new URL("https://www.nike.sa/**"),
+      new URL("https://atlas-content-cdn.pixelsquid.com/**"),
     ],
   },
 };

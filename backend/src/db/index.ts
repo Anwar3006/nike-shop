@@ -6,6 +6,7 @@ import { Pool } from "pg";
 import { logger } from "../utils/logger";
 import { sql } from "drizzle-orm";
 import { DATABASE_URL, NODE_ENV } from "../config/default";
+import * as schema from "../models/index";
 
 if (!DATABASE_URL) {
   logger.error("Missing DATABASE_URL environment variable");
@@ -16,10 +17,10 @@ let db: ReturnType<typeof drizzle> | ReturnType<typeof localDrizzle>;
 try {
   if (NODE_ENV === "development") {
     const pool = new Pool({ connectionString: DATABASE_URL });
-    db = localDrizzle(pool);
+    db = localDrizzle(pool, { schema });
   } else {
     const sql = neon(DATABASE_URL);
-    db = drizzle(sql);
+    db = drizzle(sql, { schema });
   }
 } catch (error) {
   console.error("Failed to initialize the database:", error);

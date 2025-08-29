@@ -13,7 +13,7 @@ const validate =
     } catch (error: any) {
       return res.status(400).json({
         error: "Validation Error",
-        message: error.message,
+        message: JSON.parse(error.message),
       });
     }
   };

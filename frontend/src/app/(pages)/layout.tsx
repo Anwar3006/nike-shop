@@ -1,8 +1,10 @@
 "use client";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 export default function CollectionsLayout({
   children,
@@ -10,8 +12,9 @@ export default function CollectionsLayout({
   children: React.ReactNode;
 }) {
   const path = usePathname();
+
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen w-full">
       <Navbar />
       <main className="flex-grow">{children}</main>
       {path === "/" ? <Footer /> : <CollectionFooter />}
@@ -27,7 +30,7 @@ const CollectionFooter = () => {
     { href: "#", label: "Privacy Policy" },
   ];
   return (
-    <footer className="bg-black text-white">
+    <footer className="bg-black text-white z-3">
       {/* Bottom Bar */}
       <div className="px-4 py-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
         <p>&copy; {new Date().getFullYear()} Nike, Inc. All Rights Reserved</p>

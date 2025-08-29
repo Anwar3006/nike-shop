@@ -1,5 +1,6 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { nextCookies } from "better-auth/next-js";
 import { db } from "../db";
 import {
   FRONTEND_URL,
@@ -30,5 +31,32 @@ export const auth = betterAuth({
       clientId: GITHUB_CLIENT_ID!,
       clientSecret: GITHUB_CLIENT_SECRET!,
     },
+  },
+  session: {
+    expiresIn: 60 * 60 * 24 * 7,
+    cookieCache: {
+      enabled: true,
+      maxAge: 60 * 60 * 24 * 7,
+    },
+  },
+  advanced: {
+    cookies: {
+      session_token: {
+        name: "nike-shop.session_token",
+        options: {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+          path: "/",
+          maxAge: 60 * 60 * 24 * 7,
+        },
+      },
+    },
+  },
+  plugins: [nextCookies()],
+  rateLimit: {
+    enabled: true,
+    window: 60, //1 min
+    max: 5, // 5 attempts per minute
   },
 });

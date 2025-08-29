@@ -30,14 +30,17 @@ const Sort = () => {
 
   return (
     <div className="flex items-center gap-2">
-      <label htmlFor="sort" className="text-sm font-medium">
+      <label
+        htmlFor="sort"
+        className="text-xs md:text-sm font-medium font-bevellier"
+      >
         Sort by:
       </label>
       <select
         id="sort"
         value={currentSort}
         onChange={handleSortChange}
-        className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-indigo-500 focus:border-indigo-500"
+        className="px-3 py-2 border border-gray-300 rounded-md font-bevellier text-xs md:text-sm focus:ring-gray-500 focus:border-gray-500"
       >
         {sortOptions.map((option) => (
           <option key={option.value} value={option.value}>

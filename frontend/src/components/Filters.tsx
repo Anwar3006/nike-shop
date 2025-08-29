@@ -4,6 +4,29 @@ import { useState } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { formUrlQuery } from "@/utils/query";
 import { ChevronDown, Filter } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
+import { Label } from "./ui/label";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "@/components/ui/sidebar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "./ui/collapsible";
 
 type FilterOption =
   | string
@@ -19,7 +42,21 @@ const filterGroups = [
   {
     name: "Size",
     key: "size",
-    options: ["5.0", "5.5", "6.0", "6.5", "7.0", "7.5", "8.0", "8.5", "9.0", "9.5", "10.0", "10.5", "11.0"],
+    options: [
+      "5.0",
+      "5.5",
+      "6.0",
+      "6.5",
+      "7.0",
+      "7.5",
+      "8.0",
+      "8.5",
+      "9.0",
+      "9.5",
+      "10.0",
+      "10.5",
+      "11.0",
+    ],
   },
   {
     name: "Color",
@@ -49,110 +86,175 @@ const Filters = () => {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [openSections, setOpenSections] = useState<string[]>(["Gender", "Price"]);
 
   const handleFilterChange = (key: string, value: string) => {
-    const currentValues = searchParams.get(key)?.split(",") || [];
-    const newValues = currentValues.includes(value)
-      ? currentValues.filter((v) => v !== value)
-      : [...currentValues, value];
-
     const newQuery = formUrlQuery({
       params: searchParams.toString(),
       key,
-      value: newValues.length > 0 ? newValues.join(",") : null,
+      value,
       pathname,
     });
 
     router.push(newQuery, { scroll: false });
   };
 
-  const toggleSection = (section: string) => {
-    setOpenSections((prev) =>
-      prev.includes(section) ? prev.filter((s) => s !== section) : [...prev, section]
-    );
-  };
-
-  const renderFilters = () => (
-    <div className="space-y-6">
+  const renderDropdownFilters = () => (
+    <SidebarMenu>
       {filterGroups.map((group) => (
-        <div key={group.name}>
-          <button
-            onClick={() => toggleSection(group.name)}
-            className="w-full flex justify-between items-center py-2 text-left font-semibold"
-          >
-            {group.name}
-            <ChevronDown
-              className={`w-5 h-5 transition-transform ${
-                openSections.includes(group.name) ? "rotate-180" : ""
-              }`}
-            />
-          </button>
-          {openSections.includes(group.name) && (
-            <div className="pt-2 space-y-2">
+        <SidebarMenuItem key={group.key}>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <SidebarMenuButton className="w-full justify-between">
+                <span className="font-bevellier text-lead">{group.name}</span>
+                <ChevronDown className="w-4 h-4" />
+              </SidebarMenuButton>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56" align="start">
               {group.options.map((option: FilterOption) => {
-                const value = typeof option === "string" ? option : "value" in option ? option.value : option.name;
-                const label = typeof option === "string" ? option : "label" in option ? option.label : option.name;
-                const isChecked = searchParams.get(group.key)?.split(",").includes(value);
+                const label =
+                  typeof option === "string"
+                    ? option
+                    : "label" in option
+                    ? option.label
+                    : option.name;
+                const value =
+                  typeof option === "string"
+                    ? option
+                    : "value" in option
+                    ? option.value
+                    : option.hex;
 
                 return (
-                  <label key={value} className="flex items-center space-x-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={isChecked}
-                      onChange={() => handleFilterChange(group.key, value)}
-                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                    />
-                    {group.key === "color" && typeof option === "object" && "hex" in option && (
-                       <span
-                        className="w-4 h-4 rounded-full border border-gray-300"
-                        style={{ backgroundColor: option.hex }}
-                      />
-                    )}
-                    <span className="capitalize">{label}</span>
-                  </label>
+                  <DropdownMenuItem
+                    key={value}
+                    onClick={() => handleFilterChange(group.key, value)}
+                    className="cursor-pointer"
+                  >
+                    <div className="flex items-center space-x-2">
+                      {group.key === "color" &&
+                        typeof option === "object" &&
+                        "hex" in option && (
+                          <div
+                            className="w-4 h-4 rounded-full border border-gray-300"
+                            style={{ backgroundColor: option.hex }}
+                          />
+                        )}
+                      <span className="font-bevellier text-[1.05rem]">
+                        {label}
+                      </span>
+                    </div>
+                  </DropdownMenuItem>
                 );
               })}
-            </div>
-          )}
-        </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </SidebarMenuItem>
       ))}
-    </div>
+    </SidebarMenu>
+  );
+
+  const renderCollapsibleFilters = () => (
+    <SidebarMenu>
+      {filterGroups.map((group) => (
+        <Collapsible key={group.key} defaultOpen className="group/collapsible">
+          <SidebarMenuItem>
+            <CollapsibleTrigger asChild>
+              <SidebarMenuButton className="w-full justify-between">
+                <span className="font-bevellier text-lead">{group.name}</span>
+                <ChevronDown className="w-4 h-4 group-data-[state=open]/collapsible:rotate-180 transition-transform" />
+              </SidebarMenuButton>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="pl-4 py-2 space-y-2">
+                <RadioGroup
+                  value={searchParams.get(group.key) || ""}
+                  onValueChange={(value) =>
+                    handleFilterChange(group.key, value)
+                  }
+                  className="grid grid-cols-2"
+                >
+                  {group.options.map((option: FilterOption) => {
+                    const label =
+                      typeof option === "string"
+                        ? option
+                        : "label" in option
+                        ? option.label
+                        : option.name;
+                    const value =
+                      typeof option === "string"
+                        ? option
+                        : "value" in option
+                        ? option.value
+                        : option.hex;
+
+                    return (
+                      <div key={value} className="flex items-center space-x-2">
+                        <RadioGroupItem
+                          value={value}
+                          id={value}
+                          onClick={() => handleFilterChange(group.key, value)}
+                        />
+                        <Label
+                          htmlFor={value}
+                          className="font-bevellier text-[1.05rem] cursor-pointer flex items-center space-x-2"
+                        >
+                          {group.key === "color" &&
+                            typeof option === "object" &&
+                            "hex" in option && (
+                              <div
+                                className="w-4 h-4 rounded-sm border border-gray-300"
+                                style={{ backgroundColor: option.hex }}
+                              />
+                            )}
+                          <span>{label}</span>
+                        </Label>
+                      </div>
+                    );
+                  })}
+                </RadioGroup>
+              </div>
+            </CollapsibleContent>
+          </SidebarMenuItem>
+        </Collapsible>
+      ))}
+    </SidebarMenu>
   );
 
   return (
     <>
-      {/* Mobile filter button */}
-      <div className="lg:hidden mb-4">
-        <button
-          onClick={() => setIsDrawerOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-md"
-        >
-          <Filter className="w-5 h-5" />
-          <span>Filters</span>
-        </button>
+      <div className="lg:hidden">
+        <Sidebar className="border-none" collapsible="icon">
+          <SidebarContent>
+            <SidebarGroup>
+              <SidebarGroupLabel className="text-xl font-semibold my-4 font-bevellier">
+                Filters
+              </SidebarGroupLabel>
+              <SidebarGroupContent>
+                {renderCollapsibleFilters()}
+              </SidebarGroupContent>
+            </SidebarGroup>
+          </SidebarContent>
+        </Sidebar>
       </div>
 
-      {/* Mobile Drawer */}
-      {isDrawerOpen && (
-        <div className="lg:hidden fixed inset-0 z-40">
-          {/* Overlay */}
-          <div
-            className="absolute inset-0 bg-black opacity-50"
-            onClick={() => setIsDrawerOpen(false)}
-          />
-          {/* Drawer content */}
-          <div className="relative bg-white w-80 h-full p-6">
-            <h3 className="text-xl font-semibold mb-6">Filters</h3>
-            {renderFilters()}
-          </div>
-        </div>
-      )}
-
       {/* Desktop Sidebar */}
-      <div className="hidden lg:block">
-        <h3 className="text-xl font-semibold mb-6">Filters</h3>
-        {renderFilters()}
+      <div className="hidden lg:block z-2">
+        <Sidebar
+          className="border-none fixed top-16 left-0 h-[calc(100vh-8rem)] w-80 z-10 bg-white overflow-y-auto"
+          collapsible="none"
+        >
+          <SidebarContent>
+            <SidebarGroup>
+              <SidebarGroupLabel className="text-xl font-semibold my-4 font-bevellier">
+                Filters
+              </SidebarGroupLabel>
+              <SidebarGroupContent>
+                {renderCollapsibleFilters()}
+                {/* <div className="h-16"></div> */}
+              </SidebarGroupContent>
+            </SidebarGroup>
+          </SidebarContent>
+        </Sidebar>
       </div>
     </>
   );

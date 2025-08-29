@@ -56,18 +56,22 @@ export const ShoesController = {
     ) => {
       const {
         limit = "6",
-        page = "1",
-        sortBy,
-        categoryId,
+        offset = "1",
+        sort,
+        gender,
+        size,
+        color,
         minPrice,
         maxPrice,
       } = req.query;
 
       const options = {
         limit: parseInt(limit),
-        page: Number(page),
-        sortBy,
-        categoryId: categoryId ? parseInt(categoryId) : undefined,
+        offset: parseInt(offset),
+        sort,
+        gender,
+        size: size ? parseFloat(size) : undefined,
+        color,
         minPrice: minPrice ? parseInt(minPrice) : undefined,
         maxPrice: maxPrice ? parseInt(maxPrice) : undefined,
       };

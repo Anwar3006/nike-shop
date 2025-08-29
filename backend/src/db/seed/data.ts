@@ -8,6 +8,8 @@ import {
   category,
 } from "../../models/shoes.model";
 
+import seedData from "./seedData";
+
 // Real Nike shoe data
 const nikeShoesSeedData = [
   {
@@ -264,15 +266,22 @@ const sizesData = [
 
 // Category data
 const categoriesData = [
-  { name: "Women's Shoes" },
-  { name: "Men's Shoes" },
-  { name: "kid's Shoes" },
-  { name: "Unisex Shoes" },
+  { name: "women" },
+  { name: "men" },
+  { name: "kids" },
+  { name: "unisex" },
 ];
 
 export async function seedNikeShoes() {
   try {
     console.log("🌱 Starting Nike shoes seeding...");
+
+    // await db.delete(category).execute();
+    // await db.delete(sizes).execute();
+    // await db.delete(colorVariant).execute();
+    // await db.delete(shoes).execute();
+    // await db.delete(shoeSizes).execute();
+    // await db.delete(images).execute();
 
     // First, seed sizes if they don't exist
     console.log("📏 Seeding sizes...");
@@ -281,8 +290,14 @@ export async function seedNikeShoes() {
     }
 
     console.log("📏 Seeding categories...");
+    const categories = [];
     for (const cat of categoriesData) {
-      await db.insert(category).values(cat).onConflictDoNothing();
+      const [insertedCat] = await db
+        .insert(category)
+        .values(cat)
+        .onConflictDoNothing()
+        .returning();
+      categories.push(insertedCat);
     }
 
     // Get all size IDs for later use
@@ -294,8 +309,15 @@ export async function seedNikeShoes() {
     let totalImages = 0;
 
     // Seed each shoe with its variants
-    for (const shoeData of nikeShoesSeedData) {
+    for (const shoeData of seedData) {
       console.log(`👟 Creating shoe: ${shoeData.name}`);
+
+      const catId = categories.find((c) => c.name === shoeData.category)?.id;
+      console.log(`Category ID: ${catId}`);
+      // if (!cat) {
+      //   throw new Error(`Category not found for ${shoeData.name}`);
+      // }
+      // shoeData.category = cat;
 
       // Create the base shoe
       const [shoe] = await db
@@ -303,22 +325,22 @@ export async function seedNikeShoes() {
         .values({
           name: shoeData.name,
           description: shoeData.description,
-          categoryId: shoeData.categoryId,
-          styleNumber: shoeData.styleNumber,
-          basePrice: shoeData.basePrice,
+          categoryId: catId!,
+          basePrice: shoeData.price,
         })
         .returning();
 
       totalShoes++;
 
       // Create color variants for this shoe
-      for (const variantData of shoeData.colorVariants) {
+      for (const variantData of shoeData.colors) {
         const [variant] = await db
           .insert(colorVariant)
           .values({
             shoeId: shoe.id,
             name: variantData.name,
             dominantColor: variantData.dominantColor,
+            styleNumber: shoeData.styleNumber,
           })
           .returning();
 
@@ -348,7 +370,7 @@ export async function seedNikeShoes() {
           await db.insert(shoeSizes).values({
             colorVariantId: variant.id,
             sizeId: size.id,
-            price: shoeData.basePrice + priceVariation,
+            price: shoeData.price + priceVariation,
             quantity: quantity,
           });
         }

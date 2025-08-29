@@ -1,12 +1,31 @@
-import { and, between, eq, gte, lte, or } from "drizzle-orm";
+import {
+  and,
+  between,
+  eq,
+  gte,
+  inArray,
+  like,
+  lte,
+  or,
+  sql,
+} from "drizzle-orm";
 import { db } from "../db";
-import { category, colorVariant, images, shoes, shoeSizes } from "../models";
+import {
+  category,
+  colorVariant,
+  images,
+  shoes,
+  shoeSizes,
+  sizes,
+} from "../models";
 import {
   CreateShoeSchemaType,
+  GetShoesSchemaType,
   UpdateShoeSchemaType,
 } from "../schemas/shoe.schema";
 import { PgTransaction, PgTransactionConfig } from "drizzle-orm/pg-core";
 import { NeonHttpQueryResultHKT } from "drizzle-orm/neon-http";
+import { has } from "config";
 
 export const ShoeRepository = {
   createShoe: async (data: CreateShoeSchemaType["body"]) => {
@@ -16,14 +35,7 @@ export const ShoeRepository = {
         const [exists] = await tx
           .select()
           .from(shoes)
-          .where(
-            data.styleNumber
-              ? or(
-                  eq(shoes.name, data.name),
-                  eq(shoes.styleNumber, data.styleNumber)
-                )
-              : eq(shoes.name, data.name)
-          )
+          .where(eq(shoes.name, data.name))
           .limit(1);
 
         if (exists) {
@@ -37,7 +49,6 @@ export const ShoeRepository = {
             name: data.name,
             description: data.description,
             categoryId: data.categoryId,
-            styleNumber: data.styleNumber,
             basePrice: data.basePrice,
           })
           .returning();
@@ -73,7 +84,6 @@ export const ShoeRepository = {
           name: data.name || exists.name,
           description: data.description || exists.description,
           categoryId: data.categoryId || exists.categoryId,
-          styleNumber: data.styleNumber || exists.styleNumber,
           basePrice: data.basePrice || exists.basePrice,
         };
 
@@ -138,85 +148,229 @@ export const ShoeRepository = {
     }
   },
 
-  getShoes: async (options: GetShoesOptions) => {
+  getShoes: async (options: GetShoesSchemaType["query"]) => {
     try {
       const {
-        limit = 8,
-        page = 1,
-        sortBy,
-        categoryId,
+        limit = "6",
+        offset = "0",
+        gender,
+        size,
+        color,
         minPrice,
         maxPrice,
       } = options;
+      const limit_ = parseInt(limit);
+      const offset_ = parseInt(offset);
+      const minPrice_ = minPrice ? parseInt(minPrice) : undefined;
+      const maxPrice_ = maxPrice ? parseInt(maxPrice) : undefined;
 
-      const offset = (page - 1) * limit;
-      let query = [];
-      if (categoryId) {
-        query.push(eq(shoes.categoryId, categoryId));
+      console.log("Options: ", options);
+
+      // Build base conditions for shoes table
+      let baseConditions = [];
+
+      // Gender filter
+      if (gender) {
+        const [{ id: categoryId }] = await db
+          .select()
+          .from(category)
+          .where(eq(category.name, gender));
+        baseConditions.push(eq(shoes.categoryId, categoryId));
       }
+
+      // Price filters
       if (minPrice && maxPrice) {
-        query.push(between(shoes.basePrice, minPrice, maxPrice));
+        baseConditions.push(between(shoes.basePrice, minPrice_!, maxPrice_!));
       } else if (minPrice) {
-        query.push(gte(shoes.basePrice, minPrice));
+        baseConditions.push(gte(shoes.basePrice, minPrice_!));
       } else if (maxPrice) {
-        query.push(lte(shoes.basePrice, maxPrice));
+        baseConditions.push(lte(shoes.basePrice, maxPrice_!));
       }
 
-      const queryString = query.length > 0 ? and(...query) : undefined;
+      // Get shoe IDs that have the required size (if size filter exists)
+      let validShoeIdsForSize: string[] | null = null;
+      if (size) {
+        const [{ id: sizeId }] = await db
+          .select()
+          .from(sizes)
+          .where(eq(sizes.size, size));
 
-      const [shoeRecords, totalItems] = await Promise.all([
-        db.query.shoes.findMany({
-          where: queryString,
-          limit,
-          offset,
-          with: {
-            category: true,
-            colorVariants: {
-              with: {
-                images: true,
-                shoeSizes: true,
-              },
+        const shoesWithSize = await db
+          .selectDistinct({ shoeId: colorVariant.shoeId })
+          .from(colorVariant)
+          .innerJoin(shoeSizes, eq(shoeSizes.colorVariantId, colorVariant.id))
+          .where(
+            and(eq(shoeSizes.sizeId, sizeId), sql`${shoeSizes.quantity} > 0`)
+          );
+
+        validShoeIdsForSize = shoesWithSize.map((row) => row.shoeId);
+
+        if (validShoeIdsForSize.length === 0) {
+          return {
+            data: [],
+            meta: {
+              totalItems: 0,
+              hasMore: false,
+              nextOffset: offset_,
             },
-          },
-        }),
-        db.select({ count: sql`count(*)` }).from(shoes).where(queryString),
+          };
+        }
+      }
+
+      // Get shoe IDs that have the required color (if color filter exists)
+      let validShoeIdsForColor: string[] | null = null;
+      if (color) {
+        const colorUp = color.charAt(0).toUpperCase() + color.slice(1);
+        const shoesWithColor = await db
+          .selectDistinct({ shoeId: colorVariant.shoeId })
+          .from(colorVariant)
+          .where(eq(colorVariant.dominantColor, colorUp));
+
+        validShoeIdsForColor = shoesWithColor.map((row) => row.shoeId);
+
+        if (validShoeIdsForColor.length === 0) {
+          return {
+            data: [],
+            meta: {
+              totalItems: 0,
+              hasMore: false,
+              nextOffset: offset_,
+            },
+          };
+        }
+      }
+
+      // Combine shoe ID filters
+      if (validShoeIdsForSize || validShoeIdsForColor) {
+        let finalValidIds = validShoeIdsForSize || validShoeIdsForColor;
+
+        // If both filters exist, find intersection
+        if (validShoeIdsForSize && validShoeIdsForColor) {
+          finalValidIds = validShoeIdsForSize.filter((id) =>
+            validShoeIdsForColor!.includes(id)
+          );
+        }
+
+        if (finalValidIds!.length === 0) {
+          return {
+            data: [],
+            meta: {
+              totalItems: 0,
+              hasMore: false,
+              nextOffset: offset_,
+            },
+          };
+        }
+
+        baseConditions.push(inArray(shoes.id, finalValidIds!));
+      }
+
+      const queryConditions =
+        baseConditions.length > 0 ? and(...baseConditions) : undefined;
+
+      // Execute main queries
+      const [shoeRecords, totalCountResult] = await Promise.all([
+        db
+          .select({
+            id: shoes.id,
+            name: shoes.name,
+            basePrice: shoes.basePrice,
+            baseImage: shoes.baseImage,
+            categoryName: category.name,
+          })
+          .from(shoes)
+          .leftJoin(category, eq(shoes.categoryId, category.id))
+          .where(queryConditions)
+          .orderBy(shoes.createdAt)
+          .limit(limit_)
+          .offset(offset_),
+
+        db
+          .select({ count: sql<number>`count(*)` })
+          .from(shoes)
+          .leftJoin(category, eq(shoes.categoryId, category.id))
+          .where(queryConditions),
       ]);
 
-      const totalPages = Math.ceil(Number(totalItems[0].count) / limit);
-      const hasNextPage = page < totalPages;
-      const hasPrevPage = page > 1;
-
-      const transformedData = shoeRecords.map((shoe) => {
-        const gender = shoe.category.name.split("'")[0].toLowerCase();
-        const baseImage = shoe.colorVariants[0]?.images[0]?.imageUrl || shoe.baseImage;
-
+      if (shoeRecords.length === 0) {
         return {
-          id: shoe.id,
-          name: shoe.name,
-          basePrice: shoe.basePrice,
-          category: shoe.category.name,
-          gender,
-          baseImage,
-          colors: shoe.colorVariants.length,
-          colorVariants: shoe.colorVariants.map((variant) => ({
-            id: variant.id,
-            name: variant.name,
-            dominantColor: variant.dominantColor,
-            images: variant.images.map((img) => ({ url: img.imageUrl, altText: img.altText })),
-            sizes: variant.shoeSizes.map((size) => ({ sizeId: size.sizeId, price: size.price, quantity: size.quantity })),
-          })),
+          data: [],
+          meta: {
+            total: Number(totalCountResult[0].count),
+            limit: limit_,
+            offset: offset_,
+            hasNext: false,
+            nextPage: undefined,
+          },
         };
+      }
+
+      const shoeIds = shoeRecords.map((shoe) => shoe.id);
+
+      // Get colors and sizes for the returned shoes
+      const [colorsQuery, sizesQuery] = await Promise.all([
+        db
+          .select({
+            shoeId: colorVariant.shoeId,
+            dominantColor: colorVariant.dominantColor,
+          })
+          .from(colorVariant)
+          .where(inArray(colorVariant.shoeId, shoeIds))
+          .orderBy(colorVariant.dominantColor),
+
+        db
+          .select({
+            shoeId: colorVariant.shoeId,
+            size: sizes.size,
+          })
+          .from(colorVariant)
+          .innerJoin(shoeSizes, eq(shoeSizes.colorVariantId, colorVariant.id))
+          .innerJoin(sizes, eq(shoeSizes.sizeId, sizes.id))
+          .where(
+            and(
+              inArray(colorVariant.shoeId, shoeIds),
+              sql`${shoeSizes.quantity} > 0`
+            )
+          )
+          .orderBy(sql`${sizes.size}::numeric`),
+      ]);
+
+      // Group data
+      const colorMap = new Map<string, Set<string>>();
+      const sizeMap = new Map<string, Set<string>>();
+
+      colorsQuery.forEach((row) => {
+        if (!colorMap.has(row.shoeId)) colorMap.set(row.shoeId, new Set());
+        colorMap.get(row.shoeId)!.add(row.dominantColor);
       });
+
+      sizesQuery.forEach((row) => {
+        if (!sizeMap.has(row.shoeId)) sizeMap.set(row.shoeId, new Set());
+        sizeMap.get(row.shoeId)!.add(row.size);
+      });
+
+      // Transform final data
+      const transformedData = shoeRecords.map((shoe) => ({
+        id: shoe.id,
+        name: shoe.name,
+        price: shoe.basePrice,
+        baseImage: shoe.baseImage,
+        category: shoe.categoryName || "Unknown Category",
+        colors: Array.from(colorMap.get(shoe.id) || []),
+      }));
+
+      const totalItems = Number(totalCountResult[0].count);
+      const hasNext = offset_ + limit_ < totalItems;
+      const nextOffset = hasNext ? offset_ + limit_ : undefined;
 
       return {
         data: transformedData,
         meta: {
-          totalItems: Number(totalItems[0].count),
-          totalPages,
-          perPage: limit,
-          currentPage: page,
-          hasNextPage,
-          hasPrevPage,
+          total: totalItems,
+          limit: limit_,
+          offset: offset_,
+          hasNext,
+          nextPage: nextOffset,
         },
       };
     } catch (error) {
