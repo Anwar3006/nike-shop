@@ -5,7 +5,7 @@
  */
 
 export const createRedirectUrl = (path: string, authTarget = "sign-in") => {
-  if (authTarget === "sign-in" || authTarget === "sign-up") return authTarget;
+  // if (authTarget === "sign-in" || authTarget === "sign-up") return authTarget;
 
   const encodedPath = encodeURIComponent(path);
   return `/${authTarget}?redirect=${encodedPath}`;

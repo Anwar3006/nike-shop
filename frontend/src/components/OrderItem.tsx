@@ -1,9 +1,13 @@
+"use client";
 import Image from "next/image";
 import { Trash2 } from "lucide-react";
 import { Button } from "./ui/button";
+import { DeleteDialog } from "./DeleteDialog";
+import { useState } from "react";
 
 // Define the type for the component's props
 type OrderItemProps = {
+  id: string;
   status: "Delivered" | "Estimated arrival";
   date: string;
   imageUrl: string;
@@ -15,6 +19,7 @@ type OrderItemProps = {
 };
 
 const OrderItem = ({
+  id,
   status,
   date,
   imageUrl,
@@ -26,6 +31,13 @@ const OrderItem = ({
 }: OrderItemProps) => {
   const statusColor =
     status === "Delivered" ? "text-green-600" : "text-yellow-600";
+
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
+
+  const handleDelete = (id: string) => {
+    console.log("Archiving order with ID:", id);
+    // setDeleteDialogOpen(false);
+  };
 
   return (
     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 md:gap-6 py-3 px-2 md:p-6 bg-white rounded-lg shadow-sm border-b border-gray-200 w-full md:w-3/4">
@@ -58,12 +70,24 @@ const OrderItem = ({
           ${price.toFixed(2)}
         </p>
 
+        <DeleteDialog
+          open={deleteDialogOpen}
+          toggleDialog={setDeleteDialogOpen}
+          resourceType="order"
+          resourceId={id}
+          handleDelete={handleDelete}
+        />
         <Button
           variant="ghost"
           className="text-red hover:text-red-600 px-0.5! self-end font-bevellier"
         >
           <Trash2 className="w-5 h-5" />
-          <span className="hidden sm:inline">Cancel Order</span>
+          <span
+            className="hidden sm:inline"
+            onClick={() => setDeleteDialogOpen(true)}
+          >
+            Cancel Order
+          </span>
         </Button>
       </div>
     </div>

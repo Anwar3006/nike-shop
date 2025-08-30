@@ -1,4 +1,4 @@
-export { user, account, session, verification } from "./auth-model";
+export { user, address, account, session, verification } from "./auth-model";
 export {
   category,
   shoes,

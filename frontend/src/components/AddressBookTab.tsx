@@ -1,8 +1,23 @@
+"use client";
+
+import { useState } from "react";
 import { Button } from "./ui/button";
 import { Home, Briefcase } from "lucide-react";
+import { toast } from "sonner";
+
+import { AddressEditDialog } from "./AddressEditDialog";
+import { AddressFormData } from "@/schemas/auth.schema";
+
+export interface Address2 {
+  type: "Home" | "Work";
+  icon: React.ReactNode;
+  address: string;
+  phone: string;
+  isDefault: boolean;
+}
 
 const AddressBookTab = () => {
-  const addresses = [
+  const [addresses, setAddresses] = useState<Address2[]>([
     {
       type: "Home" as const,
       icon: <Home className="w-5 h-5 text-gray-500" />,
@@ -17,7 +32,39 @@ const AddressBookTab = () => {
       phone: "+1 098 765 432",
       isDefault: false,
     },
-  ];
+  ]);
+
+  const handleAddressSave = async (index: number, formData: any) => {
+    try {
+      // Simulate API call delay
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Format the address string from form data
+      const formattedAddress = `${formData.streetAddress}, ${formData.city}, ${formData.state} ${formData.zipCode}`;
+
+      // Update the address in state
+      setAddresses((prev) =>
+        prev.map((addr, i) =>
+          i === index
+            ? {
+                ...addr,
+                address: formattedAddress,
+                phone: formData.telephone,
+              }
+            : addr
+        )
+      );
+
+      // Show success message
+      toast.success("Address updated successfully!");
+
+      console.log("Address updated:", { index, formData, formattedAddress });
+    } catch (error) {
+      console.error("Failed to update address:", error);
+      toast.error("Failed to update address. Please try again.");
+      throw error; // Re-throw to handle in dialog
+    }
+  };
 
   return (
     <div>
@@ -46,9 +93,17 @@ const AddressBookTab = () => {
                 <p className="text-gray-600">{addr.phone}</p>
               </div>
             </div>
-            <Button variant="outline" size="sm">
-              Edit
-            </Button>
+            <AddressEditDialog
+              address={addr}
+              onSave={(formData: AddressFormData) =>
+                handleAddressSave(index, formData)
+              }
+              trigger={
+                <Button variant="outline" size="sm">
+                  Edit
+                </Button>
+              }
+            />
           </div>
         ))}
       </div>

@@ -3,7 +3,11 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
+import { Menu, User2, X } from "lucide-react";
+import { useSession } from "@/lib/auth-client";
+import { Button } from "./ui/button";
+import { usePathname, useRouter } from "next/navigation";
+import { createRedirectUrl } from "@/utils/auth-redirect";
 
 const navLinks = [
   { href: "/collections/men", label: "Men" },
@@ -14,8 +18,15 @@ const navLinks = [
 ];
 
 const Navbar = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const router = useRouter();
+  const path = usePathname();
 
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { data } = useSession();
+  const user = data?.user;
+
+  const routeTo = createRedirectUrl(path, "sign-in");
+  console.log("routeTo: ", routeTo);
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
@@ -52,20 +63,41 @@ const Navbar = () => {
         </div>
 
         {/* Right side icons */}
-        <div className="hidden md:flex items-center space-x-6">
-          <Link
-            href="#"
-            className="text-base text-gray-600 hover:text-black text-lead font-bevellier"
-          >
-            Search
-          </Link>
-          <Link
-            href="#"
-            className="text-base text-gray-600 hover:text-black font-bevellier text-lead"
-          >
-            My Cart (2)
-          </Link>
-        </div>
+        {user ? (
+          <div className="hidden md:flex items-center space-x-6">
+            <Link
+              href="#"
+              className="text-base text-gray-600 hover:text-black text-lead font-bevellier"
+            >
+              Search
+            </Link>
+            <Link
+              href="#"
+              className="text-base text-gray-600 hover:text-black font-bevellier text-lead"
+            >
+              My Cart (2)
+            </Link>
+            <Link
+              href="/profile"
+              className="text-base text-gray-600 hover:text-black font-bevellier text-lead"
+            >
+              <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center p-2 hover:bg-gray-300 transition-colors duration-300 hover:cursor-pointer">
+                <User2 size={24} />
+              </div>
+            </Link>
+          </div>
+        ) : (
+          <div className="flex items-center">
+            <Button
+              type="button"
+              onClick={() => router.push(routeTo)}
+              variant={"ghost"}
+              className="py-0! font-bevellier text-heading-2-medium text-lg hover:cursor-pointer"
+            >
+              Sign In
+            </Button>
+          </div>
+        )}
 
         {/* Mobile Menu Button */}
         <div className="md:hidden flex items-center">
@@ -94,24 +126,47 @@ const Navbar = () => {
               </li>
             ))}
 
-            <li className="pt-4">
-              <Link
-                href="#"
-                className="text-base text-gray-600 hover:text-black font-bevellier text-lead"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Search
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="#"
-                className="text-base text-gray-600 hover:text-black font-bevellier text-lead"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                My Cart (2)
-              </Link>
-            </li>
+            {user ? (
+              <>
+                <li className="pt-4">
+                  <Link
+                    href="#"
+                    className="text-base text-gray-600 hover:text-black text-lead font-bevellier"
+                  >
+                    Search
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="#"
+                    className="text-base text-gray-600 hover:text-black font-bevellier text-lead"
+                  >
+                    My Cart (2)
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/profile"
+                    className="text-base text-gray-600 hover:text-black font-bevellier text-lead"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center p-2 hover:bg-gray-300 transition-colors duration-300 hover:cursor-pointer">
+                      <User2 size={24} />
+                    </div>
+                  </Link>
+                </li>
+              </>
+            ) : (
+              <li className="flex items-center">
+                <Button
+                  type="button"
+                  onClick={() => router.push(routeTo)}
+                  variant={"ghost"}
+                  className="py-0! font-bevellier text-heading-2-medium text-lg hover:cursor-pointer"
+                >
+                  Sign In
+                </Button>
+              </li>
+            )}
           </ul>
         </div>
       )}

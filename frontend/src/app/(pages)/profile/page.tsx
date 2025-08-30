@@ -20,6 +20,7 @@ import FavoritesTab from "@/components/FavoritesTab";
 import MyDetailsTab from "@/components/MyDetailsTab";
 import PaymentMethodsTab from "@/components/PaymentMethodsTab";
 import AddressBookTab from "@/components/AddressBookTab";
+import _ from "lodash";
 
 // Tab configuration
 const TAB_CONFIG = [
@@ -165,21 +166,27 @@ const ResponsiveTabsList = ({
 const ProfilePage = () => {
   const router = useRouter();
   const path = usePathname();
-  const { data } = useSession();
+  const { data, isPending } = useSession();
   const [activeTab, setActiveTab] = useState("my-orders");
 
-  if (!data) {
-    const redirect = createRedirectUrl(path, "sign-in");
-    console.log("Path: ", redirect);
-    // router.push(redirect);
+  if (!isPending) {
+    if (!data?.user) {
+      const redirect = createRedirectUrl(path, "sign-in");
+      router.push(redirect);
+    }
   }
 
-  const user = {
-    name: "Ronald O. Williams",
-    email: "ronald@mail.com",
-    avatarUrl: "https://github.com/shadcn.png",
+  const [firstName, lastName] = data?.user.name.split(" ") || ["", ""];
+  const customer = {
+    firstName: firstName,
+    lastName: lastName,
+    email: data?.user.email!,
+    avatarUrl: data?.user.image || "https://github.com/shadcn.png",
     fallback: "RW",
+    dob: "2000-06-01",
+    addresses: [],
   };
+  const customerDetails = _.omit(customer, "avatarUrl", "fallback");
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);
@@ -192,14 +199,14 @@ const ProfilePage = () => {
         <aside className="flex w-full">
           <div className="flex items-center gap-4">
             <Avatar className="h-20 w-20 sm:h-28 sm:w-28">
-              <AvatarImage src={user.avatarUrl} alt={user.name} />
+              <AvatarImage src={customer.avatarUrl} alt={customer.firstName} />
               <AvatarFallback className="text-lg sm:text-xl">
-                {user.fallback}
+                {customer.fallback}
               </AvatarFallback>
             </Avatar>
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold">{user.name}</h1>
-              <p className="text-sm text-gray-500">{user.email}</p>
+              <h1 className="text-xl sm:text-2xl font-bold">{`${customer.firstName} ${customer.lastName}`}</h1>
+              <p className="text-sm text-gray-500">{customer.email}</p>
             </div>
           </div>
         </aside>
@@ -226,7 +233,7 @@ const ProfilePage = () => {
                 const Component = tab.component;
                 return (
                   <TabsContent key={tab.value} value={tab.value}>
-                    <Component />
+                    <Component customerDetails_={customerDetails} />
                   </TabsContent>
                 );
               })}
