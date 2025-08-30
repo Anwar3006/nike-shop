@@ -32,13 +32,13 @@ export default function CollectionsLayout({
 
 const CollectionFooter = () => {
   const legalLinks = [
-    { href: "#", label: "Guides" },
-    { href: "#", label: "Terms of Sale" },
-    { href: "#", label: "Terms of Use" },
-    { href: "#", label: "Privacy Policy" },
+    { href: "/guides", label: "Guides" },
+    { href: "/terms-of-sale", label: "Terms of Sale" },
+    { href: "/terms-of-use", label: "Terms of Use" },
+    { href: "/privacy", label: "Privacy Policy" },
   ];
   return (
-    <footer className="bg-black text-white z-10 fixed bottom-0 left-0 right-0 mt-12">
+    <footer className="bg-black text-white z-10 fixed bottom-0 left-0 right-0 mt-12 font-bevellier">
       {/* Bottom Bar */}
       <div className="px-4 py-5 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
         <p>&copy; {new Date().getFullYear()} Nike, Inc. All Rights Reserved</p>
