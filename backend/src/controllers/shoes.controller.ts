@@ -54,29 +54,7 @@ export const ShoesController = {
       res: Response,
       next: NextFunction
     ) => {
-      const {
-        limit = "6",
-        offset = "1",
-        sort,
-        gender,
-        size,
-        color,
-        minPrice,
-        maxPrice,
-      } = req.query;
-
-      const options = {
-        limit: parseInt(limit),
-        offset: parseInt(offset),
-        sort,
-        gender,
-        size: size ? parseFloat(size) : undefined,
-        color,
-        minPrice: minPrice ? parseInt(minPrice) : undefined,
-        maxPrice: maxPrice ? parseInt(maxPrice) : undefined,
-      };
-
-      const shoes = await ShoesService.getShoes(options);
+      const shoes = await ShoesService.getShoes(req.query);
 
       res.status(200).json({ success: true, ...shoes });
     }

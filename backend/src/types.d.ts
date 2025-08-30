@@ -1,8 +1,8 @@
 type GetShoesOptions = {
-  limit?: number;
-  page?: number;
+  limit: string;
+  offset: string;
   sortBy?: string;
   categoryId?: number;
-  minPrice?: number;
-  maxPrice?: number;
+  minPrice?: string;
+  maxPrice?: string;
 };

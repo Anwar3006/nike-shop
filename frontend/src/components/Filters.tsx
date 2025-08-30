@@ -27,6 +27,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "./ui/collapsible";
+import { Slider } from "@/components/ui/slider";
 
 type FilterOption =
   | string
@@ -38,25 +39,6 @@ const filterGroups = [
     name: "Gender",
     key: "gender",
     options: ["men", "women", "kids", "unisex"],
-  },
-  {
-    name: "Size",
-    key: "size",
-    options: [
-      "5.0",
-      "5.5",
-      "6.0",
-      "6.5",
-      "7.0",
-      "7.5",
-      "8.0",
-      "8.5",
-      "9.0",
-      "9.5",
-      "10.0",
-      "10.5",
-      "11.0",
-    ],
   },
   {
     name: "Color",
@@ -85,7 +67,26 @@ const Filters = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  // Size range state for the slider (default range: 5.0 to 13.0)
+  const [sizeRange, setSizeRange] = useState<number[]>([5.0, 13.0]);
+
+  // Debounced size filter update
+  const handleSizeRangeChange = (value: number[]) => {
+    setSizeRange(value);
+
+    // Create size range string for URL (e.g., "5.0-13.0")
+    const sizeRangeValue = `${value[0]}-${value[1]}`;
+
+    const newQuery = formUrlQuery({
+      params: searchParams.toString(),
+      key: "size",
+      value: sizeRangeValue,
+      pathname,
+    });
+
+    router.push(newQuery, { scroll: false });
+  };
 
   const handleFilterChange = (key: string, value: string) => {
     const newQuery = formUrlQuery({
@@ -97,6 +98,32 @@ const Filters = () => {
 
     router.push(newQuery, { scroll: false });
   };
+
+  const renderSizeSlider = () => (
+    <div className="pl-4 py-4 space-y-4">
+      <div className="space-y-3">
+        <div className="flex justify-between text-sm text-muted-foreground font-bevellier">
+          <span>Size {sizeRange[0]}</span>
+          <span>Size {sizeRange[1]}</span>
+        </div>
+        <Slider
+          value={sizeRange}
+          onValueChange={handleSizeRangeChange}
+          min={5.0}
+          max={16.0}
+          step={0.5}
+          className="w-full"
+          minStepsBetweenThumbs={1}
+        />
+        <div className="flex justify-between text-xs text-muted-foreground font-bevellier">
+          <span>5.0</span>
+          <span>8.5</span>
+          <span>12.0</span>
+          <span>16.0</span>
+        </div>
+      </div>
+    </div>
+  );
 
   const renderDropdownFilters = () => (
     <SidebarMenu>
@@ -150,6 +177,21 @@ const Filters = () => {
           </DropdownMenu>
         </SidebarMenuItem>
       ))}
+
+      {/* Size Slider in Dropdown */}
+      <SidebarMenuItem>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <SidebarMenuButton className="w-full justify-between">
+              <span className="font-bevellier text-lead">Size</span>
+              <ChevronDown className="w-4 h-4" />
+            </SidebarMenuButton>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-56 p-4" align="start">
+            {renderSizeSlider()}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </SidebarMenuItem>
     </SidebarMenu>
   );
 
@@ -217,11 +259,25 @@ const Filters = () => {
           </SidebarMenuItem>
         </Collapsible>
       ))}
+
+      {/* Size Slider - Separate collapsible section */}
+      <Collapsible defaultOpen className="group/collapsible">
+        <SidebarMenuItem>
+          <CollapsibleTrigger asChild>
+            <SidebarMenuButton className="w-full justify-between">
+              <span className="font-bevellier text-lead">Size</span>
+              <ChevronDown className="w-4 h-4 group-data-[state=open]/collapsible:rotate-180 transition-transform" />
+            </SidebarMenuButton>
+          </CollapsibleTrigger>
+          <CollapsibleContent>{renderSizeSlider()}</CollapsibleContent>
+        </SidebarMenuItem>
+      </Collapsible>
     </SidebarMenu>
   );
 
   return (
     <>
+      {/* Mobile Sidebar */}
       <div className="lg:hidden">
         <Sidebar className="border-none" collapsible="icon">
           <SidebarContent>
@@ -230,7 +286,7 @@ const Filters = () => {
                 Filters
               </SidebarGroupLabel>
               <SidebarGroupContent>
-                {renderCollapsibleFilters()}
+                {renderDropdownFilters()}
               </SidebarGroupContent>
             </SidebarGroup>
           </SidebarContent>
@@ -250,7 +306,6 @@ const Filters = () => {
               </SidebarGroupLabel>
               <SidebarGroupContent>
                 {renderCollapsibleFilters()}
-                {/* <div className="h-16"></div> */}
               </SidebarGroupContent>
             </SidebarGroup>
           </SidebarContent>

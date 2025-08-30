@@ -26,6 +26,7 @@ import {
 import { PgTransaction, PgTransactionConfig } from "drizzle-orm/pg-core";
 import { NeonHttpQueryResultHKT } from "drizzle-orm/neon-http";
 import { has } from "config";
+import { parseSizeRange } from "../utils/helpers";
 
 export const ShoeRepository = {
   createShoe: async (data: CreateShoeSchemaType["body"]) => {
@@ -159,6 +160,7 @@ export const ShoeRepository = {
         minPrice,
         maxPrice,
       } = options;
+
       const limit_ = parseInt(limit);
       const offset_ = parseInt(offset);
       const minPrice_ = minPrice ? parseInt(minPrice) : undefined;
@@ -187,37 +189,72 @@ export const ShoeRepository = {
         baseConditions.push(lte(shoes.basePrice, maxPrice_!));
       }
 
-      // Get shoe IDs that have the required size (if size filter exists)
+      // Size range filter - Updated for slider
       let validShoeIdsForSize: string[] | null = null;
       if (size) {
-        const [{ id: sizeId }] = await db
-          .select()
-          .from(sizes)
-          .where(eq(sizes.size, size));
+        const sizeRange = parseSizeRange(size);
 
-        const shoesWithSize = await db
-          .selectDistinct({ shoeId: colorVariant.shoeId })
-          .from(colorVariant)
-          .innerJoin(shoeSizes, eq(shoeSizes.colorVariantId, colorVariant.id))
-          .where(
-            and(eq(shoeSizes.sizeId, sizeId), sql`${shoeSizes.quantity} > 0`)
+        if (sizeRange) {
+          console.log(
+            `🔍 Filtering by size range: ${sizeRange.min} - ${sizeRange.max}`
           );
 
-        validShoeIdsForSize = shoesWithSize.map((row) => row.shoeId);
+          // Find all sizes within the range
+          const foundSizes = await db
+            .select()
+            .from(sizes)
+            .where(
+              and(
+                gte(sizes.size, sql`${sizeRange.min}`),
+                lte(sizes.size, sql`${sizeRange.max}`)
+              )
+            );
 
-        if (validShoeIdsForSize.length === 0) {
-          return {
-            data: [],
-            meta: {
-              totalItems: 0,
-              hasMore: false,
-              nextOffset: offset_,
-            },
-          };
+          if (foundSizes.length === 0) {
+            return {
+              data: [],
+              meta: {
+                totalItems: 0,
+                hasMore: false,
+                nextOffset: offset_,
+              },
+            };
+          }
+
+          const sizeIds = foundSizes.map((s) => s.id);
+          console.log(`📏 Found ${sizeIds.length} sizes in range`);
+
+          // Get shoes that have variants available in these sizes
+          const shoesWithSizeInRange = await db
+            .selectDistinct({ shoeId: colorVariant.shoeId })
+            .from(colorVariant)
+            .innerJoin(shoeSizes, eq(shoeSizes.colorVariantId, colorVariant.id))
+            .where(
+              and(
+                inArray(shoeSizes.sizeId, sizeIds),
+                sql`${shoeSizes.quantity} > 0` // Only in-stock items
+              )
+            );
+
+          validShoeIdsForSize = shoesWithSizeInRange.map((row) => row.shoeId);
+          console.log(
+            `👟 Found ${validShoeIdsForSize.length} shoes with sizes in range`
+          );
+
+          if (validShoeIdsForSize.length === 0) {
+            return {
+              data: [],
+              meta: {
+                totalItems: 0,
+                hasMore: false,
+                nextOffset: offset_,
+              },
+            };
+          }
         }
       }
 
-      // Get shoe IDs that have the required color (if color filter exists)
+      // Color filter (unchanged)
       let validShoeIdsForColor: string[] | null = null;
       if (color) {
         const colorUp = color.charAt(0).toUpperCase() + color.slice(1);
@@ -248,6 +285,10 @@ export const ShoeRepository = {
         if (validShoeIdsForSize && validShoeIdsForColor) {
           finalValidIds = validShoeIdsForSize.filter((id) =>
             validShoeIdsForColor!.includes(id)
+          );
+
+          console.log(
+            `🔗 Intersection of size and color filters: ${finalValidIds.length} shoes`
           );
         }
 
@@ -307,7 +348,7 @@ export const ShoeRepository = {
 
       const shoeIds = shoeRecords.map((shoe) => shoe.id);
 
-      // Get colors and sizes for the returned shoes
+      // Get colors and available size ranges for the returned shoes
       const [colorsQuery, sizesQuery] = await Promise.all([
         db
           .select({
@@ -318,10 +359,15 @@ export const ShoeRepository = {
           .where(inArray(colorVariant.shoeId, shoeIds))
           .orderBy(colorVariant.dominantColor),
 
+        // Get available size ranges for each shoe
         db
           .select({
             shoeId: colorVariant.shoeId,
-            size: sizes.size,
+            minSize: sql<number>`MIN(${sizes.size}::numeric)`,
+            maxSize: sql<number>`MAX(${sizes.size}::numeric)`,
+            availableSizes: sql<
+              string[]
+            >`array_agg(DISTINCT ${sizes.size}::text)`,
           })
           .from(colorVariant)
           .innerJoin(shoeSizes, eq(shoeSizes.colorVariantId, colorVariant.id))
@@ -332,12 +378,15 @@ export const ShoeRepository = {
               sql`${shoeSizes.quantity} > 0`
             )
           )
-          .orderBy(sql`${sizes.size}::numeric`),
+          .groupBy(colorVariant.shoeId),
       ]);
 
       // Group data
       const colorMap = new Map<string, Set<string>>();
-      const sizeMap = new Map<string, Set<string>>();
+      const sizeMap = new Map<
+        string,
+        { min: number; max: number; available: string[] }
+      >();
 
       colorsQuery.forEach((row) => {
         if (!colorMap.has(row.shoeId)) colorMap.set(row.shoeId, new Set());
@@ -345,8 +394,11 @@ export const ShoeRepository = {
       });
 
       sizesQuery.forEach((row) => {
-        if (!sizeMap.has(row.shoeId)) sizeMap.set(row.shoeId, new Set());
-        sizeMap.get(row.shoeId)!.add(row.size);
+        sizeMap.set(row.shoeId, {
+          min: row.minSize,
+          max: row.maxSize,
+          available: row.availableSizes,
+        });
       });
 
       // Transform final data
@@ -357,6 +409,7 @@ export const ShoeRepository = {
         baseImage: shoe.baseImage,
         category: shoe.categoryName || "Unknown Category",
         colors: Array.from(colorMap.get(shoe.id) || []),
+        sizes: sizeMap.get(shoe.id) || { min: 0, max: 0, available: [] },
       }));
 
       const totalItems = Number(totalCountResult[0].count);
@@ -374,6 +427,7 @@ export const ShoeRepository = {
         },
       };
     } catch (error) {
+      console.error("❌ Error in getShoes:", error);
       throw error;
     }
   },

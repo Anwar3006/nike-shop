@@ -9,3 +9,13 @@ export function sanitizeUpdateData<T extends Record<string, any>>(
     })
   ) as Partial<T>;
 }
+
+// Parse the size range from URL params
+export function parseSizeRange(
+  sizeParam: string | null
+): { min: string; max: string } | null {
+  if (!sizeParam || !sizeParam.includes("-")) return null;
+
+  const [min, max] = sizeParam.split("-");
+  return { min, max };
+}
