@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import nextFontLocal from "next/font/local";
 import "./globals.css";
-import { Toaster } from "@/components/ui/sonner";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import GlobalProvider from "@/providers";
 
 const fontSans = nextFontLocal({
@@ -63,8 +61,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const queryClient = new QueryClient();
-
   return (
     <html lang="en">
       <body className={`${fontSans.variable} antialiased overflow-x-hidden`}>

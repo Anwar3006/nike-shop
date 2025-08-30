@@ -24,10 +24,10 @@ export default function CollectionsLayout({
 
 const CollectionFooter = () => {
   const legalLinks = [
-    { href: "#", label: "Guides" },
-    { href: "#", label: "Terms of Sale" },
-    { href: "#", label: "Terms of Use" },
-    { href: "#", label: "Privacy Policy" },
+    { href: "/guides", label: "Guides" },
+    { href: "/terms-of-sale", label: "Terms of Sale" },
+    { href: "/terms-of-use", label: "Terms of Use" },
+    { href: "/privacy", label: "Privacy Policy" },
   ];
   return (
     <footer className="bg-black text-white z-3">
@@ -37,7 +37,10 @@ const CollectionFooter = () => {
         <ul className="flex space-x-6 mt-4 md:mt-0">
           {legalLinks.map((link) => (
             <li key={link.label}>
-              <Link href={link.href} className="hover:text-white">
+              <Link
+                href={link.href}
+                className="hover:text-white font-bevellier"
+              >
                 {link.label}
               </Link>
             </li>

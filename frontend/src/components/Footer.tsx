@@ -36,10 +36,10 @@ const socialLinks = [
 ];
 
 const legalLinks = [
-  { href: "#", label: "Guides" },
-  { href: "#", label: "Terms of Sale" },
-  { href: "#", label: "Terms of Use" },
-  { href: "#", label: "Privacy Policy" },
+  { href: "/guides", label: "Guides" },
+  { href: "/terms-of-sale", label: "Terms of Sale" },
+  { href: "/terms-of-use", label: "Terms of Use" },
+  { href: "/privacy", label: "Privacy Policy" },
 ];
 
 const Footer = () => {
