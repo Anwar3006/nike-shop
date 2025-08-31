@@ -8,6 +8,7 @@ import { useSession } from "@/lib/auth-client";
 import { Button } from "./ui/button";
 import { usePathname, useRouter } from "next/navigation";
 import { createRedirectUrl } from "@/utils/auth-redirect";
+import SearchBar from "./SearchBar";
 
 const navLinks = [
   { href: "/collections/men", label: "Men" },
@@ -65,12 +66,7 @@ const Navbar = () => {
         {/* Right side icons */}
         {user ? (
           <div className="hidden md:flex items-center space-x-6">
-            <Link
-              href="#"
-              className="text-base text-gray-600 hover:text-black text-lead font-bevellier"
-            >
-              Search
-            </Link>
+            <SearchBar />
             <Link
               href="#"
               className="text-base text-gray-600 hover:text-black font-bevellier text-lead"
@@ -129,12 +125,7 @@ const Navbar = () => {
             {user ? (
               <>
                 <li className="pt-4">
-                  <Link
-                    href="#"
-                    className="text-base text-gray-600 hover:text-black text-lead font-bevellier"
-                  >
-                    Search
-                  </Link>
+                  <SearchBar />
                 </li>
                 <li>
                   <Link

@@ -10,7 +10,7 @@ interface CardProps {
   name: string;
   category: string;
   price: number;
-  colorCount: number;
+  colorCount?: number;
   className?: string;
 }
 
@@ -65,9 +65,11 @@ const Card: React.FC<CardProps> = ({
           <p className="text-gray-500 text-body-medium mt-0.5 font-bevellier">
             {category}
           </p>
-          <p className="text-gray-500 font-bevellier mt-0.5 text-footnote">
-            {colorCount} Colour{colorCount > 1 ? "s" : ""}
-          </p>
+          {colorCount !== undefined && (
+            <p className="text-gray-500 font-bevellier mt-0.5 text-footnote">
+              {colorCount} Colour{colorCount > 1 ? "s" : ""}
+            </p>
+          )}
         </div>
 
         <div>
