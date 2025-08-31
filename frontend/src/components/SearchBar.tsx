@@ -49,7 +49,7 @@ const SearchBar = () => {
   const showHistory = isFocused && query.length === 0;
 
   return (
-    <div className="relative w-full max-w-md">
+    <div className="relative max-w-md">
       <form onSubmit={handleSearch} className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
         <Input
@@ -59,7 +59,7 @@ const SearchBar = () => {
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           placeholder="Search for shoes..."
-          className="pl-10 pr-4 py-2 w-full rounded-full border-gray-300 focus:border-black focus:ring-black"
+          className="pl-10 pr-4 py-2 max-w-md rounded-full border-gray-300 focus:border-black focus:ring-black"
         />
         {isLoadingSuggestions && (
           <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 animate-spin" />

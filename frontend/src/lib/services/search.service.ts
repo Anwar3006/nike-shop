@@ -5,15 +5,17 @@ import {
   SearchHistoryApiResponse,
 } from "@/types/search";
 import axiosClient from "../api/client";
+import { string } from "zod";
 
 const SearchService = {
   async getSearchResults(
     query: string,
+
     offset: number = 0,
     limit: number = 10
   ): Promise<SearchApiResponse> {
     try {
-      const response = await axiosClient.get("/search", {
+      const response = await axiosClient.get(`/search`, {
         params: { q: query, offset, limit },
       });
       return response.data;
@@ -47,9 +49,14 @@ const SearchService = {
     }
   },
 
-  async getSearchHistory(): Promise<SearchHistoryApiResponse> {
+  async getSearchHistory(userId: string): Promise<SearchHistoryApiResponse> {
     try {
-      const response = await axiosClient.get("/search/history");
+      if (!userId) {
+        throw new Error("User ID is required to fetch search history");
+      }
+      const response = await axiosClient.get("/search/history", {
+        params: { userId },
+      });
       return response.data;
     } catch (error) {
       console.error("Error fetching search history:", error);

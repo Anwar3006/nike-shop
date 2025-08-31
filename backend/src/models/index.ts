@@ -13,3 +13,8 @@ export {
   shoesRelations,
   colorVariantRelations,
 } from "./shoes.model";
+export {
+  search_queries,
+  search_clicks,
+  popular_searches,
+} from "./search.model";

@@ -5,15 +5,12 @@ import {
   SearchApiResponse,
   SearchHistoryApiResponse,
 } from "@/types/search";
-import {
-  useInfiniteQuery,
-  useMutation,
-  useQuery,
-} from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
 
 interface UseSearchOptions {
   query: string;
   enabled?: boolean;
+  userId?: string;
 }
 
 export const useSearch = ({ query, enabled = true }: UseSearchOptions) => {
@@ -35,10 +32,10 @@ export const useAutocomplete = (query: string) => {
   });
 };
 
-export const useSearchHistory = () => {
+export const useSearchHistory = (userId: string) => {
   return useQuery<SearchHistoryApiResponse, Error>({
     queryKey: ["searchHistory"],
-    queryFn: () => SearchService.getSearchHistory(),
+    queryFn: () => SearchService.getSearchHistory(userId),
   });
 };
 

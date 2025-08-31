@@ -15,7 +15,8 @@ export interface Shoe {
   id: string;
   name: string;
   category: string;
-  price: number;
+  baseImage: string;
+  basePrice: number;
   images: string[];
   colors: Array<{
     name: string;

@@ -1,12 +1,16 @@
 "use client";
 import { useSearchHistory } from "@/hooks/api/use-search";
+import { authClient } from "@/lib/auth-client";
 import { History, Loader2 } from "lucide-react";
 import Link from "next/link";
 
 const SearchHistory = () => {
-  const { data, isLoading, isError } = useSearchHistory();
+  const { data: session, isPending } = authClient.useSession();
+  const { data, isLoading, isError } = useSearchHistory(
+    session?.user?.id || ""
+  );
 
-  if (isLoading) {
+  if (isLoading || isPending) {
     return (
       <div className="flex items-center gap-2 text-gray-500">
         <Loader2 className="w-4 h-4 animate-spin" />

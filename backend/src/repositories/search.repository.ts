@@ -1,6 +1,10 @@
 import { and, desc, eq, ilike, sql } from "drizzle-orm";
 import { db } from "../db";
-import { popular_searches, search_clicks, search_queries } from "../models/search.model";
+import {
+  popular_searches,
+  search_clicks,
+  search_queries,
+} from "../models/search.model";
 import { shoes, category } from "../models";
 import { alias } from "drizzle-orm/pg-core";
 
@@ -19,9 +23,7 @@ export const SearchRepository = {
       };
     }
     const searchConditions = and(
-      ...searchWords.map((word) =>
-        ilike(shoes.name, `%${word.toLowerCase()}%`)
-      )
+      ...searchWords.map((word) => ilike(shoes.name, `%${word.toLowerCase()}%`))
     );
     try {
       const results = await db
@@ -126,7 +128,10 @@ export const SearchRepository = {
     // This will not work until the user creates the `search_queries` table.
     try {
       return await db
-        .selectDistinct({ query: search_queries.query })
+        .selectDistinct({
+          query: search_queries.query,
+          search_timestamp: search_queries.search_timestamp,
+        })
         .from(search_queries)
         .where(eq(search_queries.user_id, userId))
         .orderBy(desc(search_queries.search_timestamp))

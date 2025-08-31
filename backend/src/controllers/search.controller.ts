@@ -6,17 +6,24 @@ import {
   GetSearchResultsSchemaType,
   RecordClickSchemaType,
 } from "../schemas/search.schema";
+import AppError from "../errors/AppError";
 
 export const SearchController = {
   getSearchResults: catchAsync(
     async (
-      req: Request<{}, {}, {}, GetSearchResultsSchemaType["query"]>,
+      req: Request<
+        GetSearchResultsSchemaType["params"],
+        {},
+        {},
+        GetSearchResultsSchemaType["query"]
+      >,
       res: Response,
       next: NextFunction
     ) => {
       const { q } = req.query;
-      // @ts-ignore
       const userId = req.user?.id;
+
+      // @ts-ignore
       const ip_address = req.ip;
       const results = await SearchService.getSearchResults(
         q,
@@ -53,12 +60,10 @@ export const SearchController = {
 
   getSearchHistory: catchAsync(
     async (req: Request, res: Response, next: NextFunction) => {
-      // @ts-ignore
       const userId = req.user?.id;
+
       if (!userId) {
-        return res
-          .status(401)
-          .json({ success: false, message: "Unauthorized" });
+        return new AppError("Unauthorized", 401);
       }
       const history = await SearchService.getSearchHistory(userId);
       res.status(200).json({ success: true, data: history });

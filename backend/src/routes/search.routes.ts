@@ -6,11 +6,13 @@ import {
   getSearchResultsSchema,
   recordClickSchema,
 } from "../schemas/search.schema";
+import { optionalAuth, verifyAuth } from "../middlewares/verfiyAuth.middleware";
 
 const searchRouter = Router();
 
 searchRouter.get(
   "/",
+  optionalAuth,
   validate(getSearchResultsSchema),
   SearchController.getSearchResults
 );
@@ -26,7 +28,7 @@ searchRouter.post(
 );
 
 // TODO: Add auth middleware to protect this route
-searchRouter.get("/history", SearchController.getSearchHistory);
+searchRouter.get("/history", verifyAuth, SearchController.getSearchHistory);
 searchRouter.get("/popular", SearchController.getPopularSearches);
 
 export default searchRouter;

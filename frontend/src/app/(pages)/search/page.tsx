@@ -7,6 +7,7 @@ import ShoesSkeleton from "@/components/ShoesSkeleton";
 import Error from "@/components/Error";
 import { Button } from "@/components/ui/button";
 import React from "react";
+import { authClient } from "@/lib/auth-client";
 
 const SearchPage = () => {
   const searchParams = useSearchParams();
@@ -32,7 +33,8 @@ const SearchPage = () => {
         </h1>
         {query && !isLoading && (
           <p className="text-gray-500 mt-2">
-            Showing {allShoes.length} of {data?.pages[0]?.meta.total || 0} results
+            Showing {allShoes.length} of {data?.pages[0]?.meta.total || 0}{" "}
+            results
           </p>
         )}
       </div>

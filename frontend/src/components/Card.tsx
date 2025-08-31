@@ -51,6 +51,7 @@ const Card: React.FC<CardProps> = ({
           alt={name}
           width={400}
           height={200}
+          priority={true}
         />
         {badgeText && (
           <div className="absolute top-4 left-4 bg-white px-3 py-1 rounded-md text-sm font-semibold text-red-600">

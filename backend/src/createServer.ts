@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import morgan from "morgan";
 import { toNodeHandler } from "better-auth/node";
+import cookieParser from "cookie-parser";
 
 import { routes } from "./routes/index.routes";
 import { FRONTEND_URL } from "./config/default";
@@ -19,6 +20,7 @@ export default () => {
     })
   );
   app.use(morgan("dev"));
+  app.use(cookieParser());
   app.all("/api/auth/*", toNodeHandler(auth));
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
