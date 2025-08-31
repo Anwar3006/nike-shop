@@ -3,6 +3,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
 import { db } from "../db";
 import {
+  BETTER_AUTH_SECRET,
   FRONTEND_URL,
   GITHUB_CLIENT_ID,
   GITHUB_CLIENT_SECRET,
@@ -12,6 +13,7 @@ import {
 import { account, session, user, verification } from "../models";
 
 export const auth = betterAuth({
+  secret: BETTER_AUTH_SECRET,
   database: drizzleAdapter(db, {
     provider: "pg", // or "mysql", "sqlite"
     schema: { user, account, verification, session },

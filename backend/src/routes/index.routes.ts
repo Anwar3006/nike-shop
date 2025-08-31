@@ -2,6 +2,7 @@ import type { Express } from "express";
 
 import { VERSION } from "../config/default";
 import shoeRouter from "./shoe.routes";
+import searchRouter from "./search.routes";
 
 export const routes = (app: Express) => {
   //Health check
@@ -15,4 +16,5 @@ export const routes = (app: Express) => {
 
   // Other routes
   app.use(`/api/${VERSION}/shoes`, shoeRouter);
+  app.use(`/api/${VERSION}/search`, searchRouter);
 };

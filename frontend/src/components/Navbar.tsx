@@ -8,6 +8,7 @@ import { useSession } from "@/lib/auth-client";
 import { Button } from "./ui/button";
 import { usePathname, useRouter } from "next/navigation";
 import { createRedirectUrl } from "@/utils/auth-redirect";
+import SearchBar from "./SearchBar";
 
 const navLinks = [
   { href: "/collections/men", label: "Men" },
@@ -26,14 +27,13 @@ const Navbar = () => {
   const user = data?.user;
 
   const routeTo = createRedirectUrl(path, "sign-in");
-  console.log("routeTo: ", routeTo);
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
   return (
     <header className="bg-white sticky top-0 z-50">
-      <nav className="container mx-auto px-6 py-4 flex justify-between items-center">
+      <nav className="container mx-auto xl:px-6 py-4 flex justify-between items-center">
         {/* Logo */}
         <div className="flex-shrink-0">
           <Link href="/" className="flex items-center">
@@ -63,14 +63,9 @@ const Navbar = () => {
         </div>
 
         {/* Right side icons */}
+        <SearchBar />
         {user ? (
-          <div className="hidden md:flex items-center space-x-6">
-            <Link
-              href="#"
-              className="text-base text-gray-600 hover:text-black text-lead font-bevellier"
-            >
-              Search
-            </Link>
+          <div className="hidden md:flex md:ml-4 items-center space-x-3">
             <Link
               href="#"
               className="text-base text-gray-600 hover:text-black font-bevellier text-lead"
@@ -87,7 +82,7 @@ const Navbar = () => {
             </Link>
           </div>
         ) : (
-          <div className="flex items-center">
+          <div className="hidden md:flex items-center">
             <Button
               type="button"
               onClick={() => router.push(routeTo)}
@@ -128,14 +123,6 @@ const Navbar = () => {
 
             {user ? (
               <>
-                <li className="pt-4">
-                  <Link
-                    href="#"
-                    className="text-base text-gray-600 hover:text-black text-lead font-bevellier"
-                  >
-                    Search
-                  </Link>
-                </li>
                 <li>
                   <Link
                     href="#"
@@ -163,7 +150,7 @@ const Navbar = () => {
                   variant={"ghost"}
                   className="py-0! font-bevellier text-heading-2-medium text-lg hover:cursor-pointer"
                 >
-                  Sign In
+                  Sign Inmomom
                 </Button>
               </li>
             )}
