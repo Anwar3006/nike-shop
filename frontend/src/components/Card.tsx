@@ -2,9 +2,18 @@
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, { useEffect } from "react";
+import { Button } from "./ui/button";
+import { Heart } from "lucide-react";
+import {
+  useAddFavorite,
+  useIsFavorite,
+  useToggleFavorite,
+} from "@/hooks/api/use-favorites";
+import { toast } from "sonner";
 
 interface CardProps {
+  id: string;
   imgSrc: string;
   badgeText?: string;
   name: string;
@@ -15,6 +24,7 @@ interface CardProps {
 }
 
 const Card: React.FC<CardProps> = ({
+  id,
   imgSrc,
   badgeText,
   name,
@@ -25,8 +35,14 @@ const Card: React.FC<CardProps> = ({
 }) => {
   const router = useRouter();
 
+  const {
+    toggleFavorite,
+    isLoading: isToggling,
+    error: toggleError,
+  } = useToggleFavorite();
+  const { data: favorited, isPending, error } = useIsFavorite(id);
+
   const handleClick = () => {
-    console.log("Card clicked");
     const slugName = name.replace(/\s+/g, "-").toLowerCase();
     const slugCategory = (
       category.split("'")[0] || category.split(" ")[0]
@@ -34,12 +50,36 @@ const Card: React.FC<CardProps> = ({
     router.push(`/collections/${slugCategory}/${slugName}`);
   };
 
+  useEffect(() => {
+    if (error) {
+      toast.error("Error checking favorite status: " + error);
+    }
+  }, [error]);
+
+  const handleFavoriteClick = async (e: any) => {
+    e.stopPropagation();
+
+    if (isPending || isToggling) return;
+    console.log("Favorited:", favorited);
+    try {
+      await toggleFavorite({
+        shoeId: id,
+        isFavorite: favorited?.isFavorite ?? false,
+        favoriteId: favorited?.favoriteId,
+      });
+    } catch (error) {
+      toast.error("Failed to update favorite");
+      console.error("Error updating favorite:", error);
+    }
+  };
+
   const formattedPrice = Number(Math.round(price / 100)).toFixed(2);
+  console.log("Favorited:", favorited, id);
 
   return (
     <div
       className={cn(
-        "max-w-sm rounded-lg overflow-hidden bg-gray-50 shadow-2xs hover:shadow-xl hover:cursor-pointer",
+        "max-w-sm rounded-lg overflow-hidden bg-gray-50 shadow-2xs hover:shadow-xl hover:cursor-pointer z-2",
         className
       )}
       onClick={handleClick}
@@ -58,6 +98,23 @@ const Card: React.FC<CardProps> = ({
             {badgeText}
           </div>
         )}
+
+        {/* Heart Icon for Wishlist/Favorite */}
+        <div className="absolute top-4 right-4 z-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            // disabled={isLoading || isPending}
+            onClick={handleFavoriteClick}
+          >
+            {/* TODO: integrate with favorites API */}
+            {favorited?.isFavorite ? (
+              <Heart color="red" size={30} fill="red" />
+            ) : (
+              <Heart color="gray" size={30} />
+            )}
+          </Button>
+        </div>
       </div>
 
       <div className="px-3 pt-2.5 pb-2 flex flex-row justify-between">

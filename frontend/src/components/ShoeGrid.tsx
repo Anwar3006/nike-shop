@@ -47,6 +47,7 @@ const ShoeGrid = () => {
           {allShoes.map((product) => (
             <div key={product.id} className="flex justify-center">
               <Card
+                id={product.id}
                 imgSrc={product.baseImage}
                 name={product.name}
                 category={product.category}

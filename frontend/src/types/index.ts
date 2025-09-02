@@ -4,6 +4,12 @@ export const ToastID = {
   REGISTER_SUCCESS: "register-success",
   LOGIN_SUCCESS: "login-success",
   LOGOUT_SUCCESS: "logout-success",
+  LOGOUT_ERROR: "logout-error",
+
+  ADD_FAVORITE_SUCCESS: "add-favorite-success",
+  ADD_FAVORITE_ERROR: "add-favorite-error",
+  REMOVE_FAVORITE_SUCCESS: "remove-favorite-success",
+  REMOVE_FAVORITE_ERROR: "remove-favorite-error",
   SYSTEM_ERROR: "system-error",
 };
 

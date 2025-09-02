@@ -40,6 +40,7 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {dummyData.map((card) => (
             <Card
+              id={"123"}
               key={card.name}
               imgSrc={card.imgSrc}
               badgeText={card.badgeText}

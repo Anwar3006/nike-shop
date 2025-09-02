@@ -24,6 +24,9 @@ declare global {
   }
 }
 
+// optionalAuth: Allows both authenticated and anonymous users
+//Search results use optionalAuth (allows anonymous search but gets user if authenticated)
+
 export const optionalAuth = async (
   req: Request,
   res: Response,
@@ -48,6 +51,8 @@ export const optionalAuth = async (
   }
 };
 
+//verifyAuth: Requires authentication, returns 401 if not authenticated
+//Search history uses verifyAuth (requires authentication)
 export const verifyAuth = async (
   req: Request,
   res: Response,
