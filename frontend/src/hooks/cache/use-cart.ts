@@ -200,72 +200,27 @@ export const useUpdateCartItemQuantity = () => {
     void,
     Error,
     {
-      userId: string;
-      cartItem: {
-        shoeId: string;
-        quantity: number;
-        size: string;
-        color?: string;
-      };
+      shoeId: string;
+      quantity: number;
+      size: string;
+      color?: string;
     }
   >({
-    mutationFn: async ({
-      userId,
-      cartItem: { shoeId, quantity, size, color },
-    }) => {
-      if (!userId) {
-        throw new Error("User must be logged in to add items to cart");
-      }
-
-      const cartInstance = await redisClient();
-      if (!cartInstance) {
-        throw new Error("Redis client not initialized");
-      }
-
-      // Store as hash for better data structure
-      const cartKey = `cart:${userId}`;
-      const fieldKey = `${shoeId}:${size}:${color || "default"}`;
-
-      const [cartExists, existingItem] = await Promise.all([
-        cartInstance?.exists(cartKey),
-        cartInstance.hget(cartKey, fieldKey),
-      ]);
-      if (!cartExists || !existingItem) {
-        // If item already in cart, update quantity
-        toast.error("Item does not exist in cart, please add to cart first");
-        return;
-      }
-
-      let newQuantity = quantity;
-      if (existingItem) {
-        const parsedItem = JSON.parse(existingItem as string);
-        newQuantity = parsedItem.quantity + quantity;
-      }
-
-      const updatedItem = JSON.stringify({
+    mutationFn: async ({ shoeId, quantity, size, color }) => {
+      const response = await axios.patch("/api/cart/update", {
         shoeId,
-        quantity: newQuantity,
+        quantity,
         size,
-        color: color || null,
-        addedAt: existingItem
-          ? JSON.parse(existingItem as string).addedAt
-          : Date.now(),
+        color,
       });
-
-      await cartInstance.hset(cartKey, {
-        [fieldKey]: updatedItem,
-      });
-
-      // After updating, refresh TTL
-      await refreshCartTTL(cartInstance, userId);
+      return response.data;
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["cart", userId] });
-      queryClient.invalidateQueries({ queryKey: ["cartSize", userId] });
 
       // Show success toast
-      toast.success("Added to cart", {
-        id: ToastID.ADD_TO_CART_SUCCESS,
+      toast.success("Updated cart item quantity successfully", {
+        id: ToastID.UPDATE_CART_SUCCESS,
         description: "Item has been added to your cart.",
         duration: 4000,
         descriptionClassName: "text-green-800 font-medium",
@@ -274,8 +229,8 @@ export const useUpdateCartItemQuantity = () => {
     onError: (error) => {
       console.error("Error adding to cart:", error);
       // Show error toast
-      toast.error("❌Failed to add to favorites😪", {
-        id: ToastID.REMOVE_FROM_CART_ERROR,
+      toast.error("❌Failed to update cart item quantity😪", {
+        id: ToastID.UPDATE_CART_ERROR,
         description: error.message || "Something went wrong. Please try again.",
         duration: 8000,
       });

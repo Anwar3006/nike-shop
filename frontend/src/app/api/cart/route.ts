@@ -4,7 +4,6 @@ import { redisClient } from "@/lib/cache/redis-client";
 import { cookies } from "next/headers";
 import axios from "axios";
 
-// Temporary helper - replace with your actual auth verification
 // Helper to get user from request in API routes
 export async function getUserFromRequest(request: NextRequest) {
   try {

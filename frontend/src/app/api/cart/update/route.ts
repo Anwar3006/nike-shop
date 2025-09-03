@@ -1,19 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { redisClient } from "@/lib/cache/redis-client";
 import { authClient } from "@/lib/auth-client";
+import { getUserFromRequest } from "../route";
+import { CartItem } from "@/types/cart";
 
 export async function PATCH(request: NextRequest) {
   try {
-    const session = await authClient.getSession();
+    const user = await getUserFromRequest(request);
 
-    if (!session.data?.user?.id) {
+    if (!user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { shoeId, size, color, quantity } = await request.json();
 
     const cartInstance = await redisClient();
-    const cartKey = `cart:${session.data?.user.id}`;
+    const cartKey = `cart:${user.id}`;
     const fieldKey = `${shoeId}:${size}:${color || "default"}`;
 
     // Get existing item
@@ -26,12 +28,14 @@ export async function PATCH(request: NextRequest) {
     }
 
     // Update quantity
-    const parsedItem = JSON.parse(existingItem as string);
-    parsedItem.quantity = quantity;
+    const parsedItem = {
+      ...existingItem,
+      quantity: (existingItem as CartItem).quantity + quantity,
+    } as CartItem;
 
     const pipeline = cartInstance.pipeline();
     pipeline.hset(cartKey, { [fieldKey]: JSON.stringify(parsedItem) });
-    pipeline.expire(cartKey, 30 * 24 * 60 * 60); // Refresh TTL
+    pipeline.expire(cartKey, 7 * 24 * 60 * 60); // Refresh TTL
     await pipeline.exec();
 
     return NextResponse.json({ success: true });
