@@ -9,7 +9,7 @@ import { DeleteDialog } from "./DeleteDialog";
 import AddToCartDialog from "./AddToCartDialog";
 import { useGetCart, useAddToCart } from "@/hooks/cache/use-cart";
 import { useRemoveFavorite } from "@/hooks/api/use-favorites";
-import { Favorite } from "@/types/favorites";
+import { FavoriteItem as Favorite } from "@/types/favorites";
 import { AddToCartParams, CartItem } from "@/types/cart";
 
 type FavoriteItemProps = {
@@ -19,14 +19,18 @@ type FavoriteItemProps = {
 export const FavoriteItem = ({ favorite }: FavoriteItemProps) => {
   const router = useRouter();
   const { data: cart } = useGetCart();
-  const { mutateAsync: addToCart } = useAddToCart();
+  const { mutateAsync: addToCart, isPending } = useAddToCart();
   const { mutate: removeFavorite } = useRemoveFavorite();
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
+  // console.log("Cart Data: ", cart);
   const isInCart =
-    cart?.some((item: CartItem) => item.shoeId === favorite.shoe.id) || false;
+    cart?.some(
+      (item: { itemKey: string; value: CartItem }) =>
+        item.value.shoeId === favorite.shoe.id
+    ) || false;
 
   const handleRemoveFavorite = () => {
     removeFavorite({ favoriteId: favorite.id, shoeId: favorite.shoeId });
@@ -63,6 +67,8 @@ export const FavoriteItem = ({ favorite }: FavoriteItemProps) => {
       setDialogOpen(true);
     }
   };
+
+  console.log("Favorite Item Render: ", favorite.id, " IsInCart: ", isInCart);
 
   return (
     <div className="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
@@ -118,6 +124,7 @@ export const FavoriteItem = ({ favorite }: FavoriteItemProps) => {
           <Button
             className="flex-1 bg-black text-white hover:bg-gray-800 hover:cursor-pointer"
             onClick={handleCartAction}
+            disabled={isPending}
           >
             {isInCart ? (
               <>

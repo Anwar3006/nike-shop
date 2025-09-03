@@ -33,6 +33,7 @@ import { Label } from "@/components/ui/label";
 import { Minus, Plus } from "lucide-react";
 import { AddToCartFormData, addToCartSchema } from "@/schemas/cart.schema";
 import Image from "next/image";
+import { toast } from "sonner";
 
 // Mock data - replace with actual shoe data
 const AVAILABLE_SIZES = [
@@ -87,6 +88,9 @@ const AddToCartDialog = ({
       quantity: 1,
       size: "",
       color: "",
+      name: shoeData.name,
+      image: shoeData.image,
+      price: shoeData.price,
     },
   });
 
@@ -103,7 +107,6 @@ const AddToCartDialog = ({
   };
 
   const handleSaveToCart = (data: AddToCartFormData) => {
-    console.log("Form Submitted Data: ", data);
     onAddToCart({ ...data, shoeId: shoeData.id });
     toggleDialog(false);
     form.reset();
@@ -113,6 +116,16 @@ const AddToCartDialog = ({
     onOrderNow({ ...data, shoeId: shoeData.id });
     toggleDialog(false);
     form.reset();
+  };
+  const onFormError = (errors: any) => {
+    console.error("Form Errors:", errors);
+    console.log("Current Form Values:", form.getValues());
+    toast.error("Please fill out all required fields.", {
+      description:
+        "Select a size and color to continue.\n" +
+        "Current Form Values: " +
+        JSON.stringify(form.getValues()),
+    });
   };
 
   const handleCancel = () => {
@@ -294,13 +307,13 @@ const AddToCartDialog = ({
                 <Button
                   type="button"
                   variant="secondary"
-                  onClick={form.handleSubmit(handleSaveToCart)}
+                  onClick={form.handleSubmit(handleSaveToCart, onFormError)}
                 >
                   Save to Cart
                 </Button>
                 <Button
                   type="button"
-                  onClick={form.handleSubmit(handleOrderNow)}
+                  onClick={form.handleSubmit(handleOrderNow, onFormError)}
                 >
                   Order Now
                 </Button>

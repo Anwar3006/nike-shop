@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
 
     const cartItems = Object.entries(cartData).map(([fieldKey, value]) => ({
       itemKey: fieldKey,
-      ...JSON.parse(value as string),
+      value,
     }));
 
     return NextResponse.json(cartItems);
@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
 
     const pipeline = cartInstance.pipeline();
     pipeline.hset(cartKey, { [fieldKey]: JSON.stringify(cartItem) });
-    pipeline.expire(cartKey, 30 * 24 * 60 * 60); // 30 days TTL
+    pipeline.expire(cartKey, 7 * 24 * 60 * 60); // 7 days TTL
     await pipeline.exec();
 
     return NextResponse.json({ success: true, message: "COMPLETED" });
