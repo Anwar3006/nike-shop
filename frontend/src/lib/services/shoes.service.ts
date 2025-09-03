@@ -1,4 +1,4 @@
-import { GetShoesSchemaType } from "@/schemas/shoes.schema";
+// import { GetShoesSchemaType } from "@/schemas/shoes.schema";
 import axiosClient from "../api/client";
 import { GetShoesApiResponse, ShoesQueryOptions } from "@/types/shoes";
 

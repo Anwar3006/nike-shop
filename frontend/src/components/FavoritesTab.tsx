@@ -2,19 +2,91 @@
 import React, { useState } from "react";
 import { useGetFavorites, useRemoveFavorite } from "@/hooks/api/use-favorites";
 import { Button } from "./ui/button";
-import { Heart, Trash2, ShoppingCart } from "lucide-react";
+import { Heart, Trash2, ShoppingCart, X } from "lucide-react";
 import Image from "next/image";
 import { Skeleton } from "./ui/skeleton";
 import { DeleteDialog } from "./DeleteDialog";
+import { useAddToCart, useRemoveFromCart } from "@/hooks/cache/use-cart";
+import { AddToCartParams } from "@/types";
+import AddToCartDialog from "./AddToCartDialog";
+import { useRouter } from "next/navigation";
 
 const FavoritesTab = () => {
   const { data: favoritesData, isLoading, error } = useGetFavorites();
+  const { mutateAsync: removeFromCart } = useRemoveFromCart();
+  const { mutateAsync: addToCart, isPending: addingToCart } = useAddToCart();
+  const router = useRouter();
+
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [isInCart, setIsInToCart] = useState(false);
   const removeFavorite = useRemoveFavorite();
 
   const handleRemoveFavorite = (favoriteId: string, shoeId: string) => {
     removeFavorite.mutate({ favoriteId, shoeId });
   };
+
+  ///////////////////////// Handle Cart ///////////////////////////////////////////////////
+  const handleAddToCart = async (params: AddToCartParams) => {
+    if (addingToCart) return;
+
+    try {
+      setIsInToCart(true);
+      await addToCart({
+        cartItem: {
+          shoeId: params.shoeId,
+          name: params.name,
+          image: params.image,
+          price: params.price,
+          quantity: params.quantity ?? 1,
+          size: params.size,
+          color: params.color,
+        },
+      });
+    } catch (error) {
+      setIsInToCart(false);
+      console.error("Failed to add to cart:", error);
+    }
+  };
+  // const handleRemoveFromCart = async (
+  //   params: Pick<AddToCartParams, "shoeId" | "size" | "color">
+  // ) => {
+  //   if (addingToCart) return;
+
+  //   try {
+  //     setIsInToCart(false);
+  //     await removeFromCart({
+  //       cartItem: {
+  //         shoeId: params.shoeId,
+  //         size: params.size,
+  //         color: params.color,
+  //       },
+  //     });
+  //   } catch (error) {
+  //     setIsInToCart(true);
+  //     console.error("Failed to remove from cart:", error);
+  //   }
+  // };
+  // const toggleCartItem = async (params: AddToCartParams) => {
+  //   if (isInCart) {
+  //     await handleRemoveFromCart({
+  //       shoeId: params.shoeId,
+  //       size: params.size,
+  //       color: params.color,
+  //     });
+  //   } else {
+  //     await handleAddToCart(params);
+  //   }
+  // };
+  ////////////////////////////////////////////////////////////////////////////
+
+  /////// handle Order Now /////
+  const handleOrderNow = (data: AddToCartParams) => {
+    // Add to cart and redirect to checkout
+    handleAddToCart(data);
+    router.push("/checkout");
+  };
+  //////////////////////////////
 
   if (isLoading) {
     return (
@@ -49,7 +121,7 @@ const FavoritesTab = () => {
   console.log("Favorites: ", favorites);
 
   return (
-    <div>
+    <div aria-hidden={dialogOpen}>
       <div className="flex items-center gap-2 mb-6">
         <Heart className="w-5 h-5" />
         <h2 className="text-xl font-bold">Favorites</h2>
@@ -105,15 +177,44 @@ const FavoritesTab = () => {
                 </p>
 
                 <div className="flex gap-2">
-                  <Button
-                    className="flex-1 bg-black text-white hover:bg-gray-800"
-                    onClick={() => {
-                      // TODO: Add to cart functionality
-                      console.log("Add to cart:", favorite.shoeId);
+                  <AddToCartDialog
+                    open={dialogOpen}
+                    toggleDialog={setDialogOpen}
+                    shoeData={{
+                      id: favorite.shoe.id,
+                      name: favorite.shoe.name,
+                      image: favorite.shoe.baseImage,
+                      price: favorite.shoe.basePrice / 100,
+                      availableSizes: favorite.shoe.availableSizes || [
+                        "6",
+                        "7",
+                        "8",
+                        "9",
+                        "10",
+                      ],
+                      availableColors: [
+                        { id: "black", name: "Black", hex: "#000000" },
+                        { id: "white", name: "White", hex: "#FFFFFF" },
+                      ],
                     }}
+                    onAddToCart={handleAddToCart}
+                    onOrderNow={handleOrderNow}
+                  />
+                  <Button
+                    className="flex-1 bg-black text-white hover:bg-gray-800 hover:cursor-pointer"
+                    onClick={() => setDialogOpen(true)}
                   >
-                    <ShoppingCart className="w-4 h-4 mr-2" />
-                    Add to Cart
+                    {!isInCart ? (
+                      <>
+                        <ShoppingCart className="w-4 h-4 mr-2" />
+                        <span>Add to Cart</span>{" "}
+                      </>
+                    ) : (
+                      <>
+                        <X className="w-4 h-4 mr-2" />
+                        <span>Remove from Cart</span>{" "}
+                      </>
+                    )}
                   </Button>
 
                   <DeleteDialog

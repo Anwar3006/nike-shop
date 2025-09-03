@@ -1,6 +1,6 @@
 import { Shoe } from "./shoes";
 
-export interface SearchResult extends Shoe {}
+// export interface SearchResult extends Shoe {}
 
 export interface SearchHistory {
   query: string;
@@ -14,7 +14,7 @@ export interface PopularSearch {
 
 export interface SearchApiResponse {
   success: boolean;
-  data: SearchResult[];
+  data: Shoe[];
   meta: {
     total: number;
     limit: number;

@@ -5,7 +5,6 @@ import {
   SearchHistoryApiResponse,
 } from "@/types/search";
 import axiosClient from "../api/client";
-import { string } from "zod";
 
 const SearchService = {
   async getSearchResults(

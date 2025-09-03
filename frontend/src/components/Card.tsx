@@ -5,11 +5,7 @@ import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 import { Button } from "./ui/button";
 import { Heart } from "lucide-react";
-import {
-  useAddFavorite,
-  useIsFavorite,
-  useToggleFavorite,
-} from "@/hooks/api/use-favorites";
+import { useIsFavorite, useToggleFavorite } from "@/hooks/api/use-favorites";
 import { toast } from "sonner";
 
 interface CardProps {
@@ -38,7 +34,7 @@ const Card: React.FC<CardProps> = ({
   const {
     toggleFavorite,
     isLoading: isToggling,
-    error: toggleError,
+    // error: toggleError,
   } = useToggleFavorite();
   const { data: favorited, isPending, error } = useIsFavorite(id);
 

@@ -11,6 +11,8 @@ export interface FavoriteItem {
     baseImage: string;
     basePrice: number;
     categoryName: string;
+    availableSizes?: string[];
+    availableColors?: { id: string; name: string }[];
   };
 }
 

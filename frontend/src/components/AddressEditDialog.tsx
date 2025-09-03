@@ -22,7 +22,6 @@ import { AddressFormData, addressSchema } from "@/schemas/auth.schema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
-import { Address } from "@/types";
 import { Address2 } from "./AddressBookTab";
 
 interface AddressEditDialogProps {

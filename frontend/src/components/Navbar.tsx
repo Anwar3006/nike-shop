@@ -3,12 +3,13 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Menu, User2, X } from "lucide-react";
+import { Loader2, Menu, User2, X } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
 import { Button } from "./ui/button";
 import { usePathname, useRouter } from "next/navigation";
 import { createRedirectUrl } from "@/utils/auth-redirect";
 import SearchBar from "./SearchBar";
+import { useCartSize } from "@/hooks/cache/use-cart";
 
 const navLinks = [
   { href: "/collections/men", label: "Men" },
@@ -21,6 +22,7 @@ const navLinks = [
 const Navbar = () => {
   const router = useRouter();
   const path = usePathname();
+  const { data: cartData, isLoading: cartLoading } = useCartSize();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { data } = useSession();
@@ -67,10 +69,16 @@ const Navbar = () => {
         {user ? (
           <div className="hidden md:flex md:ml-4 items-center space-x-3">
             <Link
-              href="#"
-              className="text-base text-gray-600 hover:text-black font-bevellier text-lead"
+              href="/cart"
+              className="text-base text-gray-600 hover:text-black font-bevellier text-lead text-nowrap flex items-center justify-center"
             >
-              My Cart (2)
+              My Cart (
+              {cartLoading ? (
+                <Loader2 size={12} className="animate-spin" />
+              ) : (
+                cartData || 0
+              )}
+              )
             </Link>
             <Link
               href="/profile"
@@ -125,10 +133,16 @@ const Navbar = () => {
               <>
                 <li>
                   <Link
-                    href="#"
+                    href="/cart"
                     className="text-base text-gray-600 hover:text-black font-bevellier text-lead"
                   >
-                    My Cart (2)
+                    My Cart (
+                    {cartLoading ? (
+                      <Loader2 size={12} className="animate-spin" />
+                    ) : (
+                      cartData || 0
+                    )}
+                    )
                   </Link>
                 </li>
                 <li>

@@ -1,6 +1,6 @@
 import ShoesService from "@/lib/services/shoes.service";
 import { GetShoesApiResponse, ShoesQueryOptions } from "@/types/shoes";
-import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 
 // const shoesQueryClient = useQueryClient();
 interface UseShoesOptions

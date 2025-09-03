@@ -75,8 +75,8 @@ const ResponsiveTabsList = ({
   const activeTabInDropdown = dropdownTabs.find(
     (tab) => tab.value === activeTab
   );
-  const activeTabLabel =
-    TAB_CONFIG.find((tab) => tab.value === activeTab)?.label || "";
+  // const activeTabLabel =
+  //   TAB_CONFIG.find((tab) => tab.value === activeTab)?.label || "";
 
   // Common tab trigger classes
   const tabTriggerClasses =
@@ -180,7 +180,7 @@ const ProfilePage = () => {
   const customer = {
     firstName: firstName,
     lastName: lastName,
-    email: data?.user.email!,
+    email: data?.user.email || "",
     avatarUrl: data?.user.image || "https://github.com/shadcn.png",
     fallback: "RW",
     dob: "2000-06-01",

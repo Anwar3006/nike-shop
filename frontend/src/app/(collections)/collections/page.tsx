@@ -3,13 +3,13 @@ import Sort from "@/components/Sort";
 import ShoeGrid from "@/components/ShoeGrid";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-interface SearchParams {
-  gender?: string;
-  size?: string;
-  color?: string;
-  price?: string;
-  sort?: string;
-}
+// interface SearchParams {
+//   gender?: string;
+//   size?: string;
+//   color?: string;
+//   price?: string;
+//   sort?: string;
+// }
 
 const CollectionsPage = () => {
   const searchParams = useSearchParams();

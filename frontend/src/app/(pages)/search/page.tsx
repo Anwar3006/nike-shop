@@ -7,7 +7,6 @@ import ShoesSkeleton from "@/components/ShoesSkeleton";
 import Error from "@/components/Error";
 import { Button } from "@/components/ui/button";
 import React from "react";
-import { authClient } from "@/lib/auth-client";
 
 const SearchPage = () => {
   const searchParams = useSearchParams();
