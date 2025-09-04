@@ -120,7 +120,7 @@ const MyDetailsTab = ({ customerDetails_ }: MyDetailsTabProps) => {
               )}
             />
 
-            <FormField
+            {/* <FormField
               control={form.control}
               name="phone"
               render={({ field }) => (
@@ -140,7 +140,7 @@ const MyDetailsTab = ({ customerDetails_ }: MyDetailsTabProps) => {
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            /> */}
 
             <FormField
               control={form.control}

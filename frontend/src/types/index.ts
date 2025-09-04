@@ -20,6 +20,13 @@ export const ToastID = {
   EMPTY_CART_SUCCESS: "empty-cart_success",
   EMPTY_CART_ERROR: "empty-cart_error",
 
+  UPDATE_USER_INFO_SUCCESS: "update-user-info-success",
+  UPDATE_USER_INFO_ERROR: "update-user-info-error",
+  UPSERT_ADDRESS_SUCCESS: "upsert-address-success",
+  UPSERT_ADDRESS_ERROR: "upsert-address-error",
+  DELETE_ADDRESS_SUCCESS: "delete-address-success",
+  DELETE_ADDRESS_ERROR: "delete-address-error",
+
   SYSTEM_ERROR: "system-error",
 };
 
@@ -31,6 +38,7 @@ export interface Address {
   state: string; //CA
   zipCode: string; //CA 94103
   phoneNumber: string; //+1 234 567 890
+  isDefault: boolean;
 }
 export interface Customer {
   id: string;

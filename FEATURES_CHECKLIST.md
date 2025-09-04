@@ -110,19 +110,18 @@ Full-stack Nike-inspired e-commerce shop built with:
 - [ ] **Yet To Do**: Address validation
 - [ ] **Yet To Do**: Default address handling
 
+### Shopping Cart System
+
+- [x] Shopping cart state management
+- [x] Add to cart functionality
+- [x] Cart item management (update quantity, remove)
+- [x] Cart persistence (local storage/database)
+- [x] Cart UI components
+- [x] Cart page layout
+
 ---
 
 ## ❌ YET TO DO FEATURES
-
-### Shopping Cart System
-
-- [ ] **Yet To Do**: Shopping cart state management
-- [ ] **Yet To Do**: Add to cart functionality
-- [ ] **Yet To Do**: Cart item management (update quantity, remove)
-- [ ] **Yet To Do**: Cart persistence (local storage/database)
-- [ ] **Yet To Do**: Cart UI components
-- [ ] **Yet To Do**: Mini cart dropdown
-- [ ] **Yet To Do**: Cart page layout
 
 ### Checkout Process
 

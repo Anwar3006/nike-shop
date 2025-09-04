@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import { Button } from "./ui/button";
-import { Home, Briefcase } from "lucide-react";
+import { Home, Briefcase, MapPin } from "lucide-react";
 import { toast } from "sonner";
 
 import { AddressEditDialog } from "./AddressEditDialog";
 import { AddressFormData } from "@/schemas/auth.schema";
+import { Address } from "@/types";
+import { useUpsertAddress } from "@/hooks/api/use-userInfo";
 
 export interface Address2 {
   type: "Home" | "Work";
@@ -16,7 +18,8 @@ export interface Address2 {
   isDefault: boolean;
 }
 
-const AddressBookTab = () => {
+const AddressBookTab = ({ userAddresses }: { userAddresses: Address[] }) => {
+  const { mutateAsync, isPending } = useUpsertAddress();
   const [addresses, setAddresses] = useState<Address2[]>([
     {
       type: "Home" as const,
@@ -34,31 +37,40 @@ const AddressBookTab = () => {
     },
   ]);
 
-  const handleAddressSave = async (index: number, formData: any) => {
+  const transformedAddresses =
+    userAddresses && userAddresses.length > 0
+      ? userAddresses.map((addr) => {
+          return {
+            type: addr.type,
+            address: `${addr.streetAddress}, ${addr.city}, ${addr.state} ${addr.zipCode}`,
+            phone: addr.phoneNumber,
+            isDefault: addr.isDefault,
+            icon:
+              addr.type === "Home" ? (
+                <Home className="w-5 h-5 text-gray-500" />
+              ) : addr.type === "Work" ? (
+                <Briefcase className="w-5 h-5 text-gray-500" />
+              ) : (
+                <MapPin className="w-5 h-5 text-gray-500" />
+              ),
+            originalAddress: addr,
+          };
+        })
+      : [];
+
+  const handleAddressSave = async (
+    formData: AddressFormData,
+    index?: number
+  ) => {
     try {
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Format the address string from form data
-      const formattedAddress = `${formData.streetAddress}, ${formData.city}, ${formData.state} ${formData.zipCode}`;
-
-      // Update the address in state
-      setAddresses((prev) =>
-        prev.map((addr, i) =>
-          i === index
-            ? {
-                ...addr,
-                address: formattedAddress,
-                phone: formData.telephone,
-              }
-            : addr
-        )
-      );
+      console.log("Saving address:", formData);
+      mutateAsync({
+        addressId: index ? userAddresses[index].id : undefined,
+        ...formData,
+      });
 
       // Show success message
       toast.success("Address updated successfully!");
-
-      console.log("Address updated:", { index, formData, formattedAddress });
     } catch (error) {
       console.error("Failed to update address:", error);
       toast.error("Failed to update address. Please try again.");
@@ -70,10 +82,15 @@ const AddressBookTab = () => {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-bold">Address Book</h2>
-        <Button>Add New Address</Button>
+        <AddressEditDialog
+          address={{} as Address}
+          onSave={(formData: AddressFormData) => handleAddressSave(formData)}
+          trigger={<Button type="button">Add Address</Button>}
+        />
       </div>
+
       <div className="space-y-4">
-        {addresses.map((addr, index) => (
+        {transformedAddresses.map((addr, index) => (
           <div
             key={index}
             className="p-6 border border-gray-200 rounded-lg flex flex-col sm:flex-row justify-between items-start gap-4"
@@ -94,12 +111,12 @@ const AddressBookTab = () => {
               </div>
             </div>
             <AddressEditDialog
-              address={addr}
+              address={addr.originalAddress}
               onSave={(formData: AddressFormData) =>
-                handleAddressSave(index, formData)
+                handleAddressSave(formData, index)
               }
               trigger={
-                <Button variant="outline" size="sm">
+                <Button type="button" variant="outline" size="sm">
                   Edit
                 </Button>
               }

@@ -23,9 +23,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { Address2 } from "./AddressBookTab";
+import { Address } from "@/types";
 
 interface AddressEditDialogProps {
-  address: Address2;
+  address: Address;
   onSave: (data: AddressFormData) => Promise<void> | void;
   trigger: React.ReactNode;
 }
@@ -38,38 +39,16 @@ export function AddressEditDialog({
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Parse existing address for form defaults
-  const parseAddress = (addressString: string) => {
-    // Example: "123 Market St, San Francisco, CA 94103"
-    const parts = addressString.split(", ");
-    if (parts.length >= 3) {
-      const streetAddress = parts[0] || "";
-      const city = parts[1] || "";
-      const stateZip = parts[2]?.split(" ");
-      const state = stateZip?.[0] || "";
-      const zipCode = stateZip?.[1] || "";
-
-      return { streetAddress, city, state, zipCode };
-    }
-
-    return {
-      streetAddress: addressString,
-      city: "",
-      state: "",
-      zipCode: "",
-    };
-  };
-
-  const parsedAddress = parseAddress(address.address);
-
   const form = useForm<AddressFormData>({
     resolver: zodResolver(addressSchema),
     defaultValues: {
-      streetAddress: parsedAddress.streetAddress,
-      city: parsedAddress.city,
-      state: parsedAddress.state,
-      zipCode: parsedAddress.zipCode,
-      telephone: address.phone,
+      streetAddress: address.streetAddress || "",
+      city: address.city || "",
+      state: address.state || "",
+      zipcode: address.zipCode || "",
+      phone: address.phoneNumber || "",
+      type: address.type || "Home",
+      isDefault: address.isDefault || false,
     },
   });
 
@@ -92,9 +71,15 @@ export function AddressEditDialog({
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Edit {address.type} Address</DialogTitle>
+          <DialogTitle>
+            {address.streetAddress
+              ? `Edit ${address.type} Address`
+              : "Add new Address"}
+          </DialogTitle>
           <DialogDescription>
-            Update your address information below.
+            {address.streetAddress
+              ? "Update your address information below."
+              : "Add your address information below."}
           </DialogDescription>
         </DialogHeader>
 
@@ -154,7 +139,7 @@ export function AddressEditDialog({
 
             <FormField
               control={form.control}
-              name="zipCode"
+              name="zipcode"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>ZIP Code</FormLabel>
@@ -168,7 +153,7 @@ export function AddressEditDialog({
 
             <FormField
               control={form.control}
-              name="telephone"
+              name="phone"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Telephone</FormLabel>

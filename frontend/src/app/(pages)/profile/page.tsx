@@ -2,7 +2,7 @@
 import { useSession } from "@/lib/auth-client";
 import { usePathname, useRouter } from "next/navigation";
 import React, { useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { Briefcase, ChevronDown, Home } from "lucide-react";
 
 import { createRedirectUrl } from "@/utils/auth-redirect";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -21,6 +21,10 @@ import MyDetailsTab from "@/components/MyDetailsTab";
 import PaymentMethodsTab from "@/components/PaymentMethodsTab";
 import AddressBookTab from "@/components/AddressBookTab";
 import _ from "lodash";
+import { useGetUserInfo } from "@/hooks/api/use-userInfo";
+import { splitFullName } from "@/utils/helper";
+import { Address } from "@/types";
+import Error from "@/components/Error";
 
 // Tab configuration
 const TAB_CONFIG = [
@@ -166,25 +170,34 @@ const ResponsiveTabsList = ({
 const ProfilePage = () => {
   const router = useRouter();
   const path = usePathname();
-  const { data, isPending } = useSession();
+  const { data: userInfo, isLoading, isError, error } = useGetUserInfo();
   const [activeTab, setActiveTab] = useState("my-orders");
 
-  if (!isPending) {
-    if (!data?.user) {
-      const redirect = createRedirectUrl(path, "sign-in");
-      router.push(redirect);
-    }
+  // if (!isLoading) {
+  //   if (!userInfo?.data) {
+  //     const redirect = createRedirectUrl(path, "sign-in");
+  //     router.push(redirect);
+  //   }
+  // }
+
+  if (isError) {
+    return <Error title="Error" error={error} />;
+  }
+  if (!userInfo?.data) {
+    return <div>Not user</div>;
   }
 
-  const [firstName, lastName] = data?.user.name.split(" ") || ["", ""];
+  console.log("User Info:", userInfo);
+  const [firstName, lastName] =
+    userInfo?.data && splitFullName(userInfo.data.name);
   const customer = {
     firstName: firstName,
     lastName: lastName,
-    email: data?.user.email || "",
-    avatarUrl: data?.user.image || "https://github.com/shadcn.png",
+    email: userInfo.data.email || "",
+    avatarUrl: userInfo.data.image || "https://github.com/shadcn.png",
     fallback: "RW",
-    dob: "2000-06-01",
-    addresses: [],
+    dob: userInfo.data.dob || "",
+    addresses: userInfo.data.addresses || [],
   };
   const customerDetails = _.omit(customer, "avatarUrl", "fallback");
 
@@ -233,7 +246,10 @@ const ProfilePage = () => {
                 const Component = tab.component;
                 return (
                   <TabsContent key={tab.value} value={tab.value}>
-                    <Component customerDetails_={customerDetails} />
+                    <Component
+                      customerDetails_={customerDetails}
+                      userAddresses={customer.addresses}
+                    />
                   </TabsContent>
                 );
               })}

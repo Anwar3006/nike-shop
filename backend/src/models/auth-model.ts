@@ -1,4 +1,14 @@
-import { pgTable, text, timestamp, boolean, date } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  timestamp,
+  boolean,
+  date,
+  uuid,
+  varchar,
+  unique,
+} from "drizzle-orm/pg-core";
+import { nanoid } from "nanoid";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -17,18 +27,25 @@ export const user = pgTable("user", {
     .notNull(),
 });
 
-export const address = pgTable("address", {
-  id: text("id").primaryKey(),
-  type: text("type").notNull(),
-  streetAddress: text("street_address").notNull(),
-  city: text("city").notNull(),
-  state: text("state").notNull(),
-  zipCode: text("zip_code").notNull(),
-  phoneNumber: text("phone_number").notNull(),
-  userId: text("user_id")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
-});
+export const address = pgTable(
+  "address",
+  {
+    id: varchar("id")
+      .primaryKey()
+      .$defaultFn(() => nanoid(6)),
+    type: text("type").notNull(),
+    streetAddress: text("street_address").notNull(),
+    city: text("city").notNull(),
+    state: text("state").notNull(),
+    zipCode: text("zip_code").notNull(),
+    phoneNumber: text("phone_number").notNull(),
+    isDefault: boolean("is_default").notNull().default(false),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+  },
+  (table) => [unique("user_type_unique").on(table.userId, table.type)]
+);
 
 export const session = pgTable("session", {
   id: text("id").primaryKey(),
