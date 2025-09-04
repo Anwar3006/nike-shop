@@ -6,15 +6,15 @@ import { Home, Briefcase, MapPin } from "lucide-react";
 import { AddressEditDialog } from "./AddressEditDialog";
 import { AddressFormData } from "@/schemas/auth.schema";
 import { Address } from "@/types";
-import {
-  useDeleteAddress,
-  useUpsertAddress,
-} from "@/hooks/api/use-userInfo";
+import { useDeleteAddress, useUpsertAddress } from "@/hooks/api/use-userInfo";
 import { DeleteDialog } from "./DeleteDialog";
+import { useState } from "react";
 
 const AddressBookTab = ({ userAddresses }: { userAddresses: Address[] }) => {
   const { mutateAsync } = useUpsertAddress();
   const { mutate: deleteAddress, isPending: isDeleting } = useDeleteAddress();
+
+  const [open, setOpen] = useState(false);
 
   const transformedAddresses =
     userAddresses?.map((addr) => {
@@ -99,19 +99,22 @@ const AddressBookTab = ({ userAddresses }: { userAddresses: Address[] }) => {
                 }
               />
               <DeleteDialog
-                onDelete={() => handleAddressDelete(addr.originalAddress.id)}
+                handleDelete={handleAddressDelete}
                 isDeleting={isDeleting}
-                trigger={
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="sm"
-                    disabled={isDeleting}
-                  >
-                    Delete
-                  </Button>
-                }
+                resourceType="address"
+                resourceId={addr.originalAddress.id}
+                open={open}
+                toggleDialog={setOpen}
               />
+              <Button
+                type="button"
+                variant="destructive"
+                size="sm"
+                disabled={isDeleting}
+                onClick={() => setOpen(true)}
+              >
+                Delete
+              </Button>
             </div>
           </div>
         ))}

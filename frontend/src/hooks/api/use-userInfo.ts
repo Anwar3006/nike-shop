@@ -2,11 +2,7 @@ import { useSession } from "@/lib/auth-client";
 import UserInfoService from "@/lib/services/userInfo.service";
 import { UserProfileSchemaType } from "@/schemas/auth.schema";
 import { ToastID } from "@/types";
-import {
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 export const useGetUserInfo = () => {
@@ -28,7 +24,7 @@ export const useUpdateInfo = () => {
 
   return useMutation({
     mutationFn: (data: UserProfileSchemaType) =>
-      UserInfoService.updateInfo({ ...data, userId: userId! }),
+      UserInfoService.updateInfo({ ...data }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["userInfo", userId] });
       toast.success("User info updated successfully", {
