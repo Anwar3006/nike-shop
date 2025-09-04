@@ -16,32 +16,39 @@ import {
   FormLabel,
   FormMessage,
 } from "./ui/form";
+import { useUpdateInfo } from "@/hooks/api/use-userInfo";
+import { useEffect } from "react";
 
 type MyDetailsTabProps = {
-  customerDetails_: Omit<Customer, "id" | "addresses">;
+  customerDetails: Omit<Customer, "id" | "addresses">;
 };
 
-const MyDetailsTab = ({ customerDetails_ }: MyDetailsTabProps) => {
-  const userDetails = customerDetails_ || {
-    firstName: "Ronald",
-    lastName: "Williams",
-    email: "ronald@mail.com",
-    phone: "+1 234 567 890",
-    dob: "1990-01-01",
-  };
+const MyDetailsTab = ({ customerDetails }: MyDetailsTabProps) => {
+  const { mutate: updateInfo, isPending: isLoading } = useUpdateInfo();
 
   const form = useForm<UserProfileSchemaType>({
     resolver: zodResolver(userProfileSchema),
     defaultValues: {
-      firstName: userDetails.firstName || "",
-      lastName: userDetails.lastName || "",
-      email: userDetails.email || "",
-      dob: userDetails.dob || "",
+      firstName: customerDetails?.firstName || "",
+      lastName: customerDetails?.lastName || "",
+      email: customerDetails?.email || "",
+      dob: customerDetails?.dob || "",
     },
   });
 
+  useEffect(() => {
+    if (customerDetails) {
+      form.reset({
+        firstName: customerDetails.firstName || "",
+        lastName: customerDetails.lastName || "",
+        email: customerDetails.email || "",
+        dob: customerDetails.dob || "",
+      });
+    }
+  }, [customerDetails, form]);
+
   const handleForm = (data: UserProfileSchemaType) => {
-    console.log(data);
+    updateInfo(data);
   };
 
   const isDirty = form.formState.isDirty;
@@ -67,7 +74,7 @@ const MyDetailsTab = ({ customerDetails_ }: MyDetailsTabProps) => {
                         placeholder="Jason"
                         {...field}
                         className="text-foreground font-bevellier"
-                        // disabled={isLoading}
+                        disabled={isLoading}
                       />
                     </FormControl>
                     <FormMessage />
@@ -89,7 +96,7 @@ const MyDetailsTab = ({ customerDetails_ }: MyDetailsTabProps) => {
                         placeholder="Tester"
                         {...field}
                         className="text-foreground font-bevellier"
-                        // disabled={isLoading}
+                        disabled={isLoading}
                       />
                     </FormControl>
                     <FormMessage />
@@ -112,35 +119,13 @@ const MyDetailsTab = ({ customerDetails_ }: MyDetailsTabProps) => {
                       placeholder="JayT@gmail.com"
                       {...field}
                       className="text-foreground font-bevellier"
-                      // disabled={isLoading}
+                      disabled={isLoading}
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
-            {/* <FormField
-              control={form.control}
-              name="phone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-muted-foreground text-lead text-lg font-bevellier">
-                    Phone Number
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="tel"
-                      placeholder="+1 234 567 890"
-                      {...field}
-                      className="text-foreground font-bevellier"
-                      // disabled={isLoading}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            /> */}
 
             <FormField
               control={form.control}
@@ -156,7 +141,7 @@ const MyDetailsTab = ({ customerDetails_ }: MyDetailsTabProps) => {
                       placeholder="1990-01-01"
                       {...field}
                       className="text-foreground font-bevellier"
-                      // disabled={isLoading}
+                      disabled={isLoading}
                     />
                   </FormControl>
                   <FormMessage />
@@ -169,18 +154,17 @@ const MyDetailsTab = ({ customerDetails_ }: MyDetailsTabProps) => {
                 type="button"
                 variant="outline"
                 onClick={() => form.reset()}
-                disabled={!isDirty}
+                disabled={!isDirty || isLoading}
                 className="font-bevellier"
               >
                 Reset
               </Button>
               <Button
                 type="submit"
-                disabled={!isDirty}
+                disabled={!isDirty || isLoading}
                 className="font-bevellier"
               >
-                {/* {isLoading ? "Saving..." : "Save Changes"} */}
-                Save
+                {isLoading ? "Saving..." : "Save Changes"}
               </Button>
             </div>
           </div>

@@ -247,7 +247,7 @@ const ProfilePage = () => {
                 return (
                   <TabsContent key={tab.value} value={tab.value}>
                     <Component
-                      customerDetails_={customerDetails}
+                      customerDetails={customerDetails}
                       userAddresses={customer.addresses}
                     />
                   </TabsContent>

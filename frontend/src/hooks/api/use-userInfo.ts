@@ -2,7 +2,7 @@ import { useSession } from "@/lib/auth-client";
 import UserInfoService from "@/lib/services/userInfo.service";
 import { UserProfileSchemaType } from "@/schemas/auth.schema";
 import { ToastID } from "@/types";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 export const useGetUserInfo = () => {
@@ -17,17 +17,16 @@ export const useGetUserInfo = () => {
   });
 };
 
-export const useUpdateInfo = (data: UserProfileSchemaType) => {
+export const useUpdateInfo = () => {
   const { data: session } = useSession();
   const userId = session?.user?.id;
+  const queryClient = useQueryClient();
 
-  const userData = { ...data, userId: userId! };
   return useMutation({
-    mutationKey: ["userInfo", userId],
-    mutationFn: () => UserInfoService.updateInfo(userData),
+    mutationFn: (data: UserProfileSchemaType) =>
+      UserInfoService.updateInfo({ ...data }),
     onSuccess: () => {
-      // Invalidate and refetch
-      // queryClient.invalidateQueries({ queryKey: ["userInfo", userId] });
+      queryClient.invalidateQueries({ queryKey: ["userInfo", userId] });
       toast.success("User info updated successfully", {
         id: ToastID.UPDATE_USER_INFO_SUCCESS,
       });
@@ -44,14 +43,13 @@ export const useUpdateInfo = (data: UserProfileSchemaType) => {
 export const useUpsertAddress = () => {
   const { data: session } = useSession();
   const userId = session?.user?.id;
+  const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: ["userInfo", userId],
     mutationFn: (data: any) =>
       UserInfoService.upsertAddress({ ...data, userId }),
     onSuccess: () => {
-      // Invalidate and refetch
-      // queryClient.invalidateQueries({ queryKey: ["userInfo", userId] });
+      queryClient.invalidateQueries({ queryKey: ["userInfo", userId] });
       toast.success("Address upserted successfully", {
         id: ToastID.UPSERT_ADDRESS_SUCCESS,
       });
@@ -68,13 +66,12 @@ export const useUpsertAddress = () => {
 export const useDeleteAddress = () => {
   const { data: session } = useSession();
   const userId = session?.user?.id;
+  const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: ["userInfo", userId],
     mutationFn: (addressId: string) => UserInfoService.deleteAddress(addressId),
     onSuccess: () => {
-      // Invalidate and refetch
-      // queryClient.invalidateQueries({ queryKey: ["userInfo", userId] });
+      queryClient.invalidateQueries({ queryKey: ["userInfo", userId] });
       toast.success("Address deleted successfully", {
         id: ToastID.DELETE_ADDRESS_SUCCESS,
       });

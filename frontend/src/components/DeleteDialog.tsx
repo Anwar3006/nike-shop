@@ -15,6 +15,7 @@ type DeleteDialogProps = {
   open: boolean;
   resourceType: string;
   resourceId: string;
+  isDeleting: boolean;
   handleDelete: (id: string) => void;
 };
 
@@ -22,6 +23,7 @@ export function DeleteDialog({
   toggleDialog,
   open,
   resourceType,
+  isDeleting,
   resourceId,
   handleDelete,
 }: DeleteDialogProps) {
@@ -38,7 +40,10 @@ export function DeleteDialog({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={() => handleDelete(resourceId)}>
+          <AlertDialogAction
+            disabled={isDeleting}
+            onClick={() => handleDelete(resourceId)}
+          >
             Continue
           </AlertDialogAction>
         </AlertDialogFooter>

@@ -1,81 +1,57 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "./ui/button";
 import { Home, Briefcase, MapPin } from "lucide-react";
-import { toast } from "sonner";
 
 import { AddressEditDialog } from "./AddressEditDialog";
 import { AddressFormData } from "@/schemas/auth.schema";
 import { Address } from "@/types";
-import { useUpsertAddress } from "@/hooks/api/use-userInfo";
-
-export interface Address2 {
-  type: "Home" | "Work";
-  icon: React.ReactNode;
-  address: string;
-  phone: string;
-  isDefault: boolean;
-}
+import { useDeleteAddress, useUpsertAddress } from "@/hooks/api/use-userInfo";
+import { DeleteDialog } from "./DeleteDialog";
+import { useState } from "react";
 
 const AddressBookTab = ({ userAddresses }: { userAddresses: Address[] }) => {
-  const { mutateAsync, isPending } = useUpsertAddress();
-  const [addresses, setAddresses] = useState<Address2[]>([
-    {
-      type: "Home" as const,
-      icon: <Home className="w-5 h-5 text-gray-500" />,
-      address: "123 Market St, San Francisco, CA 94103",
-      phone: "+1 234 567 890",
-      isDefault: true,
-    },
-    {
-      type: "Work" as const,
-      icon: <Briefcase className="w-5 h-5 text-gray-500" />,
-      address: "456 Main St, Oakland, CA 94612",
-      phone: "+1 098 765 432",
-      isDefault: false,
-    },
-  ]);
+  const { mutateAsync } = useUpsertAddress();
+  const { mutate: deleteAddress, isPending: isDeleting } = useDeleteAddress();
+
+  const [open, setOpen] = useState(false);
 
   const transformedAddresses =
-    userAddresses && userAddresses.length > 0
-      ? userAddresses.map((addr) => {
-          return {
-            type: addr.type,
-            address: `${addr.streetAddress}, ${addr.city}, ${addr.state} ${addr.zipCode}`,
-            phone: addr.phoneNumber,
-            isDefault: addr.isDefault,
-            icon:
-              addr.type === "Home" ? (
-                <Home className="w-5 h-5 text-gray-500" />
-              ) : addr.type === "Work" ? (
-                <Briefcase className="w-5 h-5 text-gray-500" />
-              ) : (
-                <MapPin className="w-5 h-5 text-gray-500" />
-              ),
-            originalAddress: addr,
-          };
-        })
-      : [];
+    userAddresses?.map((addr) => {
+      return {
+        type: addr.type,
+        address: `${addr.streetAddress}, ${addr.city}, ${addr.state} ${addr.zipCode}`,
+        phone: addr.phoneNumber,
+        isDefault: addr.isDefault,
+        icon:
+          addr.type === "Home" ? (
+            <Home className="w-5 h-5 text-gray-500" />
+          ) : addr.type === "Work" ? (
+            <Briefcase className="w-5 h-5 text-gray-500" />
+          ) : (
+            <MapPin className="w-5 h-5 text-gray-500" />
+          ),
+        originalAddress: addr,
+      };
+    }) || [];
 
   const handleAddressSave = async (
     formData: AddressFormData,
-    index?: number
+    addressId?: string
   ) => {
     try {
-      console.log("Saving address:", formData);
-      mutateAsync({
-        addressId: index ? userAddresses[index].id : undefined,
+      await mutateAsync({
+        addressId,
         ...formData,
       });
-
-      // Show success message
-      toast.success("Address updated successfully!");
     } catch (error) {
-      console.error("Failed to update address:", error);
-      toast.error("Failed to update address. Please try again.");
+      // Error is handled by the hook
       throw error; // Re-throw to handle in dialog
     }
+  };
+
+  const handleAddressDelete = (addressId: string) => {
+    deleteAddress(addressId);
   };
 
   return (
@@ -90,9 +66,9 @@ const AddressBookTab = ({ userAddresses }: { userAddresses: Address[] }) => {
       </div>
 
       <div className="space-y-4">
-        {transformedAddresses.map((addr, index) => (
+        {transformedAddresses.map((addr) => (
           <div
-            key={index}
+            key={addr.originalAddress.id}
             className="p-6 border border-gray-200 rounded-lg flex flex-col sm:flex-row justify-between items-start gap-4"
           >
             <div className="flex gap-4">
@@ -110,17 +86,36 @@ const AddressBookTab = ({ userAddresses }: { userAddresses: Address[] }) => {
                 <p className="text-gray-600">{addr.phone}</p>
               </div>
             </div>
-            <AddressEditDialog
-              address={addr.originalAddress}
-              onSave={(formData: AddressFormData) =>
-                handleAddressSave(formData, index)
-              }
-              trigger={
-                <Button type="button" variant="outline" size="sm">
-                  Edit
-                </Button>
-              }
-            />
+            <div className="flex items-center space-x-2">
+              <AddressEditDialog
+                address={addr.originalAddress}
+                onSave={(formData: AddressFormData) =>
+                  handleAddressSave(formData, addr.originalAddress.id)
+                }
+                trigger={
+                  <Button type="button" variant="outline" size="sm">
+                    Edit
+                  </Button>
+                }
+              />
+              <DeleteDialog
+                handleDelete={handleAddressDelete}
+                isDeleting={isDeleting}
+                resourceType="address"
+                resourceId={addr.originalAddress.id}
+                open={open}
+                toggleDialog={setOpen}
+              />
+              <Button
+                type="button"
+                variant="destructive"
+                size="sm"
+                disabled={isDeleting}
+                onClick={() => setOpen(true)}
+              >
+                Delete
+              </Button>
+            </div>
           </div>
         ))}
       </div>

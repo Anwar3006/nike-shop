@@ -119,6 +119,14 @@ Full-stack Nike-inspired e-commerce shop built with:
 - [x] Cart UI components
 - [x] Cart page layout
 
+### Favorites/Wishlist System
+
+- [x] Favorites database model
+- [x] Add/remove from favorites API
+- [x] Favorites list display
+- [x] Favorites persistence across sessions
+- [x] Move from favorites to cart
+
 ---
 
 ## ❌ YET TO DO FEATURES
@@ -150,14 +158,6 @@ Full-stack Nike-inspired e-commerce shop built with:
 - [x] Search history
 - [x] Popular searches
 - [ ] **Yet To Do**: Advanced search filters
-
-### Favorites/Wishlist System
-
-- [x] Favorites database model
-- [x] Add/remove from favorites API
-- [x] Favorites list display
-- [x] Favorites persistence across sessions
-- [ ] **Yet To Do**: Move from favorites to cart
 
 ### Product Details & Variants
 
