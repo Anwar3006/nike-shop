@@ -59,6 +59,7 @@ export const UserInfoRepository = {
         state: addressData.state,
         zipCode: addressData.zipcode,
         phoneNumber: addressData.phone,
+        isDefault: addressData.isDefault,
         userId,
       };
 
@@ -72,6 +73,7 @@ export const UserInfoRepository = {
             city: addressValues.city,
             state: addressValues.state,
             zipCode: addressValues.zipCode,
+            isDefault: addressValues.isDefault,
             phoneNumber: addressValues.phoneNumber,
           },
         })

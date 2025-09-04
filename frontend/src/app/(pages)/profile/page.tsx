@@ -1,8 +1,8 @@
 "use client";
 import { useSession } from "@/lib/auth-client";
 import { usePathname, useRouter } from "next/navigation";
-import React, { useState } from "react";
-import { Briefcase, ChevronDown, Home } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { Briefcase, ChevronDown, Home, Loader2 } from "lucide-react";
 
 import { createRedirectUrl } from "@/utils/auth-redirect";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -173,21 +173,25 @@ const ProfilePage = () => {
   const { data: userInfo, isLoading, isError, error } = useGetUserInfo();
   const [activeTab, setActiveTab] = useState("my-orders");
 
-  // if (!isLoading) {
-  //   if (!userInfo?.data) {
-  //     const redirect = createRedirectUrl(path, "sign-in");
-  //     router.push(redirect);
-  //   }
-  // }
+  useEffect(() => {
+    if (!isLoading && !userInfo?.data) {
+      const redirect = createRedirectUrl(path, "sign-in");
+      router.push(redirect);
+    }
+  }, [isLoading, userInfo?.data, path, router]);
 
   if (isError) {
     return <Error title="Error" error={error} />;
   }
-  if (!userInfo?.data) {
-    return <div>Not user</div>;
+  if (isLoading) {
+    return (
+      <div className="flex items-center gap-2 text-gray-500">
+        <Loader2 className="w-4 h-4 animate-spin" />
+        <span>Loading profile...</span>
+      </div>
+    );
   }
 
-  console.log("User Info:", userInfo);
   const [firstName, lastName] =
     userInfo?.data && splitFullName(userInfo.data.name);
   const customer = {

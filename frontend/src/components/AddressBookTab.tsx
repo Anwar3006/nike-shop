@@ -39,13 +39,34 @@ const AddressBookTab = ({ userAddresses }: { userAddresses: Address[] }) => {
     formData: AddressFormData,
     addressId?: string
   ) => {
+    console.log("Saving address:", formData);
+
     try {
-      await mutateAsync({
-        addressId,
+      // If setting as default, handle the existing default first
+      if (formData.isDefault) {
+        const currentDefault = userAddresses.find((addr) => addr.isDefault);
+
+        if (currentDefault && currentDefault.id !== addressId) {
+          // Remove default from existing address first
+          const currentAddress = {
+            ...currentDefault,
+            isDefault: false,
+            zipcode: currentDefault.zipCode,
+            phone: currentDefault.phoneNumber,
+          };
+          await mutateAsync(currentAddress);
+        }
+      }
+
+      // Save/update the current address
+      const addressData = {
+        ...(addressId && { addressId }), // Only include if it exists
         ...formData,
-      });
+      };
+
+      await mutateAsync(addressData);
     } catch (error) {
-      // Error is handled by the hook
+      console.error("Error saving address:", error);
       throw error; // Re-throw to handle in dialog
     }
   };

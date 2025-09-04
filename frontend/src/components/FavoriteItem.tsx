@@ -20,7 +20,7 @@ export const FavoriteItem = ({ favorite }: FavoriteItemProps) => {
   const router = useRouter();
   const { data: cart } = useGetCart();
   const { mutateAsync: addToCart, isPending } = useAddToCart();
-  const { mutate: removeFavorite } = useRemoveFavorite();
+  const { mutate: removeFavorite, isPending: removing } = useRemoveFavorite();
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
@@ -67,8 +67,6 @@ export const FavoriteItem = ({ favorite }: FavoriteItemProps) => {
       setDialogOpen(true);
     }
   };
-
-  console.log("Favorite Item Render: ", favorite.id, " IsInCart: ", isInCart);
 
   return (
     <div className="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
@@ -144,6 +142,7 @@ export const FavoriteItem = ({ favorite }: FavoriteItemProps) => {
             resourceType="favorite"
             resourceId={favorite.id}
             handleDelete={handleRemoveFavorite}
+            isDeleting={removing}
           />
           <Button
             variant="outline"

@@ -12,6 +12,7 @@ import {
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -21,7 +22,7 @@ import { Input } from "./ui/input";
 import { AddressFormData, addressSchema } from "@/schemas/auth.schema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Address } from "@/types";
 import {
   Select,
@@ -30,6 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
+import { Checkbox } from "./ui/checkbox";
 
 interface AddressEditDialogProps {
   address: Address;
@@ -57,6 +59,12 @@ export function AddressEditDialog({
       isDefault: address.isDefault || false,
     },
   });
+
+  useEffect(() => {
+    form.setValue("isDefault", address.isDefault);
+  }, [address]);
+
+  console.log("Address@@@: ", address, form.getValues());
 
   const onSubmit = async (data: AddressFormData) => {
     try {
@@ -192,6 +200,27 @@ export function AddressEditDialog({
                     <Input placeholder="+1 234 567 890" {...field} />
                   </FormControl>
                   <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="isDefault"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel>Set as default address</FormLabel>
+                    <FormDescription>
+                      The default address is used for shipping.
+                    </FormDescription>
+                  </div>
                 </FormItem>
               )}
             />

@@ -89,26 +89,13 @@ Full-stack Nike-inspired e-commerce shop built with:
 - [x] Optimistic updates and caching
 - [x] Loading and error states handling
 
----
-
-## 🚧 PARTIALLY COMPLETED FEATURES
-
-### Orders Management
-
-- [x] Frontend orders UI with dummy data
-- [x] Order display components
-- [x] Order status visualization
-- [ ] **Yet To Do**: Backend orders API endpoints
-- [ ] **Yet To Do**: Order creation and management
-- [ ] **Yet To Do**: Order history storage
-
 ### Address Management
 
 - [x] Database model for addresses
 - [x] Address form components
-- [ ] **Yet To Do**: Backend address CRUD API
-- [ ] **Yet To Do**: Address validation
-- [ ] **Yet To Do**: Default address handling
+- [x] Backend address CRUD API
+- [x] Address validation
+- [x] Default address handling
 
 ### Shopping Cart System
 
@@ -126,6 +113,19 @@ Full-stack Nike-inspired e-commerce shop built with:
 - [x] Favorites list display
 - [x] Favorites persistence across sessions
 - [x] Move from favorites to cart
+
+---
+
+## 🚧 PARTIALLY COMPLETED FEATURES
+
+### Orders Management
+
+- [x] Frontend orders UI with dummy data
+- [x] Order display components
+- [x] Order status visualization
+- [ ] **Yet To Do**: Backend orders API endpoints
+- [ ] **Yet To Do**: Order creation and management
+- [ ] **Yet To Do**: Order history storage
 
 ---
 
