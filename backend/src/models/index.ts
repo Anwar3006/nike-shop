@@ -19,3 +19,4 @@ export {
   popular_searches,
 } from "./search.model";
 export { favorites, favoritesRelations } from "./favorites.model";
+export * from "./orders.model";

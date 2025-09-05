@@ -22,7 +22,16 @@ export default () => {
   app.use(morgan("dev"));
   app.use(cookieParser());
   app.all("/api/auth/*", toNodeHandler(auth));
-  app.use(express.json());
+
+  // Use raw body for stripe webhook
+  app.use((req, res, next) => {
+    if (req.originalUrl.includes("/webhook")) {
+      next();
+    } else {
+      express.json()(req, res, next);
+    }
+  });
+
   app.use(express.urlencoded({ extended: false }));
 
   routes(app);
