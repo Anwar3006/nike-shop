@@ -48,6 +48,18 @@ export const ShoesController = {
     }
   ),
 
+  getShoeBySlug: catchAsync(
+    async (
+      req: Request<{ slug: string }, {}, {}>,
+      res: Response,
+      next: NextFunction
+    ) => {
+      const slug = req.params.slug;
+      const shoe = await ShoesService.getShoeBySlug(slug);
+      res.status(200).json({ success: true, data: shoe });
+    }
+  ),
+
   getAllShoes: catchAsync(
     async (
       req: Request<{}, {}, {}, GetShoesSchemaType["query"]>,

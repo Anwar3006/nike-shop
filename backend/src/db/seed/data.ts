@@ -1,3 +1,4 @@
+import { createSlug } from "../../utils/slugify";
 import { db } from "../index";
 import {
   shoes,
@@ -324,6 +325,7 @@ export async function seedNikeShoes() {
         .insert(shoes)
         .values({
           name: shoeData.name,
+          slug: createSlug(shoeData.name),
           description: shoeData.description,
           categoryId: catId!,
           basePrice: shoeData.price,

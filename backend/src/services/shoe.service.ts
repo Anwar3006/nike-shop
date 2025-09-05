@@ -1,9 +1,12 @@
 import { ShoeRepository } from "../repositories/shoe.repository";
 import {
   CreateShoeSchemaType,
+  GetShoesSchemaType,
   UpdateShoeSchemaType,
 } from "../schemas/shoe.schema";
 import { logger } from "../utils/logger";
+
+type GetShoesOptions = GetShoesSchemaType["query"];
 
 export const ShoesService = {
   createShoe: async (data: CreateShoeSchemaType["body"]) => {
@@ -42,6 +45,16 @@ export const ShoesService = {
       return shoe;
     } catch (error) {
       logger.error(error, "Error when getting shoe");
+      throw error;
+    }
+  },
+
+  getShoeBySlug: async (slug: string) => {
+    try {
+      const shoe = await ShoeRepository.getShoeBySlug(slug);
+      return shoe;
+    } catch (error) {
+      logger.error(error, "Error when getting shoe by slug");
       throw error;
     }
   },

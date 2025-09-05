@@ -13,18 +13,19 @@ export interface ShoesQueryOptions {
 // API Response Types
 export interface Shoe {
   id: string;
-  name: string;
+  name:string;
+  description: string;
   category: string;
   baseImage: string;
   basePrice: number;
-  images: string[];
   colors: Array<{
     name: string;
-    hex: string;
+    dominantColor: string;
+    size: string[];
+    styleNumber: string;
+    images: string[];
   }>;
-  sizes: string[];
   gender: "men" | "women" | "kids" | "unisex";
-  description?: string;
   inStock?: boolean;
 }
 

@@ -12,6 +12,7 @@ const shoeRouter = Router();
 shoeRouter.post("/", validate(createShoeSchema), ShoesController.createShoe);
 shoeRouter.put("/:id", validate(updateShoeSchema), ShoesController.updateShoe);
 shoeRouter.get("/", validate(getShoesSchema), ShoesController.getAllShoes);
+shoeRouter.get("/slug/:slug", ShoesController.getShoeBySlug);
 shoeRouter.get("/:id", ShoesController.getShoeById);
 shoeRouter.delete("/:id", ShoesController.deleteShoe);
 
