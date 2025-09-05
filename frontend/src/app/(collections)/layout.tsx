@@ -1,5 +1,8 @@
+"use client";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 import Navbar from "@/components/Navbar";
 import Filters from "@/components/Filters";
@@ -9,14 +12,17 @@ export default function CollectionsLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+  const isDetailsPage = /^\/collections\/.+\/.+/.test(pathname);
+
   return (
     <SidebarProvider>
       <div className="flex flex-col min-h-screen w-full">
         <Navbar />
 
         <div className="flex flex-1 relative">
-          <Filters />
-          <main className="flex-1 lg:ml-80 min-h-0">
+          {!isDetailsPage && <Filters />}
+          <main className={cn("flex-1 min-h-0", !isDetailsPage && "lg:ml-80")}>
             <div className="lg:hidden">
               <SidebarTrigger />
             </div>

@@ -1,6 +1,10 @@
 // import { GetShoesSchemaType } from "@/schemas/shoes.schema";
 import axiosClient from "../api/client";
-import { GetShoesApiResponse, ShoesQueryOptions } from "@/types/shoes";
+import {
+  GetShoesApiResponse,
+  Shoe,
+  ShoesQueryOptions,
+} from "@/types/shoes";
 
 const ShoesService = {
   getShoes: async (
@@ -42,6 +46,28 @@ const ShoesService = {
       console.error("Error when getting shoes: ", error);
       throw new Error(
         error instanceof Error ? error.message : "Failed to fetch shoes"
+      );
+    }
+  },
+  getShoeById: async (id: string): Promise<Shoe> => {
+    try {
+      const response = await axiosClient.get(`/shoes/${id}`);
+      return response.data.data;
+    } catch (error) {
+      console.error(`Error when getting shoe with id ${id}: `, error);
+      throw new Error(
+        error instanceof Error ? error.message : "Failed to fetch shoe"
+      );
+    }
+  },
+  getShoeBySlug: async (slug: string): Promise<Shoe> => {
+    try {
+      const response = await axiosClient.get(`/shoes/slug/${slug}`);
+      return response.data.data;
+    } catch (error) {
+      console.error(`Error when getting shoe with slug ${slug}: `, error);
+      throw new Error(
+        error instanceof Error ? error.message : "Failed to fetch shoe"
       );
     }
   },

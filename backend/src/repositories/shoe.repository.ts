@@ -27,6 +27,7 @@ import { PgTransaction, PgTransactionConfig } from "drizzle-orm/pg-core";
 import { NeonHttpQueryResultHKT } from "drizzle-orm/neon-http";
 import { has } from "config";
 import { parseSizeRange } from "../utils/helpers";
+import { createSlug } from "../utils/slugify";
 
 export const ShoeRepository = {
   createShoe: async (data: CreateShoeSchemaType["body"]) => {
@@ -43,11 +44,14 @@ export const ShoeRepository = {
           throw new Error(`Shoe already exists: ${exists.name}`);
         }
 
+        const slug = createSlug(data.name);
+
         // 1. Create the base shoe
         const [shoe] = await tx
           .insert(shoes)
           .values({
             name: data.name,
+            slug,
             description: data.description,
             categoryId: data.categoryId,
             basePrice: data.basePrice,
@@ -81,12 +85,22 @@ export const ShoeRepository = {
           throw new Error("Shoe does not exist");
         }
 
-        const sanitizedData = {
-          name: data.name || exists.name,
+        const sanitizedData: {
+          name?: string;
+          slug?: string;
+          description?: string;
+          categoryId?: number;
+          basePrice?: number;
+        } = {
           description: data.description || exists.description,
           categoryId: data.categoryId || exists.categoryId,
           basePrice: data.basePrice || exists.basePrice,
         };
+
+        if (data.name && data.name !== exists.name) {
+          sanitizedData.name = data.name;
+          sanitizedData.slug = createSlug(data.name);
+        }
 
         // 1. Update the base shoe
         const [shoe] = await tx
@@ -141,9 +155,92 @@ export const ShoeRepository = {
 
   getShoeById: async (shoeId: string) => {
     try {
-      const [found] = await db.select().from(shoes).where(eq(shoes.id, shoeId));
+      // Query 1: Fetch the base shoe data
+      const [shoeData] = await db
+        .select()
+        .from(shoes)
+        .where(eq(shoes.id, shoeId));
 
-      return found;
+      if (!shoeData) {
+        return null;
+      }
+
+      // Query 2: Fetch all color variants for the shoe
+      const colorVariantsData = await db
+        .select()
+        .from(colorVariant)
+        .where(eq(colorVariant.shoeId, shoeId));
+
+      if (colorVariantsData.length === 0) {
+        return {
+          ...shoeData,
+          colors: [],
+        };
+      }
+
+      const colorVariantIds = colorVariantsData.map((v) => v.id);
+
+      // Query 3: Fetch all images for all color variants in a single query
+      const allImages = await db
+        .select()
+        .from(images)
+        .where(inArray(images.colorVariantId, colorVariantIds));
+
+      // Query 4: Fetch all sizes for all color variants in a single query
+      const allSizes = await db
+        .select({
+          colorVariantId: shoeSizes.colorVariantId,
+          size: sizes.size,
+        })
+        .from(shoeSizes)
+        .innerJoin(sizes, eq(shoeSizes.sizeId, sizes.id))
+        .where(inArray(shoeSizes.colorVariantId, colorVariantIds));
+
+      // Group images and sizes by their variant ID for efficient lookup
+      const imagesMap = new Map<string, string[]>();
+      for (const image of allImages) {
+        if (!imagesMap.has(image.colorVariantId)) {
+          imagesMap.set(image.colorVariantId, []);
+        }
+        imagesMap.get(image.colorVariantId)!.push(image.imageUrl);
+      }
+
+      const sizesMap = new Map<string, string[]>();
+      for (const size of allSizes) {
+        if (!sizesMap.has(size.colorVariantId)) {
+          sizesMap.set(size.colorVariantId, []);
+        }
+        sizesMap.get(size.colorVariantId)!.push(size.size);
+      }
+
+      // Assemble the final nested structure
+      const colorVariants = colorVariantsData.map((variant) => ({
+        ...variant,
+        images: imagesMap.get(variant.id) || [],
+        size: sizesMap.get(variant.id) || [],
+      }));
+
+      return {
+        ...shoeData,
+        colors: colorVariants,
+      };
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  getShoeBySlug: async (slug: string) => {
+    try {
+      const [shoeData] = await db
+        .select()
+        .from(shoes)
+        .where(eq(shoes.slug, slug));
+
+      if (!shoeData) {
+        return null;
+      }
+
+      return ShoeRepository.getShoeById(shoeData.id);
     } catch (error) {
       throw error;
     }

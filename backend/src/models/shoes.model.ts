@@ -38,6 +38,7 @@ export const shoes = pgTable(
       .primaryKey()
       .$defaultFn(() => nanoid(12)),
     name: varchar("name").notNull(),
+    slug: varchar("slug").notNull().unique(),
     description: text("description").default(ProductDefaultDescription),
     categoryId: integer("categoryId")
       .notNull()
