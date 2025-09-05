@@ -26,12 +26,15 @@ export default function ShoeDetails({ shoe }: ShoeDetailsProps) {
   );
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-        <div className="lg:order-1">
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 mb-12">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 lg:relative">
+        {/* Left column */}
+        <div className="lg:order-1 lg:sticky lg:top-8 lg:h-screen lg:overflow-hidden">
           <ShoeImages shoe={shoe} selectedColorStyle={selectedColorStyle} />
         </div>
-        <div className="lg:order-2">
+
+        {/* Right column */}
+        <div className="lg:order-2 lg:max-h-screen lg:overflow-y-auto lg:pb-8">
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900">
             {shoe.name}
           </h1>

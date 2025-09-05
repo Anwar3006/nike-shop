@@ -10,7 +10,10 @@ interface ShoeImagesProps {
   selectedColorStyle: string;
 }
 
-export default function ShoeImages({ shoe, selectedColorStyle }: ShoeImagesProps) {
+export default function ShoeImages({
+  shoe,
+  selectedColorStyle,
+}: ShoeImagesProps) {
   const selectedColor = shoe.colors.find(
     (c) => c.styleNumber === selectedColorStyle
   );
@@ -21,8 +24,8 @@ export default function ShoeImages({ shoe, selectedColorStyle }: ShoeImagesProps
 
   useEffect(() => {
     const newMainImage =
-      shoe.colors.find((c) => c.styleNumber === selectedColorStyle)?.images[0] ||
-      shoe.baseImage;
+      shoe.colors.find((c) => c.styleNumber === selectedColorStyle)
+        ?.images[0] || shoe.baseImage;
     setMainImage(newMainImage);
   }, [selectedColorStyle, shoe]);
 
@@ -30,12 +33,12 @@ export default function ShoeImages({ shoe, selectedColorStyle }: ShoeImagesProps
 
   return (
     <div className="flex flex-col-reverse lg:flex-row gap-4">
-      <div className="flex lg:flex-col gap-2 overflow-x-auto lg:overflow-x-visible">
+      <div className="flex lg:flex-col gap-2 overflow-x-auto lg:overflow-x-visible lg:p-1 ">
         {activeImages.map((url, index) => (
           <div
             key={index}
             className={cn(
-              "relative w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden cursor-pointer flex-shrink-0",
+              "relative w-15 h-15 rounded-lg overflow-hidden cursor-pointer flex-shrink-0",
               mainImage === url && "ring-2 ring-primary"
             )}
             onClick={() => setMainImage(url)}
@@ -43,8 +46,9 @@ export default function ShoeImages({ shoe, selectedColorStyle }: ShoeImagesProps
             <Image
               src={url}
               alt={`Shoe image ${index + 1}`}
-              layout="fill"
-              objectFit="cover"
+              width={60}
+              height={60}
+              className="object-cover"
             />
           </div>
         ))}

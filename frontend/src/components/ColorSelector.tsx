@@ -18,7 +18,7 @@ export default function ColorSelector({
   return (
     <div>
       <h3 className="text-lg font-medium text-gray-900">Color</h3>
-      <div className="flex items-center space-x-3 mt-4">
+      <div className="grid grid-cols-4 sm:grid-cols-3 md:grid-cols-6 lg:grid-cols-8 gap-4 mt-4">
         {colors.map((color) => (
           <div
             key={color.styleNumber}

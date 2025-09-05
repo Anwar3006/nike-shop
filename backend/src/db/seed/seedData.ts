@@ -1,3 +1,6 @@
+//notice that each shoe has a list of one or more colors, each color has details, including size and images, so for a product details page,
+// the color selector will be based on the dominantColor field of each colors, and instead of a color we will use the first image of each colors.images field
+//also order the images just like how they appear in the images array.
 export default [
   {
     name: "Air Jordan 1 Retro High OG",
@@ -437,13 +440,13 @@ export default [
     category: "unisex",
     baseImage:
       "https://www.nike.sa/dw/image/v2/BDVB_PRD/on/demandware.static/-/Sites-akeneo-master-catalog/default/dwef51602b/nk/864/8/d/d/8/b/8648dd8b_9a27_4ea5_a8f8_5bd97a1c903e.jpg",
-    styleNumber: "IH4458-001",
     price: 24000,
     colors: [
       {
         name: "Black/Sundial/Neon Yellow/White",
         dominantColor: "Yellow",
         size: ["6.5", "9.5", "11", "11.5", "15"],
+        styleNumber: "IH4458-001",
         images: [
           "https://www.nike.sa/dw/image/v2/BDVB_PRD/on/demandware.static/-/Sites-akeneo-master-catalog/default/dwef51602b/nk/864/8/d/d/8/b/8648dd8b_9a27_4ea5_a8f8_5bd97a1c903e.jpg?sw=700&sh=700&sm=fit&q=100&strip=false",
           "https://www.nike.sa/dw/image/v2/BDVB_PRD/on/demandware.static/-/Sites-akeneo-master-catalog/default/dw39c4afef/nk/6e3/1/1/d/f/0/6e311df0_a286_455b_b83e_cedc32d3e44e.jpg?sw=700&sh=700&sm=fit&q=100&strip=false",

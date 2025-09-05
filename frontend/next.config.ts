@@ -4,10 +4,26 @@ const nextConfig: NextConfig = {
   /* config options here */
   images: {
     remotePatterns: [
-      new URL("https://mir-s3-cdn-cf.behance.net/**"),
-      new URL("https://static.nike.com/**"),
-      new URL("https://www.nike.sa/**"),
-      new URL("https://atlas-content-cdn.pixelsquid.com/**"),
+      {
+        protocol: "https",
+        hostname: "mir-s3-cdn-cf.behance.net",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "static.nike.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "www.nike.sa",
+        pathname: "/dw/image/**",
+      },
+      {
+        protocol: "https",
+        hostname: "atlas-content-cdn.pixelsquid.com",
+        pathname: "/**",
+      },
     ],
   },
 };
