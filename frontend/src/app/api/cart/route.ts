@@ -12,7 +12,6 @@ export async function getUserFromRequest(request: NextRequest) {
     // Better Auth typically stores session in cookies
     // Adjust the cookie name based on your Better Auth configuration
     const sessionToken = cookieStore.get("nike-shop.session_token")?.value;
-    console.log("Cookies:", sessionToken);
 
     if (!sessionToken) {
       return null;

@@ -12,7 +12,7 @@ type CartItemProps = {
     quantity: number;
     size: string;
   };
-  onRemove: (shoeId: string, size: string) => void;
+  onRemove: (shoeId: string, size: string, color: string) => void;
   onUpdateQuantity: (
     shoeId: string,
     size: string,
@@ -20,13 +20,12 @@ type CartItemProps = {
     quantity: number
   ) => void;
 };
-
 export const CartItem = ({
   item,
   onRemove,
   onUpdateQuantity,
 }: CartItemProps) => {
-  console.log("Rendering CartItem: ", item);
+  // console.log("CartItem: ", item);
   return (
     <div className="flex items-center justify-between py-6">
       <div className="flex items-center space-x-4">
@@ -69,7 +68,7 @@ export const CartItem = ({
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => onRemove(item.shoeId, item.size)}
+          onClick={() => onRemove(item.shoeId, item.size, item.color!)}
         >
           <Trash2 className="h-5 w-5 text-red-500" />
         </Button>

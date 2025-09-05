@@ -20,14 +20,15 @@ const CartPage = () => {
   const router = useRouter();
   const { isPending: sessionLoading } = useSession();
   const { data: cart, isLoading: isCartLoading, isError, error } = useGetCart();
-  const { mutate: removeItem } = useRemoveFromCart();
+  const { mutate: removeItem, isPending: isRemovingFromCart } =
+    useRemoveFromCart();
   const { mutate: updateQuantity } = useUpdateCartItemQuantity();
   const { mutate: clearCart } = useClearCart();
 
   const [isDeleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
 
-  const handleRemoveItem = (shoeId: string, size: string) => {
-    removeItem({ cartItem: { shoeId, size } });
+  const handleRemoveItem = (shoeId: string, size: string, color: string) => {
+    removeItem({ cartItem: { shoeId, size, color } });
   };
 
   const handleUpdateQuantity = (
@@ -46,7 +47,13 @@ const CartPage = () => {
 
   const transformedCart: CartItemType[] = React.useMemo(() => {
     if (!cart) return [];
-    return cart.map(
+    // Sort by name to ensure a stable order
+    const sortedCart = [...cart].sort(
+      (a, b) =>
+        // a.value.name.localeCompare(b.value.name)
+        b.value.addedAt - a.value.addedAt
+    );
+    return sortedCart.map(
       ({ itemKey, value }: { itemKey: string; value: CartItemType }) => {
         return { ...value };
       }
@@ -83,6 +90,7 @@ const CartPage = () => {
     return <Error title="Cart" error={error} />;
   }
 
+  // If cart is empty
   if (!transformedCart || transformedCart.length === 0) {
     return (
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -105,7 +113,7 @@ const CartPage = () => {
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+        <h1 className="text-3xl font-bold tracking-tight text-gray-900 font-bevellier">
           Cart
         </h1>
         <Button
@@ -123,7 +131,7 @@ const CartPage = () => {
             {transformedCart.map((item: CartItemType) => (
               <CartItem
                 key={`${item.shoeId}-${item.size}`}
-                item={item}
+                item={{ ...item }}
                 onRemove={handleRemoveItem}
                 onUpdateQuantity={handleUpdateQuantity}
               />
@@ -157,6 +165,7 @@ const CartPage = () => {
         resourceType="cart"
         resourceId="cart"
         handleDelete={handleClearCart}
+        isDeleting={isRemovingFromCart}
       />
     </div>
   );

@@ -97,10 +97,14 @@ export const useRemoveFromCart = () => {
     }
   >({
     mutationFn: async ({ cartItem }) => {
-      const response = await axios.delete("/api/cart", { data: cartItem });
-      return response.data;
+      try {
+        const response = await axios.delete("/api/cart", { data: cartItem });
+        return response.data;
+      } catch (error) {
+        console.error("Error removing item from cart: ", error);
+      }
     },
-    onSuccess: () => {
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["cart", userId] });
       queryClient.invalidateQueries({ queryKey: ["cartSize", userId] });
 
