@@ -47,11 +47,9 @@ const CartPage = () => {
 
   const transformedCart: CartItemType[] = React.useMemo(() => {
     if (!cart) return [];
-    // Sort by name to ensure a stable order
+    // Sort by addedAt to ensure a stable order
     const sortedCart = [...cart].sort(
-      (a, b) =>
-        // a.value.name.localeCompare(b.value.name)
-        b.value.addedAt - a.value.addedAt
+      (a, b) => b.value.addedAt - a.value.addedAt
     );
     return sortedCart.map(
       ({ itemKey, value }: { itemKey: string; value: CartItemType }) => {
@@ -130,7 +128,7 @@ const CartPage = () => {
           <div className="lg:col-span-2">
             {transformedCart.map((item: CartItemType) => (
               <CartItem
-                key={`${item.shoeId}-${item.size}`}
+                key={`${item.color}-${item.size}`}
                 item={{ ...item }}
                 onRemove={handleRemoveItem}
                 onUpdateQuantity={handleUpdateQuantity}

@@ -161,11 +161,11 @@ Full-stack Nike-inspired e-commerce shop built with:
 
 ### Product Details & Variants
 
-- [ ] **Yet To Do**: Individual product detail pages
-- [ ] **Yet To Do**: Product image gallery
-- [ ] **Yet To Do**: Color variant selection
-- [ ] **Yet To Do**: Size selection interface
-- [ ] **Yet To Do**: Stock level display
+- [x] Individual product detail pages
+- [x] Product image gallery
+- [x] Color variant selection
+- [x] Size selection interface
+- [x] Stock level display - Not needed here
 - [ ] **Yet To Do**: Product recommendations
 - [ ] **Yet To Do**: Product zoom functionality
 
