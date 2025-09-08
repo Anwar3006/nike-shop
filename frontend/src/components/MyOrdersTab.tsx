@@ -3,6 +3,7 @@ import OrderItem from "./OrderItem";
 // Dummy data for orders
 const orders = [
   {
+    id: "1234",
     status: "Estimated arrival" as const,
     date: "24 Sep 2025",
     imageUrl: "/shoes/shoe-1.jpg", // Placeholder image
@@ -13,6 +14,7 @@ const orders = [
     price: 98.3,
   },
   {
+    id: "3456",
     status: "Delivered" as const,
     date: "04 August",
     imageUrl: "/shoes/shoe-6.avif", // Placeholder image
@@ -23,6 +25,7 @@ const orders = [
     price: 104.26,
   },
   {
+    id: "5678",
     status: "Delivered" as const,
     date: "04 August",
     imageUrl: "/shoes/shoe-9.avif", // Placeholder image

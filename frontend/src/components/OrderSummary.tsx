@@ -7,9 +7,10 @@ import Image from "next/image";
 import { PlusCircle } from "lucide-react";
 import { Separator } from "./ui/separator";
 import { CartItemData, mockRecommendedItem } from "@/lib/mock-checkout-data";
+import { CartItem as CartItemType } from "@/types/cart";
 
 interface OrderSummaryProps {
-  items: CartItemData[];
+  items: CartItemType[];
   subtotal: number;
   shipping: number;
   tax: number;

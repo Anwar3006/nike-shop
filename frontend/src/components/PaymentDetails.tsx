@@ -4,24 +4,32 @@ import { useState, FormEvent } from "react";
 import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "./ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "./ui/card";
+import { Card, CardContent, CardFooter, CardHeader } from "./ui/card";
 import { Apple, CreditCard } from "lucide-react";
 import PaymentForm from "./PaymentForm";
 import { toast } from "sonner";
 import { Separator } from "./ui/separator";
+import axiosClient from "@/lib/api/client";
+import { CartItem } from "@/types/cart";
+import { useGetUserInfo, useUpsertAddress } from "@/hooks/api/use-userInfo";
+import { Address } from "@/types";
+import AddressEditDialog from "./AddressEditDialog";
+import { AddressFormData } from "@/schemas/auth.schema";
 
 interface PaymentDetailsProps {
   total: number;
+  cart: CartItem[];
+  shippingAddress: Address;
 }
 
-const PaymentDetails = ({ total }: PaymentDetailsProps) => {
+const PaymentDetails = ({
+  total,
+  cart,
+  shippingAddress,
+}: PaymentDetailsProps) => {
   const stripe = useStripe();
   const elements = useElements();
+
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handleSubmit = async (event: FormEvent) => {
@@ -30,32 +38,38 @@ const PaymentDetails = ({ total }: PaymentDetailsProps) => {
 
     setIsProcessing(true);
 
-    const res = await fetch("/api/v1/payments/create-payment-intent", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ amount: Math.round(total * 100) }),
-    });
+    const res = await axiosClient.post(
+      "/payments/create-payment-intent",
+      JSON.stringify({
+        amount: Math.round(total * 100),
+        cart,
+        shippingAddressId: shippingAddress.id,
+      })
+    );
 
-    if (!res.ok) {
+    if (res.status !== 200) {
       toast.error("Failed to create payment intent. Please try again.");
       setIsProcessing(false);
       return;
     }
 
-    const { clientSecret } = await res.json();
+    const { clientSecret } = await res.data;
 
     const cardElement = elements.getElement(CardElement);
     if (!cardElement) {
-        setIsProcessing(false);
-        return;
+      setIsProcessing(false);
+      return;
     }
 
-    const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-      payment_method: {
-        card: cardElement,
-        billing_details: { name: "Jenny Rosen", email: "jenny@example.com" },
-      },
-    });
+    const { error, paymentIntent } = await stripe.confirmCardPayment(
+      clientSecret,
+      {
+        payment_method: {
+          card: cardElement,
+          billing_details: { name: "Jenny Rosen", email: "jenny@example.com" },
+        },
+      }
+    );
 
     if (error) {
       toast.error(error.message);

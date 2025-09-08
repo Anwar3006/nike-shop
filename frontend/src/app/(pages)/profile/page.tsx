@@ -1,8 +1,7 @@
 "use client";
-import { useSession } from "@/lib/auth-client";
 import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { Briefcase, ChevronDown, Home, Loader2 } from "lucide-react";
+import { ChevronDown, Loader2 } from "lucide-react";
 
 import { createRedirectUrl } from "@/utils/auth-redirect";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -23,7 +22,7 @@ import AddressBookTab from "@/components/AddressBookTab";
 import _ from "lodash";
 import { useGetUserInfo } from "@/hooks/api/use-userInfo";
 import { splitFullName } from "@/utils/helper";
-import { Address } from "@/types";
+
 import Error from "@/components/Error";
 
 // Tab configuration

@@ -6,10 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Star } from "lucide-react";
 
 interface ShoePageProps {
-  params: {
+  params: Promise<{
     category: string;
     slug: string;
-  };
+  }>;
 }
 
 const getShoeBySlug = async (slug: string): Promise<Shoe | null> => {
@@ -34,7 +34,7 @@ const relatedShoes = [
     discount: null,
   },
   {
-    id: "2", 
+    id: "2",
     name: "Nike Court Vision Low Next Nature",
     price: 9830,
     image: "/api/placeholder/300/300",
@@ -46,7 +46,7 @@ const relatedShoes = [
     id: "3",
     name: "Nike Dunk Low Retro",
     price: 9830,
-    image: "/api/placeholder/300/300", 
+    image: "/api/placeholder/300/300",
     colors: 6,
     isNewArrival: false,
     discount: "Extra 10% off",
@@ -93,13 +93,13 @@ function RelatedShoesSection() {
                   <span className="text-gray-400 text-sm">Shoe Image</span>
                 </div>
               </div>
-              
+
               <div className="space-y-2">
                 <h3 className="font-semibold text-gray-900 group-hover:text-gray-600 transition-colors">
                   {shoe.name}
                 </h3>
                 <p className="text-gray-600 text-sm">
-                  {shoe.colors} Colour{shoe.colors !== 1 ? 's' : ''}
+                  {shoe.colors} Colour{shoe.colors !== 1 ? "s" : ""}
                 </p>
                 <p className="font-semibold text-gray-900">
                   ${shoe.price / 100}
@@ -110,11 +110,7 @@ function RelatedShoesSection() {
         </div>
 
         <div className="text-center mt-12">
-          <Button 
-            variant="outline" 
-            size="lg"
-            className="px-8"
-          >
+          <Button variant="outline" size="lg" className="px-8">
             View All Similar Products
           </Button>
         </div>
@@ -140,7 +136,9 @@ function CustomerReviewsSection() {
                 />
               ))}
             </div>
-            <span className="text-gray-600 ml-2">4.8 out of 5 (2,847 reviews)</span>
+            <span className="text-gray-600 ml-2">
+              4.8 out of 5 (2,847 reviews)
+            </span>
           </div>
         </div>
 
@@ -155,10 +153,12 @@ function CustomerReviewsSection() {
               ))}
             </div>
             <p className="text-gray-700 mb-4">
-              "Amazing comfort and style! These are my go-to sneakers for everything from workouts to casual outings."
+              &quot;Amazing comfort and style! These are my go-to sneakers for
+              everything from workouts to casual outings.&quot;
             </p>
             <div className="text-sm text-gray-500">
-              <span className="font-medium">Jessica K.</span> • Verified Purchase
+              <span className="font-medium">Jessica K.</span> • Verified
+              Purchase
             </div>
           </div>
 
@@ -172,7 +172,8 @@ function CustomerReviewsSection() {
               ))}
             </div>
             <p className="text-gray-700 mb-4">
-              "Perfect fit and the quality is outstanding. Nike never disappoints with their Air Max line!"
+              &quot;Perfect fit and the quality is outstanding. Nike never
+              disappoints with their Air Max line!&quot;
             </p>
             <div className="text-sm text-gray-500">
               <span className="font-medium">Marcus T.</span> • Verified Purchase
@@ -189,7 +190,8 @@ function CustomerReviewsSection() {
               ))}
             </div>
             <p className="text-gray-700 mb-4">
-              "Love the retro vibe and the cushioning is incredible. Highly recommend for anyone looking for style and comfort."
+              &quot;Love the retro vibe and the cushioning is incredible. Highly
+              recommend for anyone looking for style and comfort.&quot;
             </p>
             <div className="text-sm text-gray-500">
               <span className="font-medium">Riley M.</span> • Verified Purchase
@@ -198,11 +200,7 @@ function CustomerReviewsSection() {
         </div>
 
         <div className="text-center mt-12">
-          <Button 
-            variant="outline" 
-            size="lg"
-            className="px-8"
-          >
+          <Button variant="outline" size="lg" className="px-8">
             Read All Reviews
           </Button>
         </div>
@@ -220,23 +218,24 @@ function NewsletterSection() {
             Stay In The Know
           </h2>
           <p className="text-gray-300 mb-8">
-            Be the first to hear about new releases, exclusive offers, and the latest Nike news.
+            Be the first to hear about new releases, exclusive offers, and the
+            latest Nike news.
           </p>
-          
+
           <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-            <input 
-              type="email" 
+            <input
+              type="email"
               placeholder="Enter your email"
               className="flex-1 px-4 py-3 rounded bg-gray-800 text-white placeholder-gray-400 border border-gray-700 focus:border-white focus:outline-none"
             />
-            <Button 
+            <Button
               size="lg"
               className="bg-white text-black hover:bg-gray-100 px-8"
             >
               Subscribe
             </Button>
           </div>
-          
+
           <p className="text-gray-400 text-sm mt-4">
             By signing up, you agree to our Privacy Policy and Terms of Service.
           </p>
@@ -247,8 +246,8 @@ function NewsletterSection() {
 }
 
 export default async function ShoePage({ params }: ShoePageProps) {
-  const params_ = await params;
-  const shoe = await getShoeBySlug(params_.slug);
+  const { slug } = await params;
+  const shoe = await getShoeBySlug(slug);
 
   if (!shoe) {
     notFound();

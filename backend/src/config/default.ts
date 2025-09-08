@@ -5,6 +5,7 @@ export const {
   PORT,
   VERSION,
   NODE_ENV,
+  API_URL,
   BETTER_AUTH_SECRET,
   DATABASE_URL,
   FRONTEND_URL,

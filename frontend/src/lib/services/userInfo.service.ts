@@ -29,7 +29,6 @@ const UserInfoService = {
 
   upsertAddress: async (data: AddressFormData) => {
     try {
-      console.log("Data: ", data);
       const response = await axiosClient.put("/userInfo/address", data);
       return response.data;
     } catch (error) {

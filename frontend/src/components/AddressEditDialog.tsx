@@ -62,7 +62,7 @@ export function AddressEditDialog({
 
   useEffect(() => {
     form.setValue("isDefault", address.isDefault);
-  }, [address]);
+  }, [address, form]);
 
   console.log("Address@@@: ", address, form.getValues());
 

@@ -3,7 +3,7 @@ import { testDb } from "./db";
 
 import createServer from "./createServer";
 import { logger } from "./utils/logger";
-import { PORT } from "./config/default";
+import { API_URL, PORT } from "./config/default";
 
 const app = createServer();
 
@@ -19,5 +19,5 @@ app.listen(PORT, async () => {
     logger.error("Error connecting to the database: " + error);
     process.exit(1);
   }
-  logger.info(`Backend running on http://localhost:${PORT}`);
+  logger.info(`Backend running on ${API_URL}:${PORT}`);
 });

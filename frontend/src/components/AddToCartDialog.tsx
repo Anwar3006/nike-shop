@@ -117,9 +117,8 @@ const AddToCartDialog = ({
     toggleDialog(false);
     form.reset();
   };
-  const onFormError = (errors: any) => {
+  const onFormError = (errors: unknown) => {
     console.error("Form Errors:", errors);
-    console.log("Current Form Values:", form.getValues());
     toast.error("Please fill out all required fields.", {
       description:
         "Select a size and color to continue.\n" +

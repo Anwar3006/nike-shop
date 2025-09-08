@@ -1,5 +1,4 @@
 export interface CartItem {
-  itemKey: string;
   shoeId: string;
   name: string;
   image: string;

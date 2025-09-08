@@ -25,3 +25,13 @@ declare global {
     }
   }
 }
+
+type CartItemData = {
+  shoeId: string;
+  name: string;
+  image: string;
+  color: string;
+  price: number;
+  quantity: number;
+  size: string;
+};

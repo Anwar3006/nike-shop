@@ -6,11 +6,6 @@ export type CartItemData = {
   price: number;
   quantity: number;
   size: string;
-  // Details from the design
-  category: string;
-  edition: string;
-  storage?: string; // e.g., 2 TB
-  connectivity?: string; // e.g., Wireless
 };
 
 export const mockCartItems: CartItemData[] = [
@@ -22,8 +17,6 @@ export const mockCartItems: CartItemData[] = [
     price: 499.99,
     quantity: 1,
     size: "10",
-    category: "Men's Shoes",
-    edition: "Game Console", // Adapting design text
   },
   {
     shoeId: "2",
@@ -33,9 +26,6 @@ export const mockCartItems: CartItemData[] = [
     price: 99.99,
     quantity: 1,
     size: "9.5",
-    category: "Women's Shoes",
-    edition: "Standard Edition",
-    connectivity: "Wireless",
   },
 ];
 
@@ -45,5 +35,6 @@ export const mockRecommendedItem = {
   image: "/shoes/shoe-3.webp",
   price: 180.0,
   originalPrice: 220.0,
-  description: "Dive into a world of unrivaled gaming experiences with PlayStation VR2.",
+  description:
+    "Dive into a world of unrivaled gaming experiences with PlayStation VR2.",
 };

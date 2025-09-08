@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import axios from "axios";
 
 // Helper to get user from request in API routes
-export async function getUserFromRequest(request: NextRequest) {
+async function getUserFromRequest(request: NextRequest) {
   try {
     const cookieStore = await cookies();
 

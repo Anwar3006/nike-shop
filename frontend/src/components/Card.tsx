@@ -2,7 +2,7 @@
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import React, { useEffect } from "react";
+import React, { MouseEvent, useEffect } from "react";
 import { Button } from "./ui/button";
 import { Heart } from "lucide-react";
 import { useIsFavorite, useToggleFavorite } from "@/hooks/api/use-favorites";
@@ -52,7 +52,7 @@ const Card: React.FC<CardProps> = ({
     }
   }, [error]);
 
-  const handleFavoriteClick = async (e: any) => {
+  const handleFavoriteClick = async (e: MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
 
     if (isPending || isToggling) return;

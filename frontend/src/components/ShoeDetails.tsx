@@ -128,7 +128,7 @@ export default function ShoeDetails({ shoe }: ShoeDetailsProps) {
         {/* Mobile: Product Info first */}
         <div className="lg:hidden">
           <div className="space-y-4">
-            <p className="text-lg text-gray-500">Women's Shoes</p>
+            <p className="text-lg text-gray-500">Women&apos;s Shoes</p>
             <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900">
               {shoe.name}
             </h1>
@@ -167,7 +167,7 @@ export default function ShoeDetails({ shoe }: ShoeDetailsProps) {
           <div className="space-y-8">
             {/* Desktop: Product Info */}
             <div className="hidden lg:block space-y-4">
-              <p className="text-lg text-gray-500">Women's Shoes</p>
+              <p className="text-lg text-gray-500">Women&apos;s Shoes</p>
               <h1 className="text-4xl font-bold tracking-tight text-gray-900">
                 {shoe.name}
               </h1>
@@ -247,7 +247,7 @@ export default function ShoeDetails({ shoe }: ShoeDetailsProps) {
                     <p>
                       The Air Max 90 stays true to its running roots with the
                       iconic Waffle sole. Plus, stitched overlays and textured
-                      accents create the '90s look you love. Complete with
+                      accents create the &apos;90s look you love. Complete with
                       romantic hues, its visible Air cushioning adds comfort to
                       your journey.
                     </p>
@@ -347,9 +347,10 @@ export default function ShoeDetails({ shoe }: ShoeDetailsProps) {
                           </span>
                         </div>
                         <p className="text-gray-700 text-sm">
-                          "Love these sneakers! The color is exactly as pictured
-                          and they're super comfortable for all-day wear. The
-                          Air Max cushioning really makes a difference."
+                          &quot;Love these sneakers! The color is exactly as
+                          pictured and they&apos;re super comfortable for
+                          all-day wear. The Air Max cushioning really makes a
+                          difference.&quot;
                         </p>
                       </div>
 
@@ -370,8 +371,9 @@ export default function ShoeDetails({ shoe }: ShoeDetailsProps) {
                           </span>
                         </div>
                         <p className="text-gray-700 text-sm">
-                          "Great quality and fast shipping. These Air Max 90s
-                          are a classic for a reason! Fit true to size."
+                          &quot;Great quality and fast shipping. These Air Max
+                          90s are a classic for a reason! Fit true to
+                          size.&quot;
                         </p>
                       </div>
                     </div>

@@ -5,9 +5,10 @@ import { toNodeHandler } from "better-auth/node";
 import cookieParser from "cookie-parser";
 
 import { routes } from "./routes/index.routes";
-import { FRONTEND_URL } from "./config/default";
+import { FRONTEND_URL, NODE_ENV } from "./config/default";
 import { auth } from "./utils/auth";
 import { globalErrorHandler, NotFound } from "./errors/errorHandler";
+import { cronJob } from "./utils/cron";
 
 export default () => {
   const app = express();
@@ -22,6 +23,10 @@ export default () => {
   app.use(morgan("dev"));
   app.use(cookieParser());
   app.all("/api/auth/*", toNodeHandler(auth));
+
+  if (NODE_ENV === "production") {
+    cronJob.start();
+  }
 
   // Use raw body for stripe webhook
   app.use((req, res, next) => {

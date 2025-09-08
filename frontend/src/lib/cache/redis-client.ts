@@ -24,10 +24,15 @@ export const redisClient = async (): Promise<Redis> => {
     await redisInstance.ping();
 
     return redisInstance;
-  } catch (error: any) {
+    //
+  } catch (error: unknown) {
     console.error("Redis initialization error:", error);
     redisInstance = null; // Reset on error
-    throw new Error(`Failed to initialize Redis client: ${error.message}`);
+    if (error instanceof Error) {
+      throw new Error(`Failed to initialize Redis client: ${error.message}`);
+    } else {
+      throw new Error("Failed to initialize Redis client: Unknown error");
+    }
   }
 };
 

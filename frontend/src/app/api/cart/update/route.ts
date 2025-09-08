@@ -1,8 +1,44 @@
 import { NextRequest, NextResponse } from "next/server";
 import { redisClient } from "@/lib/cache/redis-client";
-import { authClient } from "@/lib/auth-client";
-import { getUserFromRequest } from "../route";
+
 import { CartItem } from "@/types/cart";
+import axios from "axios";
+import { cookies } from "next/headers";
+
+// Helper to get user from request in API routes
+async function getUserFromRequest(request: NextRequest) {
+  try {
+    const cookieStore = await cookies();
+
+    // Better Auth typically stores session in cookies
+    // Adjust the cookie name based on your Better Auth configuration
+    const sessionToken = cookieStore.get("nike-shop.session_token")?.value;
+
+    if (!sessionToken) {
+      return null;
+    }
+
+    // Make a request to your auth server to verify the session
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/get-session`,
+      {
+        headers: {
+          cookie: request.headers.get("cookie") || "",
+        },
+      }
+    );
+
+    if (response.status !== 200) {
+      return null;
+    }
+
+    const session = await response.data;
+    return session.user;
+  } catch (error) {
+    console.error("Error verifying session:", error);
+    return null;
+  }
+}
 
 export async function PATCH(request: NextRequest) {
   try {

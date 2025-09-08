@@ -2,15 +2,8 @@ import { useSession } from "@/lib/auth-client";
 import { redisClient } from "@/lib/cache/redis-client";
 import { ToastID } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Redis } from "@upstash/redis";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { toast } from "sonner";
-
-//36,000
-const refreshCartTTL = async (cartInstance: Redis, userId: string) => {
-  const TTL_SECONDS = 7 * 24 * 60 * 60; // 7 days
-  await cartInstance.expire(`cart:${userId}`, TTL_SECONDS);
-};
 
 // GET cart items
 export const useGetCart = () => {
@@ -62,19 +55,31 @@ export const useAddToCart = () => {
         descriptionClassName: "text-green-800 font-medium",
       });
     },
-    onError: (error: any) => {
-      if (error.response?.status === 409) {
-        toast.warning("Item already in cart, increase quantity from cart page");
-        return;
-      }
 
-      toast.error("Failed to add to cart", {
-        id: ToastID.ADD_TO_CART_ERROR,
-        description:
-          error.response?.data?.error ||
-          "Something went wrong. Please try again.",
-        duration: 8000,
-      });
+    onError: (error: unknown) => {
+      console.error("Error with useAddToCart hook: ", error);
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 409) {
+          toast.warning(
+            "Item already in cart, increase quantity from cart page"
+          );
+          return;
+        }
+
+        toast.error("Failed to add to cart", {
+          id: ToastID.ADD_TO_CART_ERROR,
+          description:
+            error.response?.data?.error ||
+            "Something went wrong. Please try again.",
+          duration: 8000,
+        });
+      } else {
+        toast.error("Failed to add to cart", {
+          id: ToastID.ADD_TO_CART_ERROR,
+          description: "Something went wrong. Please try again.",
+          duration: 8000,
+        });
+      }
     },
   });
 };
@@ -115,14 +120,24 @@ export const useRemoveFromCart = () => {
         descriptionClassName: "text-green-800 font-medium",
       });
     },
-    onError: (error: any) => {
-      toast.error("Failed to remove from cart", {
-        id: ToastID.REMOVE_FROM_CART_ERROR,
-        description:
-          error.response?.data?.error ||
-          "Something went wrong. Please try again.",
-        duration: 8000,
-      });
+
+    onError: (error: unknown) => {
+      console.error("Error with useRemoveFromCart hook: ", error);
+      if (error instanceof AxiosError) {
+        toast.error("Failed to remove from cart", {
+          id: ToastID.REMOVE_FROM_CART_ERROR,
+          description:
+            error.response?.data?.error ||
+            "Something went wrong. Please try again.",
+          duration: 8000,
+        });
+      } else {
+        toast.error("Failed to remove from cart", {
+          id: ToastID.REMOVE_FROM_CART_ERROR,
+          description: "Something went wrong. Please try again.",
+          duration: 8000,
+        });
+      }
     },
   });
 };

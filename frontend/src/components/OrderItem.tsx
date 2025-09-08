@@ -76,6 +76,7 @@ const OrderItem = ({
           resourceType="order"
           resourceId={id}
           handleDelete={handleDelete}
+          isDeleting={true} //ToDo
         />
         <Button
           variant="ghost"

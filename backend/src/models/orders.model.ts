@@ -7,7 +7,7 @@ import {
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
+import { InferInsertModel, relations } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { user, address } from "./auth-model";
 import { shoeSizes } from "./shoes.model";
@@ -33,6 +33,13 @@ export const orders = pgTable("orders", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// name: string;
+// image: string;
+// color: string | undefined;
+// price: number;
+// quantity: number;
+// size: string;
+
 export const orderItems = pgTable(
   "order_items",
   {
@@ -44,14 +51,16 @@ export const orderItems = pgTable(
     sizeId: integer("size_id").notNull(),
     quantity: integer("quantity").notNull(),
     price: integer("price").notNull(), // Price at the time of purchase
+    name: text().notNull(),
+    image: text().notNull(),
   },
-  (table) => ({
-    pk: primaryKey({
+  (table) => [
+    primaryKey({
       columns: [table.orderId, table.colorVariantId, table.sizeId],
     }),
-  })
+  ]
 );
-
+export type OrderInsert = InferInsertModel<typeof orders>;
 
 // RELATIONS
 
@@ -76,3 +85,4 @@ export const orderItemsRelations = relations(orderItems, ({ one }) => ({
   // and Drizzle doesn't support relations on composite keys yet.
   // We can fetch this information manually when needed.
 }));
+export type OrderItemInsert = InferInsertModel<typeof orderItems>;

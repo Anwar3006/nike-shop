@@ -1,19 +1,27 @@
 import Stripe from "stripe";
 import { STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET } from "../config/default";
 import { db } from "../db";
-import { orders } from "../models";
-import { eq } from "drizzle-orm";
+import {
+  colorVariant,
+  OrderItemInsert,
+  orderItems,
+  orders,
+  shoeSizes,
+  sizes,
+} from "../models";
+import { and, eq } from "drizzle-orm";
 import { logger } from "../utils/logger";
 
 const stripe = new Stripe(STRIPE_SECRET_KEY!, {
-  apiVersion: "2024-04-10",
+  apiVersion: "2025-08-27.basil",
   typescript: true,
 });
 
 export const createPaymentIntent = async (
   amount: number,
   userId: string,
-  shippingAddressId: string
+  shippingAddressId: string,
+  cartItem: CartItemData[]
 ) => {
   const paymentIntent = await stripe.paymentIntents.create({
     amount: amount,
@@ -23,13 +31,52 @@ export const createPaymentIntent = async (
     },
   });
 
-  await db.insert(orders).values({
-    userId,
-    totalAmount: amount,
-    shippingAddressId,
-    paymentIntentId: paymentIntent.id,
-    status: "pending",
-  });
+  const [order] = await db
+    .insert(orders)
+    .values({
+      userId,
+      totalAmount: amount,
+      shippingAddressId,
+      paymentIntentId: paymentIntent.id,
+      status: "pending",
+    })
+    .returning();
+
+  const orderItemsToInsert: OrderItemInsert[] = [];
+  for (const item of cartItem) {
+    const [color_variant] = await db
+      .select()
+      .from(colorVariant)
+      .where(
+        and(
+          eq(colorVariant.shoeId, item.shoeId),
+          eq(colorVariant.dominantColor, item.color)
+        )
+      );
+
+    const [shoeSize] = await db
+      .select()
+      .from(shoeSizes)
+      .where(
+        and(
+          eq(shoeSizes.colorVariantId, color_variant.id),
+          eq(sizes.size, item.size)
+        )
+      )
+      .leftJoin(sizes, eq(shoeSizes.sizeId, sizes.id));
+
+    orderItemsToInsert.push({
+      name: item.name,
+      image: item.image,
+      orderId: order.id,
+      colorVariantId: color_variant.id,
+      sizeId: shoeSize.shoe_sizes.sizeId,
+      quantity: item.quantity,
+      price: item.price,
+    });
+  }
+
+  await db.insert(orderItems).values(orderItemsToInsert);
 
   return {
     clientSecret: paymentIntent.client_secret,

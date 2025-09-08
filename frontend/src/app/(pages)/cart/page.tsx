@@ -11,13 +11,12 @@ import { useSession } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { DeleteDialog } from "@/components/DeleteDialog";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+
 import { CartItem as CartItemType } from "@/types/cart";
 import { CartItem } from "@/components/CartItem";
 import Error from "@/components/Error";
 
 const CartPage = () => {
-  const router = useRouter();
   const { isPending: sessionLoading } = useSession();
   const { data: cart, isLoading: isCartLoading, isError, error } = useGetCart();
   const { mutate: removeItem, isPending: isRemovingFromCart } =
@@ -98,7 +97,7 @@ const CartPage = () => {
         <div className="text-center py-16">
           <h2 className="text-2xl font-semibold">Your cart is empty</h2>
           <p className="text-gray-500 mt-2">
-            Looks like you haven't added anything to your cart yet.
+            Looks like you haven&apos;t added anything to your cart yet.
           </p>
           <Button asChild className="mt-6">
             <Link href="/">Continue Shopping</Link>

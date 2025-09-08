@@ -1,6 +1,6 @@
 import { useSession } from "@/lib/auth-client";
 import UserInfoService from "@/lib/services/userInfo.service";
-import { UserProfileSchemaType } from "@/schemas/auth.schema";
+import { AddressFormData, UserProfileSchemaType } from "@/schemas/auth.schema";
 import { ToastID } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -46,8 +46,7 @@ export const useUpsertAddress = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: any) =>
-      UserInfoService.upsertAddress({ ...data, userId }),
+    mutationFn: (data: AddressFormData) => UserInfoService.upsertAddress(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["userInfo", userId] });
       toast.success("Address upserted successfully", {
