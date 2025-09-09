@@ -1,4 +1,4 @@
-export { user, address, account, session, verification } from "./auth-model.js";
+export { user, address, account, session, verification } from "./auth-model";
 export {
   category,
   shoes,
@@ -12,11 +12,11 @@ export {
   imagesRelations,
   shoesRelations,
   colorVariantRelations,
-} from "./shoes.model.js";
+} from "./shoes.model";
 export {
   search_queries,
   search_clicks,
   popular_searches,
-} from "./search.model.js";
-export { favorites, favoritesRelations } from "./favorites.model.js";
-export * from "./orders.model.js";
+} from "./search.model";
+export { favorites, favoritesRelations } from "./favorites.model";
+export * from "./orders.model";
