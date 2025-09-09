@@ -1,16 +1,11 @@
 import "dotenv";
-import { testDb } from "./db";
+import { testDb } from "./db/index";
 
 import createServer from "./createServer";
 import { logger } from "./utils/logger";
 import { API_URL, PORT } from "./config/default";
 
 const app = createServer();
-
-// app.get("/api/products", async (req, res) => {
-//   const result = await db.select().from(products);
-//   res.json(result);
-// });
 
 app.listen(PORT, async () => {
   try {
