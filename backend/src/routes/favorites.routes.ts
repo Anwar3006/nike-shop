@@ -1,12 +1,12 @@
 import { Router } from "express";
-import { FavoritesController } from "../controllers/favorites.controller";
-import validate from "../middlewares/validate.middleware";
-import { verifyAuth } from "../middlewares/verfiyAuth.middleware"; // You'll need to create this
+import { FavoritesController } from "../controllers/favorites.controller.js";
+import validate from "../middlewares/validate.middleware.js";
+import { verifyAuth } from "../middlewares/verfiyAuth.middleware.js";
 import {
   addFavoriteSchema,
   getFavoritesSchema,
   checkFavoriteSchema,
-} from "../schemas/favorites.schema";
+} from "../schemas/favorites.schema.js";
 
 const favoritesRouter = Router();
 

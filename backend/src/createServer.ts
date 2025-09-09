@@ -4,11 +4,11 @@ import morgan from "morgan";
 import { toNodeHandler } from "better-auth/node";
 import cookieParser from "cookie-parser";
 
-import { routes } from "./routes/index.routes";
-import { FRONTEND_URL, NODE_ENV } from "./config/default";
-import { auth } from "./utils/auth";
-import { globalErrorHandler, NotFound } from "./errors/errorHandler";
-import { cronJob } from "./utils/cron";
+import { routes } from "./routes/index.routes.js";
+import { FRONTEND_URL, NODE_ENV } from "./config/default.js";
+import { auth } from "./utils/auth.js";
+import { globalErrorHandler, NotFound } from "./errors/errorHandler.js";
+import { cronJob } from "./utils/cron.js";
 
 export default () => {
   const app = express();

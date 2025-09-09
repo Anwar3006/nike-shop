@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
-import { catchAsync } from "../errors/errorHandler";
-import { UserInfoService } from "../services/userInfo.service";
-import AppError from "../errors/AppError";
+import { catchAsync } from "../errors/errorHandler.js";
+import { UserInfoService } from "../services/userInfo.service.js";
+import AppError from "../errors/AppError.js";
 
 export const UserInfoController = {
   getUserInfo: catchAsync(

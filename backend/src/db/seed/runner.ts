@@ -1,4 +1,4 @@
-import seedNikeShoes from "./data";
+import seedNikeShoes from "./data.js";
 
 async function main() {
   await seedNikeShoes();

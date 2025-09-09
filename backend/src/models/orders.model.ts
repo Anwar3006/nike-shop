@@ -2,15 +2,13 @@ import {
   integer,
   pgTable,
   primaryKey,
-  serial,
   text,
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
 import { InferInsertModel, relations } from "drizzle-orm";
 import { nanoid } from "nanoid";
-import { user, address } from "./auth-model";
-import { shoeSizes } from "./shoes.model";
+import { user, address } from "./auth-model.js";
 
 export const orders = pgTable("orders", {
   id: varchar("id")

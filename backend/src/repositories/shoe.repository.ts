@@ -1,15 +1,5 @@
-import {
-  and,
-  between,
-  eq,
-  gte,
-  inArray,
-  like,
-  lte,
-  or,
-  sql,
-} from "drizzle-orm";
-import { db } from "../db";
+import { and, between, eq, gte, inArray, lte, sql } from "drizzle-orm";
+import { db } from "../db/index.js";
 import {
   category,
   colorVariant,
@@ -17,17 +7,15 @@ import {
   shoes,
   shoeSizes,
   sizes,
-} from "../models";
+} from "../models/index.js";
 import {
   CreateShoeSchemaType,
   GetShoesSchemaType,
   UpdateShoeSchemaType,
-} from "../schemas/shoe.schema";
-import { PgTransaction, PgTransactionConfig } from "drizzle-orm/pg-core";
-import { NeonHttpQueryResultHKT } from "drizzle-orm/neon-http";
-import { has } from "config";
-import { parseSizeRange } from "../utils/helpers";
-import { createSlug } from "../utils/slugify";
+} from "../schemas/shoe.schema.js";
+
+import { parseSizeRange } from "../utils/helpers.js";
+import { createSlug } from "../utils/slugify.js";
 
 export const ShoeRepository = {
   createShoe: async (data: CreateShoeSchemaType["body"]) => {

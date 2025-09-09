@@ -1,11 +1,11 @@
 import type { Express } from "express";
 
-import { VERSION } from "../config/default";
-import shoeRouter from "./shoe.routes";
-import searchRouter from "./search.routes";
-import favoritesRouter from "./favorites.routes";
-import userInfoRouter from "./userInfo.routes";
-import paymentRouter from "./payment.routes";
+import { VERSION } from "../config/default.js";
+import shoeRouter from "./shoe.routes.js";
+import searchRouter from "./search.routes.js";
+import favoritesRouter from "./favorites.routes.js";
+import userInfoRouter from "./userInfo.routes.js";
+import paymentRouter from "./payment.routes.js";
 
 export const routes = (app: Express) => {
   //Health check

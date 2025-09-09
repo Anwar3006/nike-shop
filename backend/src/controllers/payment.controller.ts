@@ -2,10 +2,10 @@ import { NextFunction, Request, Response } from "express";
 import {
   createPaymentIntent,
   handleStripeWebhook,
-} from "../services/payment.service";
-import { logger } from "../utils/logger";
-import { catchAsync } from "../errors/errorHandler";
-import AppError from "../errors/AppError";
+} from "../services/payment.service.js";
+import { logger } from "../utils/logger.js";
+import { catchAsync } from "../errors/errorHandler.js";
+import AppError from "../errors/AppError.js";
 
 export const createPaymentIntentHandler = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {

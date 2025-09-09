@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { verifyAuth } from "../middlewares/verfiyAuth.middleware";
-import validate from "../middlewares/validate.middleware";
+import { verifyAuth } from "../middlewares/verfiyAuth.middleware.js";
+import validate from "../middlewares/validate.middleware.js";
 import {
   addressSchema,
   updateUserInfoSchema,
-} from "../schemas/userInfo.schema";
-import { UserInfoController } from "../controllers/userInfo.controller";
+} from "../schemas/userInfo.schema.js";
+import { UserInfoController } from "../controllers/userInfo.controller.js";
 
 const userInfoRouter = Router();
 

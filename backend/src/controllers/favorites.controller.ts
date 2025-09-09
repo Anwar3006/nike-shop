@@ -1,8 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { catchAsync } from "../errors/errorHandler";
-import { FavoritesService } from "../services/favorites.service";
-import { AddFavoriteSchemaType } from "../schemas/favorites.schema";
-import AppError from "../errors/AppError";
+import { catchAsync } from "../errors/errorHandler.js";
+import { FavoritesService } from "../services/favorites.service.js";
+import { AddFavoriteSchemaType } from "../schemas/favorites.schema.js";
 
 export const FavoritesController = {
   getFavorites: catchAsync(

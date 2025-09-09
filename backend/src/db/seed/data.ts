@@ -1,5 +1,5 @@
-import { createSlug } from "../../utils/slugify";
-import { db } from "../index";
+import { createSlug } from "../../utils/slugify.js";
+import { db } from "../index.js";
 import {
   shoes,
   colorVariant,
@@ -7,9 +7,9 @@ import {
   shoeSizes,
   sizes,
   category,
-} from "../../models/shoes.model";
+} from "../../models/shoes.model.js";
 
-import seedData from "./seedData";
+import seedData from "./seedData.js";
 
 // Real Nike shoe data
 // const nikeShoesSeedData = [

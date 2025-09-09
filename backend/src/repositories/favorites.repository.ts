@@ -1,8 +1,7 @@
-import { db } from "../db";
-import { favorites } from "../models/favorites.model";
-import { shoes, category } from "../models/shoes.model";
+import { db } from "../db/index.js";
+import { favorites } from "../models/favorites.model.js";
+import { shoes, category } from "../models/shoes.model.js";
 import { eq, and, desc, sql } from "drizzle-orm";
-// import { AppError } from "../errors/errorHandler";
 
 export const FavoritesRepository = {
   getFavorites: async (userId: string, query: any) => {

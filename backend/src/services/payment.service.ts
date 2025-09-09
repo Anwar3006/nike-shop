@@ -1,6 +1,6 @@
 import Stripe from "stripe";
-import { STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET } from "../config/default";
-import { db } from "../db";
+import { STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET } from "../config/default.js";
+import { db } from "../db/index.js";
 import {
   colorVariant,
   OrderItemInsert,
@@ -8,10 +8,10 @@ import {
   orders,
   shoeSizes,
   sizes,
-} from "../models";
+} from "../models/index.js";
 import { and, eq, sql } from "drizzle-orm";
-import { logger } from "../utils/logger";
-import AppError from "../errors/AppError";
+import { logger } from "../utils/logger.js";
+import AppError from "../errors/AppError.js";
 
 const stripe = new Stripe(STRIPE_SECRET_KEY!, {
   apiVersion: "2025-08-27.basil",

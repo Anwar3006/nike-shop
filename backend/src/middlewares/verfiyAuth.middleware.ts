@@ -1,8 +1,6 @@
-import jwt from "jsonwebtoken";
-import { BETTER_AUTH_SECRET } from "../config/default";
 import { NextFunction, Request, Response } from "express";
 import { fromNodeHeaders } from "better-auth/node";
-import { auth } from "../utils/auth";
+import { auth } from "../utils/auth.js";
 
 // Extend Express Request interface to include 'user'
 declare global {

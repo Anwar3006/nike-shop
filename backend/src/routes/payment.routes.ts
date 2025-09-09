@@ -2,8 +2,8 @@ import { Router, raw } from "express";
 import {
   createPaymentIntentHandler,
   stripeWebhookHandler,
-} from "../controllers/payment.controller";
-import { verifyAuth } from "../middlewares/verfiyAuth.middleware";
+} from "../controllers/payment.controller.js";
+import { verifyAuth } from "../middlewares/verfiyAuth.middleware.js";
 
 const router = Router();
 

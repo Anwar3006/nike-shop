@@ -1,7 +1,7 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
-import { db } from "../db";
+import { db } from "../db/index.js";
 import {
   BETTER_AUTH_SECRET,
   FRONTEND_URL,
@@ -9,8 +9,8 @@ import {
   GITHUB_CLIENT_SECRET,
   GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET,
-} from "../config/default";
-import { account, session, user, verification } from "../models";
+} from "../config/default.js";
+import { account, session, user, verification } from "../models/index.js";
 
 export const auth = betterAuth({
   secret: BETTER_AUTH_SECRET,

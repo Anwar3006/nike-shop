@@ -1,10 +1,10 @@
-import { ShoeRepository } from "../repositories/shoe.repository";
+import { ShoeRepository } from "../repositories/shoe.repository.js";
 import {
   CreateShoeSchemaType,
   GetShoesSchemaType,
   UpdateShoeSchemaType,
-} from "../schemas/shoe.schema";
-import { logger } from "../utils/logger";
+} from "../schemas/shoe.schema.js";
+import { logger } from "../utils/logger.js";
 
 type GetShoesOptions = GetShoesSchemaType["query"];
 

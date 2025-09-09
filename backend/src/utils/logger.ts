@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 import pino from "pino";
 
-import { NODE_ENV } from "../config/default";
+import { NODE_ENV } from "../config/default.js";
 
 const isTest = NODE_ENV === "test";
 

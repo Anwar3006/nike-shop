@@ -13,7 +13,6 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid";
-// import { ProductDefaultDescription } from "../db/seed/data";
 import { relations, sql } from "drizzle-orm";
 
 export const ProductDefaultDescription = `

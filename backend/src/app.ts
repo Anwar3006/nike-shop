@@ -1,9 +1,9 @@
 import "dotenv";
-import { testDb } from "./db/index";
+import { testDb } from "./db/index.js";
 
-import createServer from "./createServer";
-import { logger } from "./utils/logger";
-import { API_URL, PORT } from "./config/default";
+import createServer from "./createServer.js";
+import { logger } from "./utils/logger.js";
+import { API_URL, PORT } from "./config/default.js";
 
 const app = createServer();
 

@@ -3,10 +3,10 @@ import { drizzle } from "drizzle-orm/neon-http";
 import { neon } from "@neondatabase/serverless";
 import { Pool } from "pg";
 
-import { logger } from "../utils/logger";
+import { logger } from "../utils/logger.js";
 import { sql } from "drizzle-orm";
-import { DATABASE_URL, NODE_ENV } from "../config/default";
-import * as schema from "../models/index";
+import { DATABASE_URL, NODE_ENV } from "../config/default.js";
+import * as schema from "../models/index.js";
 
 if (!DATABASE_URL) {
   logger.error("Missing DATABASE_URL environment variable");

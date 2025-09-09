@@ -1,7 +1,7 @@
 import { CronJob } from "cron";
 import https from "https";
-import { logger } from "./logger";
-import { API_URL, VERSION } from "../config/default";
+import { logger } from "./logger.js";
+import { API_URL, VERSION } from "../config/default.js";
 
 export const cronJob = new CronJob("*/14 * * * *", function () {
   https

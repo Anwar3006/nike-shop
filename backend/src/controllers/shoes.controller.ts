@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from "express";
-import { catchAsync } from "../errors/errorHandler";
+import { catchAsync } from "../errors/errorHandler.js";
 import {
   CreateShoeSchemaType,
   GetShoesSchemaType,
-} from "../schemas/shoe.schema";
-import { ShoesService } from "../services/shoe.service";
+} from "../schemas/shoe.schema.js";
+import { ShoesService } from "../services/shoe.service.js";
 
 export const ShoesController = {
   createShoe: catchAsync(

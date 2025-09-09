@@ -1,12 +1,11 @@
 import { and, desc, eq, ilike, sql } from "drizzle-orm";
-import { db } from "../db";
+import { db } from "../db/index.js";
 import {
   popular_searches,
   search_clicks,
   search_queries,
-} from "../models/search.model";
-import { shoes, category } from "../models";
-import { alias } from "drizzle-orm/pg-core";
+} from "../models/search.model.js";
+import { shoes, category } from "../models/index.js";
 
 export const SearchRepository = {
   async getSearchResults(query: string) {

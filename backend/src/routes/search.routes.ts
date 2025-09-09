@@ -1,12 +1,15 @@
 import { Router } from "express";
-import { SearchController } from "../controllers/search.controller";
-import validate from "../middlewares/validate.middleware";
+import { SearchController } from "../controllers/search.controller.js";
+import validate from "../middlewares/validate.middleware.js";
 import {
   getAutocompleteSchema,
   getSearchResultsSchema,
   recordClickSchema,
-} from "../schemas/search.schema";
-import { optionalAuth, verifyAuth } from "../middlewares/verfiyAuth.middleware";
+} from "../schemas/search.schema.js";
+import {
+  optionalAuth,
+  verifyAuth,
+} from "../middlewares/verfiyAuth.middleware.js";
 
 const searchRouter = Router();
 

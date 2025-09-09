@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { ShoesController } from "../controllers/shoes.controller";
-import validate from "../middlewares/validate.middleware";
+import { ShoesController } from "../controllers/shoes.controller.js";
+import validate from "../middlewares/validate.middleware.js";
 import {
   createShoeSchema,
   getShoesSchema,
   updateShoeSchema,
-} from "../schemas/shoe.schema";
+} from "../schemas/shoe.schema.js";
 
 const shoeRouter = Router();
 

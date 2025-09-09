@@ -1,12 +1,12 @@
 import { NextFunction, Request, Response } from "express";
-import { catchAsync } from "../errors/errorHandler";
-import { SearchService } from "../services/search.service";
+import { catchAsync } from "../errors/errorHandler.js";
+import { SearchService } from "../services/search.service.js";
 import {
   GetAutocompleteSchemaType,
   GetSearchResultsSchemaType,
   RecordClickSchemaType,
-} from "../schemas/search.schema";
-import AppError from "../errors/AppError";
+} from "../schemas/search.schema.js";
+import AppError from "../errors/AppError.js";
 
 export const SearchController = {
   getSearchResults: catchAsync(

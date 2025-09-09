@@ -1,7 +1,7 @@
 import { and, eq } from "drizzle-orm";
-import { db } from "../db";
-import { address, user } from "../models";
-import { AddressFormData } from "../schemas/userInfo.schema";
+import { db } from "../db/index.js";
+import { address, user } from "../models/index.js";
+import { AddressFormData } from "../schemas/userInfo.schema.js";
 
 export const UserInfoRepository = {
   getUserInfo: async (userId: string) => {
