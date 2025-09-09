@@ -92,9 +92,9 @@ export const ShoeRepository = {
           categoryId?: number;
           basePrice?: number;
         } = {
-          description: data.description || exists.description,
+          description: data.description || (exists.description as string),
           categoryId: data.categoryId || exists.categoryId,
-          basePrice: data.basePrice || exists.basePrice,
+          basePrice: data.basePrice || (exists.basePrice as number),
         };
 
         if (data.name && data.name !== exists.name) {
