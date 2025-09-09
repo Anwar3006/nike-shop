@@ -32,19 +32,25 @@ import {
   SelectValue,
 } from "./ui/select";
 import { Checkbox } from "./ui/checkbox";
+import { toast } from "sonner";
 
 interface AddressEditDialogProps {
   address: Address;
   onSave: (data: AddressFormData) => Promise<void> | void;
-  trigger: React.ReactNode;
+  trigger?: React.ReactNode;
+  isOpen: boolean;
+  onOpenChange: (isOpen: boolean) => void;
+  isDismissable?: boolean;
 }
 
 export function AddressEditDialog({
   address,
   onSave,
   trigger,
+  isOpen,
+  onOpenChange,
+  isDismissable = true,
 }: AddressEditDialogProps) {
-  const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<AddressFormData>({
@@ -64,26 +70,31 @@ export function AddressEditDialog({
     form.setValue("isDefault", address.isDefault);
   }, [address, form]);
 
-  console.log("Address@@@: ", address, form.getValues());
-
   const onSubmit = async (data: AddressFormData) => {
     try {
       setIsLoading(true);
       await onSave(data);
-      setIsOpen(false);
+      onOpenChange(false);
       form.reset();
     } catch (error) {
       console.error("Failed to save address:", error);
-      // Handle error - could show toast notification
+      toast.error("Failed to save address");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
+      <DialogContent
+        className="sm:max-w-[425px]"
+        onInteractOutside={(e) => {
+          if (!isDismissable) {
+            e.preventDefault();
+          }
+        }}
+      >
         <DialogHeader>
           <DialogTitle>
             {address.streetAddress
@@ -226,14 +237,16 @@ export function AddressEditDialog({
             />
 
             <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsOpen(false)}
-                disabled={isLoading}
-              >
-                Cancel
-              </Button>
+              {isDismissable && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => onOpenChange(false)}
+                  disabled={isLoading}
+                >
+                  Cancel
+                </Button>
+              )}
               <Button type="submit" disabled={isLoading}>
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Save Changes

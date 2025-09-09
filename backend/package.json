@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "tsx watch src/app.ts",
     "db:push": "drizzle-kit push:pg",
+    "build": "rimraf dist && tsc",
+    "start": "node dist/app.js",
     "seed": "tsx src/db/seed/runner.ts"
   },
   "dependencies": {

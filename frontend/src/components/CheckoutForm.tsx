@@ -5,7 +5,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import OrderSummary from "./OrderSummary";
 import PaymentDetails from "./PaymentDetails";
-import { mockCartItems, CartItemData } from "@/lib/mock-checkout-data";
+
 import {
   useGetCart,
   useRemoveFromCart,
@@ -17,7 +17,6 @@ import { useGetUserInfo, useUpsertAddress } from "@/hooks/api/use-userInfo";
 import { Address } from "@/types";
 import { AddressFormData } from "@/schemas/auth.schema";
 import AddressEditDialog from "./AddressEditDialog";
-import { Button } from "./ui/button";
 
 const CheckoutForm = () => {
   const { data: cart, isPending } = useGetCart();
@@ -30,9 +29,9 @@ const CheckoutForm = () => {
 
   const [showAddressDialog, setShowAddressDialog] = useState(false);
 
-  const shippingAddress = userInfo?.addresses?.filter(
+  const shippingAddress = userInfo?.data.addresses?.filter(
     (address: Address) => address.isDefault === true
-  );
+  )[0];
 
   const handleAddressSave = (data: AddressFormData) => {
     mutate(data);
@@ -41,7 +40,7 @@ const CheckoutForm = () => {
 
   useEffect(() => {
     // if no address
-    if (!gettingUserInfo && userInfo && userInfo.addresses?.length === 0) {
+    if (!gettingUserInfo && userInfo && userInfo.data.addresses?.length === 0) {
       setShowAddressDialog(true);
     }
   }, [userInfo, gettingUserInfo]);
@@ -127,13 +126,13 @@ const CheckoutForm = () => {
         </Elements>
       </div>
 
-      {showAddressDialog && (
-        <AddressEditDialog
-          address={{} as Address}
-          onSave={handleAddressSave}
-          trigger={<Button>ADD ADDRESS</Button>}
-        />
-      )}
+      <AddressEditDialog
+        isOpen={showAddressDialog}
+        onOpenChange={setShowAddressDialog}
+        address={{} as Address}
+        onSave={handleAddressSave}
+        isDismissable={false}
+      />
     </div>
   );
 };

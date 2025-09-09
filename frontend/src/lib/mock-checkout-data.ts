@@ -8,26 +8,26 @@ export type CartItemData = {
   size: string;
 };
 
-export const mockCartItems: CartItemData[] = [
-  {
-    shoeId: "1",
-    name: "Nike Air Max 270",
-    image: "/shoes/shoe-1.jpg", // Using existing shoe images
-    color: "Gray",
-    price: 499.99,
-    quantity: 1,
-    size: "10",
-  },
-  {
-    shoeId: "2",
-    name: "Nike React Infinity Run Flyknit",
-    image: "/shoes/shoe-2.webp",
-    color: "White",
-    price: 99.99,
-    quantity: 1,
-    size: "9.5",
-  },
-];
+// export const mockCartItems: CartItemData[] = [
+//   {
+//     shoeId: "1",
+//     name: "Nike Air Max 270",
+//     image: "/shoes/shoe-1.jpg", // Using existing shoe images
+//     color: "Gray",
+//     price: 499.99,
+//     quantity: 1,
+//     size: "10",
+//   },
+//   {
+//     shoeId: "2",
+//     name: "Nike React Infinity Run Flyknit",
+//     image: "/shoes/shoe-2.webp",
+//     color: "White",
+//     price: 99.99,
+//     quantity: 1,
+//     size: "9.5",
+//   },
+// ];
 
 export const mockRecommendedItem = {
   id: "3",

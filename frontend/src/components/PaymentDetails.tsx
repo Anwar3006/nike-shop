@@ -38,45 +38,50 @@ const PaymentDetails = ({
 
     setIsProcessing(true);
 
-    const res = await axiosClient.post(
-      "/payments/create-payment-intent",
-      JSON.stringify({
+    try {
+      const res = await axiosClient.post("/payments/create-payment-intent", {
         amount: Math.round(total * 100),
         cart,
         shippingAddressId: shippingAddress.id,
-      })
-    );
+      });
 
-    if (res.status !== 200) {
-      toast.error("Failed to create payment intent. Please try again.");
-      setIsProcessing(false);
-      return;
-    }
-
-    const { clientSecret } = await res.data;
-
-    const cardElement = elements.getElement(CardElement);
-    if (!cardElement) {
-      setIsProcessing(false);
-      return;
-    }
-
-    const { error, paymentIntent } = await stripe.confirmCardPayment(
-      clientSecret,
-      {
-        payment_method: {
-          card: cardElement,
-          billing_details: { name: "Jenny Rosen", email: "jenny@example.com" },
-        },
+      if (res.status !== 200) {
+        toast.error("Failed to create payment intent. Please try again.");
+        setIsProcessing(false);
+        return;
       }
-    );
 
-    if (error) {
-      toast.error(error.message);
-    } else if (paymentIntent?.status === "succeeded") {
-      toast.success("Payment Successful! Your order has been placed.");
+      const { clientSecret } = await res.data;
+
+      const cardElement = elements.getElement(CardElement);
+      if (!cardElement) {
+        setIsProcessing(false);
+        return;
+      }
+
+      const { error, paymentIntent } = await stripe.confirmCardPayment(
+        clientSecret,
+        {
+          payment_method: {
+            card: cardElement,
+            billing_details: {
+              name: "Jenny Rosen",
+              email: "jenny@example.com",
+            },
+          },
+        }
+      );
+      if (error) {
+        toast.error(error.message);
+      } else if (paymentIntent?.status === "succeeded") {
+        toast.success("Payment Successful! Your order has been placed.");
+      }
+    } catch (error) {
+      toast.error("Failed to create payment intent: " + (error as any).message);
+      setIsProcessing(false);
+    } finally {
+      setIsProcessing(false);
     }
-    setIsProcessing(false);
   };
 
   return (

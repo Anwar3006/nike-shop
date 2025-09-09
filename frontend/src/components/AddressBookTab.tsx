@@ -15,6 +15,8 @@ const AddressBookTab = ({ userAddresses }: { userAddresses: Address[] }) => {
   const { mutate: deleteAddress, isPending: isDeleting } = useDeleteAddress();
 
   const [open, setOpen] = useState(false);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [editingAddressId, setEditingAddressId] = useState<string | null>(null);
 
   const transformedAddresses =
     userAddresses?.map((addr) => {
@@ -79,10 +81,14 @@ const AddressBookTab = ({ userAddresses }: { userAddresses: Address[] }) => {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-bold">Address Book</h2>
+        <Button type="button" onClick={() => setIsAddDialogOpen(true)}>
+          Add Address
+        </Button>
         <AddressEditDialog
+          isOpen={isAddDialogOpen}
+          onOpenChange={setIsAddDialogOpen}
           address={{} as Address}
           onSave={(formData: AddressFormData) => handleAddressSave(formData)}
-          trigger={<Button type="button">Add Address</Button>}
         />
       </div>
 
@@ -108,15 +114,20 @@ const AddressBookTab = ({ userAddresses }: { userAddresses: Address[] }) => {
               </div>
             </div>
             <div className="flex items-center space-x-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setEditingAddressId(addr.originalAddress.id)}
+              >
+                Edit
+              </Button>
               <AddressEditDialog
+                isOpen={editingAddressId === addr.originalAddress.id}
+                onOpenChange={() => setEditingAddressId(null)}
                 address={addr.originalAddress}
                 onSave={(formData: AddressFormData) =>
                   handleAddressSave(formData, addr.originalAddress.id)
-                }
-                trigger={
-                  <Button type="button" variant="outline" size="sm">
-                    Edit
-                  </Button>
                 }
               />
               <DeleteDialog

@@ -9,8 +9,9 @@ import {
   shoeSizes,
   sizes,
 } from "../models";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { logger } from "../utils/logger";
+import AppError from "../errors/AppError";
 
 const stripe = new Stripe(STRIPE_SECRET_KEY!, {
   apiVersion: "2025-08-27.basil",
@@ -31,52 +32,114 @@ export const createPaymentIntent = async (
     },
   });
 
-  const [order] = await db
-    .insert(orders)
-    .values({
-      userId,
-      totalAmount: amount,
-      shippingAddressId,
-      paymentIntentId: paymentIntent.id,
-      status: "pending",
-    })
-    .returning();
+  await db.transaction(async (tx) => {
+    try {
+      // Step 1: Fetch details and verify stock for all cart items
+      const detailedCartItems = await Promise.all(
+        cartItem.map(async (item) => {
+          const itemColor =
+            item.color.charAt(0).toUpperCase() + item.color.slice(1);
+          const [color_variant] = await tx
+            .select()
+            .from(colorVariant)
+            .where(
+              and(
+                eq(colorVariant.shoeId, item.shoeId),
+                eq(colorVariant.dominantColor, itemColor)
+              )
+            );
 
-  const orderItemsToInsert: OrderItemInsert[] = [];
-  for (const item of cartItem) {
-    const [color_variant] = await db
-      .select()
-      .from(colorVariant)
-      .where(
-        and(
-          eq(colorVariant.shoeId, item.shoeId),
-          eq(colorVariant.dominantColor, item.color)
-        )
+          if (!color_variant) {
+            throw new AppError(
+              `Color variant not found for shoe ${item.shoeId} with color ${itemColor}`,
+              400
+            );
+          }
+
+          const [shoeSizeData] = await tx
+            .select()
+            .from(shoeSizes)
+            .where(
+              and(
+                eq(shoeSizes.colorVariantId, color_variant.id),
+                eq(sizes.size, item.size)
+              )
+            )
+            .leftJoin(sizes, eq(shoeSizes.sizeId, sizes.id));
+
+          if (
+            !shoeSizeData?.shoe_sizes ||
+            shoeSizeData.shoe_sizes.quantity < item.quantity
+          ) {
+            throw new AppError(
+              `Not enough stock for ${item.name} (Size: ${item.size}, Color: ${item.color}). Available: ${shoeSizeData.shoe_sizes?.quantity}, Requested: ${item.quantity}`,
+              400
+            );
+          }
+          return {
+            ...item,
+            colorVariantId: color_variant.id,
+            sizeId: shoeSizeData.shoe_sizes.sizeId,
+          };
+        })
       );
 
-    const [shoeSize] = await db
-      .select()
-      .from(shoeSizes)
-      .where(
-        and(
-          eq(shoeSizes.colorVariantId, color_variant.id),
-          eq(sizes.size, item.size)
-        )
-      )
-      .leftJoin(sizes, eq(shoeSizes.sizeId, sizes.id));
+      console.log("About to insert order:", {
+        userId,
+        totalAmount: amount,
+        shippingAddressId,
+        paymentIntentId: paymentIntent.id,
+        status: "pending",
+      });
+      // Step 2: Create the order
+      const [order] = await tx
+        .insert(orders)
+        .values({
+          userId,
+          totalAmount: amount,
+          shippingAddressId,
+          paymentIntentId: paymentIntent.id,
+          status: "pending",
+        })
+        .returning();
 
-    orderItemsToInsert.push({
-      name: item.name,
-      image: item.image,
-      orderId: order.id,
-      colorVariantId: color_variant.id,
-      sizeId: shoeSize.shoe_sizes.sizeId,
-      quantity: item.quantity,
-      price: item.price,
-    });
-  }
+      if (!order) {
+        throw new AppError("Failed to create order", 500);
+      }
 
-  await db.insert(orderItems).values(orderItemsToInsert);
+      // Step 3: Create order items and decrement stock
+      const orderItemsToInsert: OrderItemInsert[] = detailedCartItems.map(
+        (item) => ({
+          name: item.name,
+          image: item.image,
+          orderId: order.id,
+          colorVariantId: item.colorVariantId,
+          sizeId: item.sizeId,
+          quantity: item.quantity,
+          price: item.price * item.quantity * 100,
+        })
+      );
+
+      await tx.insert(orderItems).values(orderItemsToInsert);
+
+      for (const item of detailedCartItems) {
+        await tx
+          .update(shoeSizes)
+          .set({
+            quantity: sql`${shoeSizes.quantity} - ${item.quantity}`,
+          })
+          .where(
+            and(
+              eq(shoeSizes.colorVariantId, item.colorVariantId),
+              eq(shoeSizes.sizeId, item.sizeId)
+            )
+          );
+      }
+    } catch (error: unknown) {
+      logger.error("Error during payment transaction, rolling back: " + error);
+      throw error;
+    }
+  });
 
   return {
     clientSecret: paymentIntent.client_secret,
