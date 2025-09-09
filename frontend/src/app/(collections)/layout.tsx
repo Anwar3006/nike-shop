@@ -3,6 +3,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { Suspense } from "react";
 
 import Navbar from "@/components/Navbar";
 import Filters from "@/components/Filters";
@@ -26,7 +27,7 @@ export default function CollectionsLayout({
             <div className="lg:hidden">
               <SidebarTrigger />
             </div>
-            {children}
+            <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
           </main>
         </div>
 
