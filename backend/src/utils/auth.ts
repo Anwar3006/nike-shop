@@ -3,6 +3,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
 import { db } from "../db/index.js";
 import {
+  API_URL,
   BETTER_AUTH_SECRET,
   FRONTEND_URL,
   GITHUB_CLIENT_ID,
@@ -27,6 +28,7 @@ export const auth = betterAuth({
       enabled: true,
       clientId: GOOGLE_CLIENT_ID!,
       clientSecret: GOOGLE_CLIENT_SECRET!,
+      redirectURI: `${API_URL}/api/auth/callback/google`,
     },
     github: {
       enabled: true,
