@@ -192,15 +192,17 @@ const ProfilePage = () => {
   }
 
   const [firstName, lastName] =
-    userInfo?.data && splitFullName(userInfo.data.name);
+    userInfo?.data && userInfo.data.name
+      ? splitFullName(userInfo.data.name)
+      : ["", ""];
   const customer = {
     firstName: firstName,
     lastName: lastName,
-    email: userInfo.data.email || "",
-    avatarUrl: userInfo.data.image || "https://github.com/shadcn.png",
+    email: userInfo?.data?.email || "",
+    avatarUrl: userInfo?.data?.image || "https://github.com/shadcn.png",
     fallback: "RW",
-    dob: userInfo.data.dob || "",
-    addresses: userInfo.data.addresses || [],
+    dob: userInfo?.data?.dob || "",
+    addresses: userInfo?.data?.addresses || [],
   };
   const customerDetails = _.omit(customer, "avatarUrl", "fallback");
 

@@ -56,6 +56,8 @@ export const metadata: Metadata = {
     "Welcome to Nike Shop, your one-stop destination for all things Nike. Browse our wide range of products, from classic sneakers to the latest fashion trends. Get ready to unleash your inner athlete and style icon.",
 };
 
+import { Suspense } from "react";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -64,7 +66,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${fontSans.variable} antialiased overflow-x-hidden`}>
-        <GlobalProvider> {children}</GlobalProvider>
+        <GlobalProvider>
+          <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
+        </GlobalProvider>
       </body>
     </html>
   );
