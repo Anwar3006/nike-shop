@@ -7,9 +7,10 @@ import {
   unique,
   uuid,
 } from "drizzle-orm/pg-core";
-import { user } from "./auth-model";
 import { relations } from "drizzle-orm";
-import { shoes } from "./shoes.model";
+
+import { user } from "./auth-model.js";
+import { shoes } from "./shoes.model.js";
 
 export const search_queries = pgTable("search_queries", {
   query_id: uuid("query_id").primaryKey().defaultRandom(),
