@@ -82,8 +82,10 @@ const PaymentDetails = ({
         toast.success("Payment Successful! Your order has been placed.");
         clearCart();
       }
-    } catch (error) {
-      toast.error("Failed to create payment intent: " + (error as any).message);
+    } catch (error: unknown) {
+      toast.error(
+        "Failed to create payment intent: " + (error as Error).message
+      );
       setIsProcessing(false);
     } finally {
       setIsProcessing(false);

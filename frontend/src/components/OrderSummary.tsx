@@ -6,7 +6,7 @@ import { Input } from "./ui/input";
 import Image from "next/image";
 import { PlusCircle } from "lucide-react";
 import { Separator } from "./ui/separator";
-import { CartItemData, mockRecommendedItem } from "@/lib/mock-checkout-data";
+import { mockRecommendedItem } from "@/lib/mock-checkout-data"; //TODO: remove, set up recommendation system
 import { CartItem as CartItemType } from "@/types/cart";
 
 interface OrderSummaryProps {

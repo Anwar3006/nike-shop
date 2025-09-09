@@ -2,16 +2,9 @@
 import Sort from "@/components/Sort";
 import ShoeGrid from "@/components/ShoeGrid";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
-// interface SearchParams {
-//   gender?: string;
-//   size?: string;
-//   color?: string;
-//   price?: string;
-//   sort?: string;
-// }
-
-const CollectionsPage = () => {
+const CollectionsComponent = () => {
   const searchParams = useSearchParams();
   const resolvedSearchParams = Object.fromEntries(searchParams.entries());
   const router = useRouter();
@@ -26,25 +19,6 @@ const CollectionsPage = () => {
       : pathname;
     router.push(newUrl, { scroll: false });
   };
-
-  // // Sorting
-  // if (resolvedSearchParams.sort) {
-  //   switch (resolvedSearchParams.sort) {
-  //     case "newest":
-  //       // Assuming higher id is newer
-  //       filteredProducts.sort((a, b) => Number(b.id) - Number(a.id));
-  //       break;
-  //     case "price-asc":
-  //       filteredProducts.sort((a, b) => a.price - b.price);
-  //       break;
-  //     case "price-desc":
-  //       filteredProducts.sort((a, b) => b.price - a.price);
-  //       break;
-  //     default:
-  //       // featured - no specific sorting for now
-  //       break;
-  //   }
-  // }
 
   const activeFilters = Object.entries(resolvedSearchParams).map(
     ([key, value]) => ({
@@ -89,6 +63,12 @@ const CollectionsPage = () => {
       </div>
     </div>
   );
+};
+
+const CollectionsPage = () => {
+  <Suspense fallback={<div>Loading...</div>}>
+    <CollectionsComponent />
+  </Suspense>;
 };
 
 export default CollectionsPage;

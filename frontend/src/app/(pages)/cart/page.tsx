@@ -51,7 +51,7 @@ const CartPage = () => {
       (a, b) => b.value.addedAt - a.value.addedAt
     );
     return sortedCart.map(
-      ({ itemKey, value }: { itemKey: string; value: CartItemType }) => {
+      ({ value }: { itemKey: string; value: CartItemType }) => {
         return { ...value };
       }
     );

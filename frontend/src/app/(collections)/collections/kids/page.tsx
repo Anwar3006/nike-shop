@@ -1,7 +1,12 @@
 import React from "react";
 
-const Kids = () => {
+const KidsPage = () => {
   return <div>Kids</div>;
 };
 
-export default Kids;
+export default KidsPage;
+
+export const metadata = {
+  title: "Kid's Collection",
+  description: "Shop our kid's collection",
+};

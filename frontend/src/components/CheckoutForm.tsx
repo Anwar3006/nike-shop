@@ -21,8 +21,7 @@ import AddressEditDialog from "./AddressEditDialog";
 const CheckoutForm = () => {
   const { data: cart, isPending } = useGetCart();
   const { mutate: updateQuantity } = useUpdateCartItemQuantity();
-  const { mutate: removeItem, isPending: isRemovingFromCart } =
-    useRemoveFromCart();
+  const { mutate: removeItem } = useRemoveFromCart();
 
   const { data: userInfo, isPending: gettingUserInfo } = useGetUserInfo();
   const { mutate } = useUpsertAddress();
@@ -51,11 +50,9 @@ const CheckoutForm = () => {
     const sortedCart = [...cart].sort(
       (a, b) => b.value.addedAt - a.value.addedAt
     );
-    return sortedCart.map(
-      ({ itemKey, value }: { itemKey: string; value: CartItem }) => {
-        return { ...value };
-      }
-    );
+    return sortedCart.map(({ value }: { itemKey: string; value: CartItem }) => {
+      return { ...value };
+    });
   }, [cart]);
 
   const stripePromise = useMemo(() => {
