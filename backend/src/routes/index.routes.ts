@@ -9,7 +9,7 @@ import paymentRouter from "./payment.routes.js";
 
 export const routes = (app: Express) => {
   //Health check
-  app.get("/", (req, res) => {
+  app.get("/health", (req, res) => {
     res.send({
       status: "OK",
       version: VERSION,
