@@ -9,8 +9,8 @@ import {
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
-import { user } from "./auth-model";
-import { shoes } from "./shoes.model";
+import { user } from "./auth-model.js";
+import { shoes } from "./shoes.model.js";
 
 export const search_queries = pgTable("search_queries", {
   query_id: uuid("query_id").primaryKey().defaultRandom(),
