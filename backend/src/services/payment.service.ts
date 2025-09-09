@@ -84,13 +84,6 @@ export const createPaymentIntent = async (
         })
       );
 
-      console.log("About to insert order:", {
-        userId,
-        totalAmount: amount,
-        shippingAddressId,
-        paymentIntentId: paymentIntent.id,
-        status: "pending",
-      });
       // Step 2: Create the order
       const [order] = await tx
         .insert(orders)

@@ -11,26 +11,29 @@ import { toast } from "sonner";
 import { Separator } from "./ui/separator";
 import axiosClient from "@/lib/api/client";
 import { CartItem } from "@/types/cart";
-import { useGetUserInfo, useUpsertAddress } from "@/hooks/api/use-userInfo";
-import { Address } from "@/types";
-import AddressEditDialog from "./AddressEditDialog";
-import { AddressFormData } from "@/schemas/auth.schema";
+
+import { Address, UserInfo } from "@/types";
+import { useClearCart } from "@/hooks/cache/use-cart";
 
 interface PaymentDetailsProps {
   total: number;
   cart: CartItem[];
+  userInfo: UserInfo;
   shippingAddress: Address;
 }
 
 const PaymentDetails = ({
   total,
   cart,
+  userInfo,
   shippingAddress,
 }: PaymentDetailsProps) => {
   const stripe = useStripe();
   const elements = useElements();
 
   const [isProcessing, setIsProcessing] = useState(false);
+
+  const { mutate: clearCart } = useClearCart();
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
@@ -46,7 +49,9 @@ const PaymentDetails = ({
       });
 
       if (res.status !== 200) {
-        toast.error("Failed to create payment intent. Please try again.");
+        toast.error("Failed to create payment intent. Please try again.", {
+          description: res.data.error,
+        });
         setIsProcessing(false);
         return;
       }
@@ -65,8 +70,8 @@ const PaymentDetails = ({
           payment_method: {
             card: cardElement,
             billing_details: {
-              name: "Jenny Rosen",
-              email: "jenny@example.com",
+              name: userInfo.name,
+              email: userInfo.email,
             },
           },
         }
@@ -75,6 +80,7 @@ const PaymentDetails = ({
         toast.error(error.message);
       } else if (paymentIntent?.status === "succeeded") {
         toast.success("Payment Successful! Your order has been placed.");
+        clearCart();
       }
     } catch (error) {
       toast.error("Failed to create payment intent: " + (error as any).message);
@@ -97,7 +103,11 @@ const PaymentDetails = ({
             </TabsTrigger>
           </TabsList>
           <TabsContent value="card">
-            <PaymentForm formId="payment-form" onSubmit={handleSubmit} />
+            <PaymentForm
+              formId="payment-form"
+              onSubmit={handleSubmit}
+              userInfo={userInfo}
+            />
           </TabsContent>
         </Tabs>
       </CardHeader>

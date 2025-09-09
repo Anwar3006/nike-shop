@@ -121,6 +121,7 @@ const CheckoutForm = () => {
           <PaymentDetails
             total={total}
             cart={orders}
+            userInfo={userInfo?.data}
             shippingAddress={shippingAddress}
           />
         </Elements>

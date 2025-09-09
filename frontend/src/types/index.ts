@@ -49,6 +49,18 @@ export interface Customer {
   addresses: Address[];
 }
 
+export interface UserInfo {
+  addresses: Address[];
+  createdAt: string;
+  upatedAt: string;
+  dob: string | null;
+  email: string;
+  name: string;
+  emailVerified: boolean;
+  id: string;
+  image: string;
+}
+
 export interface AddToCartParams {
   shoeId: string;
   name: string;
