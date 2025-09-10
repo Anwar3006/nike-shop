@@ -10,8 +10,13 @@ import {
   GITHUB_CLIENT_SECRET,
   GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET,
+  NODE_ENV,
 } from "../config/default.js";
 import { account, session, user, verification } from "../models/index.js";
+
+if (!BETTER_AUTH_SECRET) {
+  throw new Error("BETTER_AUTH_SECRET is not defined");
+}
 
 export const auth = betterAuth({
   secret: BETTER_AUTH_SECRET,
@@ -50,18 +55,18 @@ export const auth = betterAuth({
         name: "nike-shop.session_token",
         options: {
           httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "strict",
+          secure: NODE_ENV === "production",
+          sameSite: "none",
           path: "/",
           maxAge: 60 * 60 * 24 * 7,
         },
       },
     },
   },
-  plugins: [nextCookies()],
   rateLimit: {
     enabled: true,
     window: 60, //1 min
     max: 5, // 5 attempts per minute
   },
+  plugins: [nextCookies()],
 });

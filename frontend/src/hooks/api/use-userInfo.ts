@@ -1,4 +1,5 @@
 import { useSession } from "@/lib/auth-client";
+// import { getSessionCookie } from "better-auth/cookies";
 import UserInfoService from "@/lib/services/userInfo.service";
 import { AddressFormData, UserProfileSchemaType } from "@/schemas/auth.schema";
 import { ToastID } from "@/types";
@@ -6,9 +7,10 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 export const useGetUserInfo = () => {
-  const { data: session, isPending } = useSession();
-  console.log("Session: ", session);
-  if (isPending) console.log("Query is Pending? ", isPending);
+  const { data: session, isPending, error } = useSession();
+
+  console.log("Session: ", { session, isPending, error });
+  // if (isPending) console.log("Query is Pending? ", isPending);
   const userId = session?.user?.id;
 
   return useQuery({
