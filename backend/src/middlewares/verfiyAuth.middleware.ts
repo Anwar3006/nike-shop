@@ -59,6 +59,8 @@ export const verifyAuth = async (
   try {
     // Convert Express headers to better-auth compatible format
     const headers = fromNodeHeaders(req.headers);
+    console.log("ReqHeaders: ", req.headers);
+    console.log("Headers: ", headers);
 
     // Use better-auth's built-in session validation
     const session = await auth.api.getSession({

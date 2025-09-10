@@ -13,9 +13,14 @@ import { cronJob } from "./utils/cron.js";
 export default () => {
   const app = express();
 
+  const allowedOrigins = ["http://localhost:3000"];
+  if (FRONTEND_URL) {
+    allowedOrigins.push(FRONTEND_URL);
+  }
+
   app.use(
     cors({
-      origin: [FRONTEND_URL!, "http://localhost:3000"], // Replace with your frontend's origin
+      origin: allowedOrigins,
       methods: ["GET", "POST", "PUT", "DELETE"], // Specify allowed HTTP methods
       credentials: true, // Allow credentials (cookies, authorization headers, etc.)
     })
