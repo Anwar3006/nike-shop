@@ -25,7 +25,10 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
-  trustedOrigins: [FRONTEND_URL!, "http://localhost:3000"],
+  trustedOrigins: [
+    "https://nike-shop-frontend.vercel.app",
+    "http://localhost:3000",
+  ],
   socialProviders: {
     google: {
       enabled: true,
