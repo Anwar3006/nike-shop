@@ -13,8 +13,6 @@ import { cronJob } from "./utils/cron.js";
 export default () => {
   const app = express();
 
-  app.all("/api/auth/*", toNodeHandler(auth));
-
   app.use(
     cors({
       origin: [FRONTEND_URL!, "http://localhost:3000"], // Replace with your frontend's origin
@@ -24,6 +22,7 @@ export default () => {
   );
   app.use(morgan("dev"));
   app.use(cookieParser());
+  app.all("/api/auth/*", toNodeHandler(auth));
 
   if (NODE_ENV === "production") {
     cronJob.start();
