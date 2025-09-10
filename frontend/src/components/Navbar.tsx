@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Loader2, Menu, User2, X } from "lucide-react";
-import { useSession } from "@/lib/auth-client";
+import { authClient, useSession } from "@/lib/auth-client";
 import { Button } from "./ui/button";
 import { usePathname, useRouter } from "next/navigation";
 import { createRedirectUrl } from "@/utils/auth-redirect";
@@ -27,6 +27,8 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { data } = useSession();
   const user = data?.user;
+
+  console.log("@@user: ", user);
 
   const routeTo = createRedirectUrl(path, "sign-in");
   const toggleMenu = () => {
