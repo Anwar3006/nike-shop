@@ -34,6 +34,7 @@ export const auth = betterAuth({
       enabled: true,
       clientId: GITHUB_CLIENT_ID!,
       clientSecret: GITHUB_CLIENT_SECRET!,
+      redirectURI: `${API_URL}/api/auth/callback/github`,
     },
   },
   session: {
@@ -50,7 +51,7 @@ export const auth = betterAuth({
         options: {
           httpOnly: true,
           secure: process.env.NODE_ENV === "production",
-          sameSite: "none",
+          sameSite: "strict",
           path: "/",
           maxAge: 60 * 60 * 24 * 7,
         },
