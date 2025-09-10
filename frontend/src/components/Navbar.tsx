@@ -25,10 +25,28 @@ const Navbar = () => {
   const { data: cartData, isLoading: cartLoading } = useCartSize();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { data } = useSession();
+  const { data, isPending } = useSession();
   const user = data?.user;
 
+  console.log("@@session: ", data);
+  console.log("@@isPending: ", isPending);
   console.log("@@user: ", user);
+
+  // Force session refresh on mount (useful after OAuth redirects)
+  useEffect(() => {
+    const refreshSession = async () => {
+      try {
+        await authClient.getSession();
+      } catch (error) {
+        console.error("Failed to refresh session:", error);
+      }
+    };
+
+    // Only refresh if we don't have a user but we're not loading
+    if (!user && !isPending) {
+      refreshSession();
+    }
+  }, [user, isPending]);
 
   const routeTo = createRedirectUrl(path, "sign-in");
   const toggleMenu = () => {
