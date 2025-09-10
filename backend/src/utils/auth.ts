@@ -22,7 +22,7 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
-  trustedOrigins: [FRONTEND_URL!],
+  trustedOrigins: [FRONTEND_URL!, "http://localhost:3000"],
   socialProviders: {
     google: {
       enabled: true,

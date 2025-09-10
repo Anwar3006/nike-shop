@@ -7,6 +7,7 @@ import { toast } from "sonner";
 
 export const useGetUserInfo = () => {
   const { data: session } = useSession();
+  console.log("Session: ", session);
   const userId = session?.user?.id;
 
   return useQuery({
