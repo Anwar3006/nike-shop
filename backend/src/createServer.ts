@@ -11,12 +11,8 @@ import { globalErrorHandler, NotFound } from "./errors/errorHandler.js";
 import { cronJob } from "./utils/cron.js";
 
 export default () => {
+  console.log("SERVER STARTING: Using hardcoded CORS origin for vercel.");
   const app = express();
-
-  const allowedOrigins = ["http://localhost:3000"];
-  if (FRONTEND_URL) {
-    allowedOrigins.push(FRONTEND_URL);
-  }
 
   app.use(
     cors({
