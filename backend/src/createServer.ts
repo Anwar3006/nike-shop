@@ -20,7 +20,10 @@ export default () => {
 
   app.use(
     cors({
-      origin: allowedOrigins,
+      origin: [
+        "http://localhost:3000",
+        "https://nike-shop-frontend.vercel.app",
+      ],
       methods: ["GET", "POST", "PUT", "DELETE"], // Specify allowed HTTP methods
       credentials: true, // Allow credentials (cookies, authorization headers, etc.)
     })
