@@ -18,8 +18,6 @@ if (!BETTER_AUTH_SECRET) {
   throw new Error("BETTER_AUTH_SECRET is not defined");
 }
 
-console.log("NODE_ENV==", NODE_ENV);
-
 export const auth = betterAuth({
   secret: BETTER_AUTH_SECRET,
   database: drizzleAdapter(db, {
@@ -35,13 +33,11 @@ export const auth = betterAuth({
       enabled: true,
       clientId: GOOGLE_CLIENT_ID!,
       clientSecret: GOOGLE_CLIENT_SECRET!,
-      redirectURI: `${API_URL}/api/auth/callback/google`,
     },
     github: {
       enabled: true,
       clientId: GITHUB_CLIENT_ID!,
       clientSecret: GITHUB_CLIENT_SECRET!,
-      redirectURI: `${API_URL}/api/auth/callback/github`,
     },
   },
   session: {
@@ -57,7 +53,7 @@ export const auth = betterAuth({
         name: "nike-shop.session_token",
         options: {
           httpOnly: true,
-          secure: true,
+          secure: NODE_ENV === "production",
           sameSite: "none",
           path: "/",
           maxAge: 60 * 60 * 24 * 7,
@@ -71,5 +67,5 @@ export const auth = betterAuth({
     window: 60, //1 min
     max: 5, // 5 attempts per minute
   },
-  plugins: [nextCookies()],
+  // plugins: [nextCookies()],
 });
