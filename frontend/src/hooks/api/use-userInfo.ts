@@ -16,7 +16,7 @@ export const useGetUserInfo = () => {
   return useQuery({
     queryKey: ["userInfo", userId],
     queryFn: () => UserInfoService.getUserInfo(),
-    // enabled: !!userId,
+    enabled: !!userId,
     // refetchOnWindowFocus: false,
   });
 };

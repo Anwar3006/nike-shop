@@ -63,9 +63,10 @@ export const verifyAuth = async (
     // Use better-auth's built-in session validation
     const session = await auth.api.getSession({
       headers,
+      query: { disableCookieCache: true },
     });
 
-    console.log("Headers: ", headers);
+    // console.log("Headers: ", headers);
     console.log("Session: ", session);
     if (!session?.user) {
       return res.status(401).json({
