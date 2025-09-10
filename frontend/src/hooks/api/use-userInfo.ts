@@ -7,10 +7,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 export const useGetUserInfo = () => {
-  const { data: session, isPending, error } = useSession();
-
-  console.log("Session: ", { session, isPending, error });
-  // if (isPending) console.log("Query is Pending? ", isPending);
+  const { data: session } = useSession();
   const userId = session?.user?.id;
 
   return useQuery({

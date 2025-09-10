@@ -27,25 +27,6 @@ const Navbar = () => {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { data: user, isPending } = useGetUserInfo();
-  // const user = data?.user;
-
-  // console.log("@@session: ", authClient.getSession());
-  console.log("@@isPending: ", isPending);
-  console.log("@@user: ", user);
-
-  // Force session refresh on mount (useful after OAuth redirects)
-
-  // useEffect(() => {
-  //   const getUserSession = async () => {
-  //     try {
-  //       user = await authClient.getSession();
-  //     } catch (error) {
-  //       console.error("Failed to refresh session:", error);
-  //     }
-  //   };
-
-  //   getUserSession();
-  // }, []);
 
   const routeTo = createRedirectUrl(path, "sign-in");
   const toggleMenu = () => {

@@ -5,7 +5,7 @@ import { toNodeHandler } from "better-auth/node";
 import cookieParser from "cookie-parser";
 
 import { routes } from "./routes/index.routes.js";
-import { FRONTEND_URL, NODE_ENV } from "./config/default.js";
+import { NODE_ENV } from "./config/default.js";
 import { auth } from "./utils/auth.js";
 import { globalErrorHandler, NotFound } from "./errors/errorHandler.js";
 import { cronJob } from "./utils/cron.js";

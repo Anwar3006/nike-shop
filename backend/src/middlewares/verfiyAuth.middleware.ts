@@ -59,8 +59,6 @@ export const verifyAuth = async (
   try {
     // Convert Express headers to better-auth compatible format
     const headers = fromNodeHeaders(req.headers);
-    console.log("ReqHeaders: ", req.headers);
-    console.log("Headers: ", headers);
 
     // Use better-auth's built-in session validation
     const session = await auth.api.getSession({
@@ -68,8 +66,6 @@ export const verifyAuth = async (
       query: { disableCookieCache: true },
     });
 
-    // console.log("Headers: ", headers);
-    console.log("Session: ", session);
     if (!session?.user) {
       return res.status(401).json({
         success: false,
