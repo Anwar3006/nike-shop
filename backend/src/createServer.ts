@@ -15,7 +15,7 @@ export default () => {
 
   app.use(
     cors({
-      origin: FRONTEND_URL, // Replace with your frontend's origin
+      origin: [FRONTEND_URL!, "http://localhost:3000"], // Replace with your frontend's origin
       methods: ["GET", "POST", "PUT", "DELETE"], // Specify allowed HTTP methods
       credentials: true, // Allow credentials (cookies, authorization headers, etc.)
     })
