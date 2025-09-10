@@ -57,13 +57,14 @@ export const auth = betterAuth({
         name: "nike-shop.session_token",
         options: {
           httpOnly: true,
-          secure: NODE_ENV === "production",
+          secure: true,
           sameSite: "none",
           path: "/",
           maxAge: 60 * 60 * 24 * 7,
         },
       },
     },
+    useSecureCookies: true,
   },
   rateLimit: {
     enabled: true,
