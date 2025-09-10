@@ -65,6 +65,8 @@ export const verifyAuth = async (
       headers,
     });
 
+    console.log("Headers: ", headers);
+    console.log("Session: ", session);
     if (!session?.user) {
       return res.status(401).json({
         success: false,
