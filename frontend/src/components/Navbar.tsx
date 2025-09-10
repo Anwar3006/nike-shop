@@ -10,6 +10,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { createRedirectUrl } from "@/utils/auth-redirect";
 import SearchBar from "./SearchBar";
 import { useCartSize } from "@/hooks/cache/use-cart";
+import { useGetUserInfo } from "@/hooks/api/use-userInfo";
 
 const navLinks = [
   { href: "/collections/men", label: "Men" },
@@ -25,28 +26,26 @@ const Navbar = () => {
   const { data: cartData, isLoading: cartLoading } = useCartSize();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { data, isPending } = useSession();
-  const user = data?.user;
+  const { data: user, isPending } = useGetUserInfo();
+  // const user = data?.user;
 
   // console.log("@@session: ", authClient.getSession());
   console.log("@@isPending: ", isPending);
   console.log("@@user: ", user);
 
   // Force session refresh on mount (useful after OAuth redirects)
+
   // useEffect(() => {
-  //   const refreshSession = async () => {
+  //   const getUserSession = async () => {
   //     try {
-  //       await authClient.getSession();
+  //       user = await authClient.getSession();
   //     } catch (error) {
   //       console.error("Failed to refresh session:", error);
   //     }
   //   };
 
-  //   // Only refresh if we don't have a user but we're not loading
-  //   if (!user && !isPending) {
-  //     refreshSession();
-  //   }
-  // }, [user, isPending]);
+  //   getUserSession();
+  // }, []);
 
   const routeTo = createRedirectUrl(path, "sign-in");
   const toggleMenu = () => {
@@ -86,7 +85,7 @@ const Navbar = () => {
 
         {/* Right side icons */}
         <SearchBar />
-        {user ? (
+        {!isPending && user ? (
           <div className="hidden md:flex md:ml-4 items-center space-x-3">
             <Link
               href="/cart"
