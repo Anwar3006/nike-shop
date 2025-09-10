@@ -18,6 +18,8 @@ if (!BETTER_AUTH_SECRET) {
   throw new Error("BETTER_AUTH_SECRET is not defined");
 }
 
+console.log("NODE_ENV==", NODE_ENV);
+
 export const auth = betterAuth({
   secret: BETTER_AUTH_SECRET,
   database: drizzleAdapter(db, {
