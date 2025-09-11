@@ -10,18 +10,18 @@ import {
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
-import { products } from "./products.model.js";
-import { colors } from "./filters/colors.model.js";
-import { sizes } from "./filters/sizes.model.js";
+import { shoes } from "./shoes.model";
+import { colors } from "./filters/colors.model";
+import { sizes } from "./filters/sizes.model";
 import { relations } from "drizzle-orm";
-import { productImages } from "./images.model.js";
-import { orderItems } from "./orders.model.js";
+import { shoeImages } from "./images.model";
+import { orderItems } from "./orders.model";
 
-export const productVariants = pgTable("product_variants", {
+export const shoeVariants = pgTable("shoe_variants", {
   id: uuid("id").primaryKey().defaultRandom(),
-  productId: uuid("product_id")
+  shoeId: uuid("shoe_id")
     .notNull()
-    .references(() => products.id),
+    .references(() => shoes.id),
   sku: text("sku").notNull().unique(),
   price: numeric("price", { precision: 10, scale: 2 }).notNull(),
   salePrice: numeric("sale_price", { precision: 10, scale: 2 }),
@@ -34,27 +34,27 @@ export const productVariants = pgTable("product_variants", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-export const productVariantsRelations = relations(
-  productVariants,
+export const shoeVariantsRelations = relations(
+  shoeVariants,
   ({ one, many }) => ({
-    product: one(products, {
-      fields: [productVariants.productId],
-      references: [products.id],
+    shoe: one(shoes, {
+      fields: [shoeVariants.shoeId],
+      references: [shoes.id],
     }),
     color: one(colors, {
-      fields: [productVariants.colorId],
+      fields: [shoeVariants.colorId],
       references: [colors.id],
     }),
     size: one(sizes, {
-      fields: [productVariants.sizeId],
+      fields: [shoeVariants.sizeId],
       references: [sizes.id],
     }),
-    images: many(productImages),
+    images: many(shoeImages),
     orderItems: many(orderItems),
   })
 );
 
-export const insertProductVariantSchema = createInsertSchema(productVariants);
-export const selectProductVariantSchema = createSelectSchema(productVariants);
-export type ProductVariant = z.infer<typeof selectProductVariantSchema>;
-export type NewProductVariant = z.infer<typeof insertProductVariantSchema>;
+export const insertShoeVariantSchema = createInsertSchema(shoeVariants);
+export const selectShoeVariantSchema = createSelectSchema(shoeVariants);
+export type ShoeVariant = z.infer<typeof selectShoeVariantSchema>;
+export type NewShoeVariant = z.infer<typeof insertShoeVariantSchema>;

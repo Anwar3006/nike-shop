@@ -1,8 +1,14 @@
-import { pgTable, text, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  timestamp,
+  uniqueIndex,
+  uuid,
+} from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid";
 import { relations, sql } from "drizzle-orm";
-import { user } from "./auth-model.js";
-import { shoes } from "./shoes.model.js";
+import { user } from "./auth-model";
+import { shoes } from "./shoes.model";
 
 export const favorites = pgTable(
   "favorites",
@@ -13,7 +19,7 @@ export const favorites = pgTable(
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
-    shoeId: text("shoe_id")
+    shoeId: uuid("shoe_id")
       .notNull()
       .references(() => shoes.id, { onDelete: "cascade" }),
     createdAt: timestamp().defaultNow(),

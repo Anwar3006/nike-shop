@@ -8,7 +8,9 @@ import {
   varchar,
   unique,
 } from "drizzle-orm/pg-core";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { nanoid } from "nanoid";
+import type { output } from "zod";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -26,6 +28,10 @@ export const user = pgTable("user", {
     .$defaultFn(() => /* @__PURE__ */ new Date())
     .notNull(),
 });
+export const insertUserSchema = createInsertSchema(user);
+export const selectUserSchema = createSelectSchema(user);
+export type User = output<typeof selectUserSchema>;
+export type NewUser = output<typeof insertUserSchema>;
 
 export const address = pgTable(
   "address",

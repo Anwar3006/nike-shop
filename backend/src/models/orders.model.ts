@@ -3,16 +3,17 @@ import {
   numeric,
   pgEnum,
   pgTable,
+  text,
   timestamp,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
-import { user, address } from "./auth-model.js";
+import { user, address } from "./auth-model";
 import { relations } from "drizzle-orm";
-import { productVariants } from "./variants.model.js";
-import { payments } from "./payments.model.js";
+import { shoeVariants } from "./variants.model";
+import { payments } from "./payments.model";
 
 export const orderStatusEnum = pgEnum("order_status", [
   "pending",
@@ -62,9 +63,9 @@ export const orderItems = pgTable("order_items", {
   orderId: uuid("order_id")
     .notNull()
     .references(() => orders.id),
-  productVariantId: uuid("product_variant_id")
+  shoeVariantId: uuid("shoe_variant_id")
     .notNull()
-    .references(() => productVariants.id),
+    .references(() => shoeVariants.id),
   quantity: integer("quantity").notNull(),
   priceAtPurchase: numeric("price_at_purchase", {
     precision: 10,
@@ -77,9 +78,9 @@ export const orderItemsRelations = relations(orderItems, ({ one }) => ({
     fields: [orderItems.orderId],
     references: [orders.id],
   }),
-  productVariant: one(productVariants, {
-    fields: [orderItems.productVariantId],
-    references: [productVariants.id],
+  shoeVariant: one(shoeVariants, {
+    fields: [orderItems.shoeVariantId],
+    references: [shoeVariants.id],
   }),
 }));
 

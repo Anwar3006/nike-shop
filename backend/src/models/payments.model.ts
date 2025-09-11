@@ -1,13 +1,7 @@
-import {
-  pgEnum,
-  pgTable,
-  text,
-  timestamp,
-  uuid,
-} from "drizzle-orm/pg-core";
+import { pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
-import { orders } from "./orders.model.js";
+import { orders } from "./orders.model";
 import { relations } from "drizzle-orm";
 
 export const paymentMethodEnum = pgEnum("payment_method", [

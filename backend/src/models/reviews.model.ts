@@ -1,15 +1,15 @@
 import { integer, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
-import { products } from "./products.model.js";
-import { user } from "./auth-model.js";
+import { shoes } from "./shoes.model";
+import { user } from "./auth-model";
 import { relations } from "drizzle-orm";
 
 export const reviews = pgTable("reviews", {
   id: uuid("id").primaryKey().defaultRandom(),
-  productId: uuid("product_id")
+  shoeId: uuid("shoe_id")
     .notNull()
-    .references(() => products.id),
+    .references(() => shoes.id),
   userId: text("user_id")
     .notNull()
     .references(() => user.id),
@@ -19,9 +19,9 @@ export const reviews = pgTable("reviews", {
 });
 
 export const reviewsRelations = relations(reviews, ({ one }) => ({
-  product: one(products, {
-    fields: [reviews.productId],
-    references: [products.id],
+  shoe: one(shoes, {
+    fields: [reviews.shoeId],
+    references: [shoes.id],
   }),
   user: one(user, {
     fields: [reviews.userId],

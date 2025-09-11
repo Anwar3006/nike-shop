@@ -3,7 +3,7 @@ import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 import { user } from "./auth-model.js";
 import { relations } from "drizzle-orm";
-import { productVariants } from "./variants.model.js";
+import { shoeVariants } from "./variants.model";
 
 export const carts = pgTable("carts", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -27,7 +27,7 @@ export const cartItems = pgTable("cart_items", {
     .references(() => carts.id),
   productVariantId: uuid("product_variant_id")
     .notNull()
-    .references(() => productVariants.id),
+    .references(() => shoeVariants.id),
   quantity: integer("quantity").notNull(),
 });
 
@@ -36,9 +36,9 @@ export const cartItemsRelations = relations(cartItems, ({ one }) => ({
     fields: [cartItems.cartId],
     references: [carts.id],
   }),
-  productVariant: one(productVariants, {
+  productVariant: one(shoeVariants, {
     fields: [cartItems.productVariantId],
-    references: [productVariants.id],
+    references: [shoeVariants.id],
   }),
 }));
 
