@@ -12,12 +12,13 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Star, Heart, ShoppingCart } from "lucide-react";
+import { Heart, ShoppingCart } from "lucide-react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useAddToCart } from "@/hooks/cache/use-cart";
 import { useIsFavorite, useToggleFavorite } from "@/hooks/api/use-favorites";
 import { toast } from "sonner";
+import ShoesSkeleton from "./ShoesSkeleton";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -28,6 +29,10 @@ interface ShoeDetailsProps {
 }
 
 export default function ShoeDetails({ shoe }: ShoeDetailsProps) {
+  if (!shoe) {
+    return <ShoesSkeleton length={1} />;
+  }
+
   const [selectedColorId, setSelectedColorId] = useState<string | null>(
     shoe.variants[0]?.color.id || null
   );
@@ -114,17 +119,17 @@ export default function ShoeDetails({ shoe }: ShoeDetailsProps) {
         shoeId: shoe.id,
         name: shoe.name,
         image: selectedVariant.images[0]?.url || "/placeholder.png",
-        price: parseFloat(selectedVariant.price),
+        price: parseInt(selectedVariant.price),
         quantity: 1,
-        size: selectedVariant.size.value,
+        size: selectedVariant.size.name,
         color: selectedVariant.color.name,
       },
     });
   };
 
   const displayPrice = selectedVariant
-    ? parseFloat(selectedVariant.price)
-    : parseFloat(shoe.variants[0]?.price || "0");
+    ? selectedVariant.price
+    : shoe.variants[0]?.price || 0;
 
   const displayImages =
     shoe.variants.find((v) => v.color.id === selectedColorId)?.images ||

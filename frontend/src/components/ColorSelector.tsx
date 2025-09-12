@@ -5,7 +5,7 @@ import { ShoeVariant } from "@/types/shoes";
 import Image from "next/image";
 
 interface ColorSelectorProps {
-  colors: { id: string; name: string; hexCode: string }[];
+  colors: { id: string; name: string; hex: string }[];
   selectedColorId: string | null;
   onSelectColor: (colorId: string) => void;
   variants: ShoeVariant[];

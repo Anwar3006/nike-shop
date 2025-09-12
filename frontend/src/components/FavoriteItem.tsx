@@ -42,14 +42,8 @@ export const FavoriteItem = ({ favorite }: FavoriteItemProps) => {
           shoeId: params.shoeId,
           name: favorite.shoe.name,
           image:
-            favorite.shoe.variants
-              .flatMap((v) => v.images)
-              .find((img) => img.isPrimary)?.url ||
-            favorite.shoe.variants[0]?.images[0]?.url ||
-            "/placeholder.png",
-          price: favorite.shoe.variants[0]?.price
-            ? parseFloat(favorite.shoe.variants[0].price)
-            : 0,
+            favorite.shoe.variants[0]?.images[0]?.url || "/placeholder.png",
+          price: favorite.shoe.variants[0]?.price || 0,
           quantity: params.quantity ?? 1,
           size: params.size,
           color: params.color,
@@ -75,14 +69,10 @@ export const FavoriteItem = ({ favorite }: FavoriteItemProps) => {
   };
 
   const primaryImage =
-    favorite.shoe.variants.flatMap((v) => v.images).find((img) => img.isPrimary)
-      ?.url ||
-    favorite.shoe.variants[0]?.images[0]?.url ||
+    favorite.shoe.variants.flatMap((v) => v.images)[0]?.url ||
     "/placeholder.png";
 
-  const price = favorite.shoe.variants[0]?.price
-    ? parseFloat(favorite.shoe.variants[0].price)
-    : 0;
+  const price = favorite.shoe.variants[0]?.price || 0;
 
   return (
     <div className="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
@@ -121,11 +111,11 @@ export const FavoriteItem = ({ favorite }: FavoriteItemProps) => {
               image: primaryImage,
               price: price,
               availableSizes:
-                favorite.shoe.variants?.map((v) => v.size.value) || [],
+                favorite.shoe.variants?.map((v) => v.size.name) || [],
               availableColors:
                 favorite.shoe.variants?.map((v) => ({
                   ...v.color,
-                  hex: v.color.hexCode,
+                  hex: v.color.hex,
                 })) || [],
             }}
             onAddToCart={handleAddToCart}

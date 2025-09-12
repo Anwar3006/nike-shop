@@ -14,31 +14,35 @@ export interface ShoesQueryOptions {
 export interface ShoeImage {
   id: string;
   url: string;
-  sortOrder: number;
   isPrimary: boolean;
 }
 
 export interface ShoeVariant {
   id: string;
   sku: string;
-  price: string;
-  salePrice: string | null;
+  price: string; // numeric from database comes as string
+  salePrice?: string | null;
   inStock: number;
+  weight?: number | null;
+  dimensions?: any;
   color: {
     id: string;
     name: string;
-    hexCode: string;
+    hex: string;
   };
   size: {
     id: string;
-    value: string;
+    name: string;
   };
   images: ShoeImage[];
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Shoe {
   id: string;
   name: string;
+  slug: string;
   description: string | null;
   isPublished: boolean;
   brand: {
@@ -54,6 +58,9 @@ export interface Shoe {
     name: string;
   };
   variants: ShoeVariant[];
+  defaultVariant?: ShoeVariant | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface GetShoesApiResponse {

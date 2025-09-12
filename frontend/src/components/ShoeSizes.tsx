@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 interface ShoeSizesProps {
-  sizes: { id: string; value: string }[];
+  sizes: { id: string; name: string }[];
   selectedSizeId: string | null;
   onSelectSize: (sizeId: string) => void;
 }
@@ -37,7 +37,7 @@ export default function ShoeSizes({
                 "bg-primary text-primary-foreground hover:bg-primary/90"
             )}
           >
-            {size.value}
+            {size.name}
           </Button>
         ))}
       </div>
