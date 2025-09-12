@@ -24,7 +24,12 @@ export const useGetShoes = (options: UseShoesOptions) => {
         pageParam: pageParam as number,
       }),
     initialPageParam: 0,
-    getNextPageParam: (lastPage) => lastPage.meta.nextPage ?? undefined,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.meta.hasNext) {
+        return lastPage.meta.offset + lastPage.meta.limit;
+      }
+      return undefined;
+    },
     enabled,
     staleTime,
     refetchOnWindowFocus: false,

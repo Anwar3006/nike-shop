@@ -44,19 +44,32 @@ const ShoeGrid = () => {
     <div className="gap-y-4">
       {allShoes.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {allShoes.map((product) => (
-            <div key={product.id} className="flex justify-center">
-              <Card
-                id={product.id}
-                imgSrc={product.baseImage}
-                name={product.name}
-                category={product.category}
-                price={product.price}
-                colorCount={product.colors.length}
-                className="w-full max-w-sm"
-              />
-            </div>
-          ))}
+          {allShoes.map((product) => {
+            const primaryImage =
+              product.variants
+                .flatMap((v) => v.images)
+                .find((img) => img.isPrimary)?.url ||
+              product.variants[0]?.images[0]?.url ||
+              "/placeholder.png";
+
+            const price = product.variants[0]?.price
+              ? parseFloat(product.variants[0].price)
+              : 0;
+
+            return (
+              <div key={product.id} className="flex justify-center">
+                <Card
+                  id={product.id}
+                  imgSrc={primaryImage}
+                  name={product.name}
+                  category={product.category.name}
+                  price={price}
+                  colorCount={product.variants.length}
+                  className="w-full max-w-sm"
+                />
+              </div>
+            );
+          })}
         </div>
       ) : (
         <div className="text-center py-16">

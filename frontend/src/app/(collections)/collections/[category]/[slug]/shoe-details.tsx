@@ -13,7 +13,7 @@ interface ShoeDetailsProps {
 
 export default function ShoeDetails({ shoe }: ShoeDetailsProps) {
   const [selectedColorStyle, setSelectedColorStyle] = useState(
-    shoe.colors[0].styleNumber
+    shoe.variants[0].styleNumber
   );
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
 
@@ -21,7 +21,7 @@ export default function ShoeDetails({ shoe }: ShoeDetailsProps) {
     notFound();
   }
 
-  const selectedColor = shoe.colors.find(
+  const selectedColor = shoe.variants.find(
     (c) => c.styleNumber === selectedColorStyle
   );
 

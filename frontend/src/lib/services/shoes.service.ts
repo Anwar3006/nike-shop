@@ -1,10 +1,6 @@
 // import { GetShoesSchemaType } from "@/schemas/shoes.schema";
 import axiosClient from "../api/client";
-import {
-  GetShoesApiResponse,
-  Shoe,
-  ShoesQueryOptions,
-} from "@/types/shoes";
+import { GetShoesApiResponse, Shoe, ShoesQueryOptions } from "@/types/shoes";
 
 const ShoesService = {
   getShoes: async (
@@ -60,6 +56,7 @@ const ShoesService = {
       );
     }
   },
+
   getShoeBySlug: async (slug: string): Promise<Shoe> => {
     try {
       const response = await axiosClient.get(`/shoes/slug/${slug}`);

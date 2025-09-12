@@ -25,7 +25,6 @@ export const FavoriteItem = ({ favorite }: FavoriteItemProps) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
-  // console.log("Cart Data: ", cart);
   const isInCart =
     cart?.some(
       (item: { itemKey: string; value: CartItem }) =>
@@ -42,8 +41,15 @@ export const FavoriteItem = ({ favorite }: FavoriteItemProps) => {
         cartItem: {
           shoeId: params.shoeId,
           name: favorite.shoe.name,
-          image: favorite.shoe.baseImage,
-          price: favorite.shoe.basePrice / 100,
+          image:
+            favorite.shoe.variants
+              .flatMap((v) => v.images)
+              .find((img) => img.isPrimary)?.url ||
+            favorite.shoe.variants[0]?.images[0]?.url ||
+            "/placeholder.png",
+          price: favorite.shoe.variants[0]?.price
+            ? parseFloat(favorite.shoe.variants[0].price)
+            : 0,
           quantity: params.quantity ?? 1,
           size: params.size,
           color: params.color,
@@ -68,11 +74,21 @@ export const FavoriteItem = ({ favorite }: FavoriteItemProps) => {
     }
   };
 
+  const primaryImage =
+    favorite.shoe.variants.flatMap((v) => v.images).find((img) => img.isPrimary)
+      ?.url ||
+    favorite.shoe.variants[0]?.images[0]?.url ||
+    "/placeholder.png";
+
+  const price = favorite.shoe.variants[0]?.price
+    ? parseFloat(favorite.shoe.variants[0].price)
+    : 0;
+
   return (
     <div className="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
       <div className="relative">
         <Image
-          src={favorite.shoe.baseImage}
+          src={primaryImage}
           alt={favorite.shoe.name}
           width={400}
           height={300}
@@ -89,10 +105,10 @@ export const FavoriteItem = ({ favorite }: FavoriteItemProps) => {
           {favorite.shoe.name}
         </h3>
         <p className="text-sm text-gray-500 mb-2">
-          {favorite.shoe.categoryName}
+          {favorite.shoe.category.name}
         </p>
         <p className="text-lg font-bold text-gray-900 mb-4">
-          ${(favorite.shoe.basePrice / 100).toFixed(2)}
+          ${price.toFixed(2)}
         </p>
 
         <div className="flex gap-2">
@@ -102,19 +118,15 @@ export const FavoriteItem = ({ favorite }: FavoriteItemProps) => {
             shoeData={{
               id: favorite.shoe.id,
               name: favorite.shoe.name,
-              image: favorite.shoe.baseImage,
-              price: favorite.shoe.basePrice / 100,
-              availableSizes: favorite.shoe.availableSizes || [
-                "6",
-                "7",
-                "8",
-                "9",
-                "10",
-              ],
-              availableColors: [
-                { id: "black", name: "Black", hex: "#000000" },
-                { id: "white", name: "White", hex: "#FFFFFF" },
-              ],
+              image: primaryImage,
+              price: price,
+              availableSizes:
+                favorite.shoe.variants?.map((v) => v.size.value) || [],
+              availableColors:
+                favorite.shoe.variants?.map((v) => ({
+                  ...v.color,
+                  hex: v.color.hexCode,
+                })) || [],
             }}
             onAddToCart={handleAddToCart}
             onOrderNow={handleOrderNow}

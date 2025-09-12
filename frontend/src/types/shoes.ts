@@ -11,43 +11,58 @@ export interface ShoesQueryOptions {
 }
 
 // API Response Types
-export interface Shoe {
+export interface ShoeImage {
   id: string;
-  name:string;
-  description: string;
-  category: string;
-  baseImage: string;
-  basePrice: number;
-  colors: Array<{
-    name: string;
-    dominantColor: string;
-    size: string[];
-    styleNumber: string;
-    images: string[];
-  }>;
-  gender: "men" | "women" | "kids" | "unisex";
-  inStock?: boolean;
+  url: string;
+  sortOrder: number;
+  isPrimary: boolean;
 }
 
-export interface Shoes {
+export interface ShoeVariant {
+  id: string;
+  sku: string;
+  price: string;
+  salePrice: string | null;
+  inStock: number;
+  color: {
+    id: string;
+    name: string;
+    hexCode: string;
+  };
+  size: {
+    id: string;
+    value: string;
+  };
+  images: ShoeImage[];
+}
+
+export interface Shoe {
   id: string;
   name: string;
-  baseImage: string;
-  category: string;
-  price: number;
-  colors: Array<{
+  description: string | null;
+  isPublished: boolean;
+  brand: {
+    id: string;
     name: string;
-    hex: string;
-  }>;
+  };
+  category: {
+    id: string;
+    name: string;
+  };
+  gender: {
+    id: string;
+    name: string;
+  };
+  variants: ShoeVariant[];
 }
 
 export interface GetShoesApiResponse {
-  data: Shoes[];
+  data: Shoe[];
   meta: {
     total: number;
     limit: number;
     offset: number;
     hasNext: boolean;
-    nextPage: number | undefined;
+    hasPrev: boolean;
   };
 }

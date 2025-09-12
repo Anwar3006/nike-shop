@@ -2,50 +2,39 @@
 
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import { Shoe } from "@/types/shoes";
+import { ShoeImage } from "@/types/shoes";
 import { useState, useEffect } from "react";
 
 interface ShoeImagesProps {
-  shoe: Shoe;
-  selectedColorStyle: string;
+  images: ShoeImage[];
 }
 
-export default function ShoeImages({
-  shoe,
-  selectedColorStyle,
-}: ShoeImagesProps) {
-  const selectedColor = shoe.colors.find(
-    (c) => c.styleNumber === selectedColorStyle
-  );
-
+export default function ShoeImages({ images }: ShoeImagesProps) {
   const [mainImage, setMainImage] = useState(
-    selectedColor?.images[0] || shoe.baseImage
+    images.find((img) => img.isPrimary)?.url || images[0]?.url || ""
   );
 
   useEffect(() => {
-    const newMainImage =
-      shoe.colors.find((c) => c.styleNumber === selectedColorStyle)
-        ?.images[0] || shoe.baseImage;
-    setMainImage(newMainImage);
-  }, [selectedColorStyle, shoe]);
-
-  const activeImages = selectedColor?.images || [];
+    setMainImage(
+      images.find((img) => img.isPrimary)?.url || images[0]?.url || ""
+    );
+  }, [images]);
 
   return (
     <div className="flex flex-col-reverse lg:flex-row gap-4">
       <div className="flex lg:flex-col gap-2 overflow-x-auto lg:overflow-x-visible lg:p-1 ">
-        {activeImages.map((url, index) => (
+        {images.map((image) => (
           <div
-            key={index}
+            key={image.id}
             className={cn(
               "relative w-15 h-15 rounded-lg overflow-hidden cursor-pointer flex-shrink-0",
-              mainImage === url && "ring-2 ring-primary"
+              mainImage === image.url && "ring-2 ring-primary"
             )}
-            onClick={() => setMainImage(url)}
+            onClick={() => setMainImage(image.url)}
           >
             <Image
-              src={url}
-              alt={`Shoe image ${index + 1}`}
+              src={image.url}
+              alt={`Shoe image`}
               width={60}
               height={60}
               className="object-cover"
