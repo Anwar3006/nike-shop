@@ -1,6 +1,6 @@
-import { NextFunction, Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { catchAsync } from "../errors/errorHandler";
-import {
+import type {
   CreateShoeSchemaType,
   GetShoesSchemaType,
   UpdateShoeSchemaType,
@@ -24,11 +24,7 @@ export const ShoesController = {
 
   updateShoe: catchAsync(
     async (
-      req: Request<
-        { id: string },
-        {},
-        UpdateShoeSchemaType["body"]
-      >,
+      req: Request<{ id: string }, {}, UpdateShoeSchemaType["body"]>,
       res: Response,
       next: NextFunction
     ) => {
@@ -44,11 +40,7 @@ export const ShoesController = {
   ),
 
   deleteShoe: catchAsync(
-    async (
-      req: Request<{ id: string }>,
-      res: Response,
-      next: NextFunction
-    ) => {
+    async (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
       const deletedShoe = await ShoesService.deleteShoe(req.params.id);
       res.status(200).json({
         success: true,
@@ -58,12 +50,22 @@ export const ShoesController = {
   ),
 
   getShoeById: catchAsync(
+    async (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
+      const shoe = await ShoesService.getShoeById(req.params.id);
+      res.status(200).json({
+        success: true,
+        data: shoe,
+      });
+    }
+  ),
+
+  getShoeBySlug: catchAsync(
     async (
-      req: Request<{ id: string }>,
+      req: Request<{ slug: string }>,
       res: Response,
       next: NextFunction
     ) => {
-      const shoe = await ShoesService.getShoeById(req.params.id);
+      const shoe = await ShoesService.getShoeBySlug(req.params.slug);
       res.status(200).json({
         success: true,
         data: shoe,

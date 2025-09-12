@@ -1,11 +1,11 @@
 import { and, desc, eq, ilike, sql } from "drizzle-orm";
-import { db } from "../db/index.js";
+import { db } from "../db";
 import {
   popular_searches,
   search_clicks,
   search_queries,
-} from "../models/search.model.js";
-import { shoes, category } from "../models/index.js";
+} from "../models/search.model";
+import { shoes } from "../models/shoes.model";
 
 export const SearchRepository = {
   async getSearchResults(query: string) {
@@ -25,18 +25,13 @@ export const SearchRepository = {
       ...searchWords.map((word) => ilike(shoes.name, `%${word.toLowerCase()}%`))
     );
     try {
-      const results = await db
-        .select({
-          id: shoes.id,
-          name: shoes.name,
-          basePrice: shoes.basePrice,
-          baseImage: shoes.baseImage,
-          category: category.name,
-        })
-        .from(shoes)
-        .leftJoin(category, eq(shoes.categoryId, category.id))
-        .where(searchConditions)
-        .limit(30);
+      const results = await db.query.shoes.findMany({
+        where: searchConditions,
+        limit: 30,
+        with: {
+          category: true,
+        },
+      });
 
       return {
         data: results,

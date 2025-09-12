@@ -19,8 +19,7 @@ import {
   orderItems,
   payments,
 } from "../../models/index.js";
-import { nanoid } from "nanoid";
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { auth } from "../../utils/auth.js";
 
 // Color mapping for hex codes
@@ -389,13 +388,17 @@ async function seedShoesAndVariants(
   logger.info("👟 Seeding shoes, variants, and images...");
 
   const nikeBrandId = brandMap.get("Nike")!;
-  const defaultCategoryId = categoryMap.get("Lifestyle")!;
 
   let totalShoes = 0;
   let totalVariants = 0;
   let totalImages = 0;
 
   for (const shoeData of seedData) {
+    const categoryValues = Array.from(categoryMap.keys());
+    const randomCategory =
+      categoryValues[Math.floor(Math.random() * categoryValues.length)];
+    const defaultCategoryId = categoryMap.get(randomCategory)!;
+
     // Determine gender and category
     const genderSlug =
       shoeData.category === "men"
@@ -412,6 +415,7 @@ async function seedShoesAndVariants(
       .insert(shoes)
       .values({
         name: shoeData.name,
+        slug: createSlug(shoeData.name),
         description: shoeData.description,
         categoryId: defaultCategoryId,
         genderId: genderId,

@@ -1,5 +1,5 @@
 import { ShoeRepository } from "../repositories/shoe.repository";
-import {
+import type {
   CreateShoeSchemaType,
   GetShoesSchemaType,
   UpdateShoeSchemaType,
@@ -23,6 +23,11 @@ export const ShoesService = {
 
   getShoeById: async (shoeId: string) => {
     const shoe = await ShoeRepository.getShoeById(shoeId);
+    return shoe;
+  },
+
+  getShoeBySlug: async (slug: string) => {
+    const shoe = await ShoeRepository.getShoeBySlug(slug);
     return shoe;
   },
 

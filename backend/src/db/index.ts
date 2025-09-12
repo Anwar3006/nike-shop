@@ -35,7 +35,7 @@ export const testDb = async () => {
 
     logger.info("Database connection successful");
   } catch (error: any) {
-    logger.error("Error connecting to the database:", error);
+    logger.error("Error connecting to the database: " + error);
     throw new Error("Database connection failed");
   }
 };

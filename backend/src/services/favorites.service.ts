@@ -1,5 +1,5 @@
-import { logger } from "../utils/logger.js";
-import { FavoritesRepository } from "../repositories/favorites.repository.js";
+import { logger } from "../utils/logger";
+import { FavoritesRepository } from "../repositories/favorites.repository";
 
 export const FavoritesService = {
   getFavorites: async (userId: string, query: any) => {

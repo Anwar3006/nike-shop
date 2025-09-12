@@ -9,7 +9,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import { z } from "zod";
+import { z, type output } from "zod";
 import { user, address } from "./auth-model";
 import { relations } from "drizzle-orm";
 import { shoeVariants } from "./variants.model";
@@ -84,7 +84,15 @@ export const orderItemsRelations = relations(orderItems, ({ one }) => ({
   }),
 }));
 
-export const insertOrderSchema = createInsertSchema(orders);
+export const insertOrderSchema = z.object({
+  id: z.string().uuid().optional(),
+  userId: z.string(),
+  status: z.enum(["pending", "processing", "shipped", "delivered"]).optional(),
+  totalAmount: z.string(), // numeric fields are often strings in Drizzle
+  shippingAddressId: z.string(),
+  billingAddressId: z.string(),
+  createdAt: z.date().optional(),
+});
 export const selectOrderSchema = createSelectSchema(orders);
 export type Order = z.infer<typeof selectOrderSchema>;
 export type NewOrder = z.infer<typeof insertOrderSchema>;
@@ -92,4 +100,4 @@ export type NewOrder = z.infer<typeof insertOrderSchema>;
 export const insertOrderItemSchema = createInsertSchema(orderItems);
 export const selectOrderItemSchema = createSelectSchema(orderItems);
 export type OrderItem = z.infer<typeof selectOrderItemSchema>;
-export type NewOrderItem = z.infer<typeof insertOrderItemSchema>;
+export type NewOrderItem = Omit<OrderItem, "id">;
