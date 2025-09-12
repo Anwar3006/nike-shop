@@ -1,19 +1,11 @@
+import { Shoe } from "./shoes";
+
 export interface FavoriteItem {
   id: string;
   userId: string;
   shoeId: string;
-  colorVariantId?: string;
   createdAt: string;
-  // Include shoe details for display
-  shoe: {
-    id: string;
-    name: string;
-    baseImage: string;
-    basePrice: number;
-    categoryName: string;
-    availableSizes?: string[];
-    availableColors?: { id: string; name: string }[];
-  };
+  shoe: Shoe;
 }
 
 export interface AddFavoriteRequest {

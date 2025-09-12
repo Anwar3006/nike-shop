@@ -1,6 +1,5 @@
-import { db } from "../db/index.js";
-import { favorites } from "../models/favorites.model.js";
-import { shoes, category } from "../models/shoes.model.js";
+import { db } from "../db";
+import { favorites } from "../models/favorites.model";
 import { eq, and, desc, sql } from "drizzle-orm";
 
 export const FavoritesRepository = {
@@ -8,36 +7,28 @@ export const FavoritesRepository = {
     const limit = parseInt(query.limit) || 10;
     const offset = parseInt(query.offset) || 0;
 
-    const userFavorites = await db
-      .select({
-        id: favorites.id,
-        userId: favorites.userId,
-        shoeId: favorites.shoeId,
-        createdAt: favorites.createdAt,
+    const userFavorites = await db.query.favorites.findMany({
+      where: eq(favorites.userId, userId),
+      orderBy: desc(favorites.createdAt),
+      limit: limit,
+      offset: offset,
+      with: {
         shoe: {
-          id: shoes.id,
-          name: shoes.name,
-          baseImage: shoes.baseImage,
-          basePrice: shoes.basePrice,
-          categoryName: category.name,
+          with: {
+            category: true,
+          },
         },
-      })
-      .from(favorites)
-      .innerJoin(shoes, eq(favorites.shoeId, shoes.id))
-      .innerJoin(category, eq(shoes.categoryId, category.id))
-      .where(eq(favorites.userId, userId))
-      .orderBy(desc(favorites.createdAt))
-      .limit(limit)
-      .offset(offset);
+      },
+    });
 
     const totalCount = await db
-      .select({ count: sql`count(*)`.as("count") }) // Also fixed this
+      .select({ count: sql<number>`count(*)` })
       .from(favorites)
       .where(eq(favorites.userId, userId));
 
     return {
       data: userFavorites,
-      count: totalCount[0].count, // And this
+      count: Number(totalCount[0].count),
     };
   },
 

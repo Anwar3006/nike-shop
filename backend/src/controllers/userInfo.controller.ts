@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { catchAsync } from "../errors/errorHandler.js";
 import { UserInfoService } from "../services/userInfo.service.js";
 import AppError from "../errors/AppError.js";

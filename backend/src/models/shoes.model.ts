@@ -13,6 +13,7 @@ export const shoes = pgTable("shoes", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
   description: text("description"),
+  slug: text("slug").notNull().unique(),
   categoryId: uuid("category_id")
     .references(() => categories.id)
     .notNull(),

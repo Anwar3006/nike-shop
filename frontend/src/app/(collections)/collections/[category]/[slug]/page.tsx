@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { Shoe } from "@/types/shoes";
-import ShoeDetails from "@/components/ShoeDetails";
+import ShoeDetails from "./shoe-details";
 import ShoesService from "@/lib/services/shoes.service";
 import { Button } from "@/components/ui/button";
 import { Star } from "lucide-react";

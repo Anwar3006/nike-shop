@@ -1,10 +1,11 @@
-import { NextFunction, Request, Response } from "express";
-import { catchAsync } from "../errors/errorHandler.js";
-import {
+import type { NextFunction, Request, Response } from "express";
+import { catchAsync } from "../errors/errorHandler";
+import type {
   CreateShoeSchemaType,
   GetShoesSchemaType,
-} from "../schemas/shoe.schema.js";
-import { ShoesService } from "../services/shoe.service.js";
+  UpdateShoeSchemaType,
+} from "../schemas/shoe.schema";
+import { ShoesService } from "../services/shoe.service";
 
 export const ShoesController = {
   createShoe: catchAsync(
@@ -13,50 +14,62 @@ export const ShoesController = {
       res: Response,
       next: NextFunction
     ) => {
-      const data = req.body;
-      const newShoe = await ShoesService.createShoe(data);
-      res.status(201).json(newShoe);
+      const newShoe = await ShoesService.createShoe(req.body);
+      res.status(201).json({
+        success: true,
+        data: newShoe,
+      });
     }
   ),
 
   updateShoe: catchAsync(
-    async (req: Request, res: Response, next: NextFunction) => {
-      const shoeId = req.params.id;
-      const data = req.body;
-      const updatedShoe = await ShoesService.updateShoe(shoeId, data);
-      res.status(200).json(updatedShoe);
+    async (
+      req: Request<{ id: string }, {}, UpdateShoeSchemaType["body"]>,
+      res: Response,
+      next: NextFunction
+    ) => {
+      const updatedShoe = await ShoesService.updateShoe(
+        req.params.id,
+        req.body
+      );
+      res.status(200).json({
+        success: true,
+        data: updatedShoe,
+      });
     }
   ),
 
   deleteShoe: catchAsync(
-    async (req: Request, res: Response, next: NextFunction) => {
-      const shoeId = req.params.id;
-      const deletedShoe = await ShoesService.deleteShoe(shoeId);
-      res.status(200).json(deletedShoe);
+    async (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
+      const deletedShoe = await ShoesService.deleteShoe(req.params.id);
+      res.status(200).json({
+        success: true,
+        data: deletedShoe,
+      });
     }
   ),
 
   getShoeById: catchAsync(
-    async (
-      req: Request<{ id: string }, {}, {}>,
-      res: Response,
-      next: NextFunction
-    ) => {
-      const shoeId = req.params.id;
-      const shoe = await ShoesService.getShoeById(shoeId);
-      res.status(200).json({ success: true, data: shoe });
+    async (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
+      const shoe = await ShoesService.getShoeById(req.params.id);
+      res.status(200).json({
+        success: true,
+        data: shoe,
+      });
     }
   ),
 
   getShoeBySlug: catchAsync(
     async (
-      req: Request<{ slug: string }, {}, {}>,
+      req: Request<{ slug: string }>,
       res: Response,
       next: NextFunction
     ) => {
-      const slug = req.params.slug;
-      const shoe = await ShoesService.getShoeBySlug(slug);
-      res.status(200).json({ success: true, data: shoe });
+      const shoe = await ShoesService.getShoeBySlug(req.params.slug);
+      res.status(200).json({
+        success: true,
+        data: shoe,
+      });
     }
   ),
 
@@ -67,8 +80,10 @@ export const ShoesController = {
       next: NextFunction
     ) => {
       const shoes = await ShoesService.getShoes(req.query);
-
-      res.status(200).json({ success: true, ...shoes });
+      res.status(200).json({
+        success: true,
+        ...shoes,
+      });
     }
   ),
 };

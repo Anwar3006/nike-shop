@@ -1,4 +1,5 @@
-import { array, number, object, output, string } from "zod";
+import { array, number, object, string } from "zod";
+import type { output } from "zod";
 
 export const createShoeSchema = object({
   body: object({

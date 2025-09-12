@@ -4,14 +4,14 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 interface ShoeSizesProps {
-  sizes: string[];
-  selectedSize: string | null;
-  onSelectSize: (size: string) => void;
+  sizes: { id: string; name: string }[];
+  selectedSizeId: string | null;
+  onSelectSize: (sizeId: string) => void;
 }
 
 export default function ShoeSizes({
   sizes,
-  selectedSize,
+  selectedSizeId,
   onSelectSize,
 }: ShoeSizesProps) {
   return (
@@ -28,16 +28,16 @@ export default function ShoeSizes({
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-4 gap-2 mt-4">
         {sizes.map((size) => (
           <Button
-            key={size}
-            variant={selectedSize === size ? "default" : "outline"}
-            onClick={() => onSelectSize(size)}
+            key={size.id}
+            variant={selectedSizeId === size.id ? "default" : "outline"}
+            onClick={() => onSelectSize(size.id)}
             className={cn(
               "w-full",
-              selectedSize === size &&
+              selectedSizeId === size.id &&
                 "bg-primary text-primary-foreground hover:bg-primary/90"
             )}
           >
-            {size}
+            {size.name}
           </Button>
         ))}
       </div>
