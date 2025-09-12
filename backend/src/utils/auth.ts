@@ -25,6 +25,13 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
+  user: {
+    additionalFields: {
+      dob: {
+        type: "string",
+      },
+    },
+  },
   trustedOrigins: [
     "https://nike-shop-frontend.vercel.app",
     "http://localhost:3000",

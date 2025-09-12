@@ -9,7 +9,8 @@
     "moduleDetection": "force",
     "isolatedModules": true,
     "verbatimModuleSyntax": true,
-    "outDir": "dist"
+    "outDir": "dist",
+    "module": "es2020"
   },
 
   "include": ["src/**/*"],
