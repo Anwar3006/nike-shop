@@ -4,11 +4,11 @@
     "skipLibCheck": true,
     "target": "es2022",
     "allowJs": true,
-    "moduleResolution": "node10",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "moduleDetection": "force",
     "isolatedModules": true,
-    "verbatimModuleSyntax": true,
+    "verbatimModuleSyntax": false,
     "outDir": "dist",
     "module": "es2020"
   },
