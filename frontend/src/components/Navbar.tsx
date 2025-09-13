@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Loader2, Menu, User2, X } from "lucide-react";
-import { authClient, useSession } from "@/lib/auth-client";
+
 import { Button } from "./ui/button";
 import { usePathname, useRouter } from "next/navigation";
 import { createRedirectUrl } from "@/utils/auth-redirect";

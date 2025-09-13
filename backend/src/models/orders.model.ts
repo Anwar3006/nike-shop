@@ -10,10 +10,10 @@ import {
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z, type output } from "zod";
-import { user, address } from "./auth-model";
+import { user, address } from "./auth-model.js";
 import { relations } from "drizzle-orm";
-import { shoeVariants } from "./variants.model";
-import { payments } from "./payments.model";
+import { shoeVariants } from "./variants.model.js";
+import { payments } from "./payments.model.js";
 
 export const orderStatusEnum = pgEnum("order_status", [
   "pending",

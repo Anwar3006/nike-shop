@@ -6,7 +6,7 @@ import Card from "@/components/Card";
 import ShoesSkeleton from "@/components/ShoesSkeleton";
 import Error from "@/components/Error";
 import { Button } from "@/components/ui/button";
-import React from "react";
+import React, { useMemo } from "react";
 
 const SearchPage = () => {
   const searchParams = useSearchParams();
@@ -22,7 +22,26 @@ const SearchPage = () => {
     isFetchingNextPage,
   } = useSearch({ query, enabled: !!query });
 
-  const allShoes = data?.pages.flatMap((page) => page.data) || [];
+  const allShoes = useMemo(
+    () => data?.pages.flatMap((page) => page.data) || [],
+    [data]
+  );
+
+  const colors = useMemo(
+    () =>
+      allShoes.map((shoe) => {
+        const tempSet = new Set();
+        const tempMap = new Map();
+        shoe.variants.forEach((variant) => {
+          if (variant.color) {
+            tempSet.add(variant.color.name);
+          }
+        });
+        tempMap.set(shoe.id, Array.from(tempSet));
+        return tempMap;
+      }),
+    [allShoes]
+  );
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-20 py-12">
@@ -49,11 +68,24 @@ const SearchPage = () => {
                 <div key={product.id} className="flex justify-center">
                   <Card
                     id={product.id}
-                    imgSrc={product.baseImage}
+                    imgSrc={
+                      product.variants
+                        .flatMap((v) => v.images)
+                        .find((img) => img.isPrimary)?.url ||
+                      product.variants[0]?.images[0]?.url ||
+                      "/placeholder.png"
+                    }
                     name={product.name}
-                    category={product.category}
-                    price={product.basePrice}
-                    // colorCount={product.colors.length}
+                    category={product.category.name}
+                    price={
+                      product.variants[0]?.price
+                        ? parseFloat(product.variants[0].price)
+                        : 0
+                    }
+                    colorCount={
+                      colors.find((c) => c.has(product.id))?.get(product.id)
+                        ?.length
+                    }
                     className="w-full max-w-sm"
                   />
                 </div>

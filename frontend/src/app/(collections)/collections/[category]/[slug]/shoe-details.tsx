@@ -25,7 +25,7 @@ interface ShoeDetailsProps {
 export default function ShoeDetails({ shoe }: ShoeDetailsProps) {
   const { mutate: addToCart, isPending } = useAddToCart();
   const { mutate, isPending: isFavoritePending } = useAddFavorite();
-  const { data: userInfo, isPending: gettingUserInfo } = useGetUserInfo();
+  const { data: userInfo } = useGetUserInfo();
 
   const availableColors = useMemo(() => {
     const colorsMap = new Map();
@@ -124,7 +124,7 @@ export default function ShoeDetails({ shoe }: ShoeDetailsProps) {
             {shoe.name}
           </h1>
           <p className="text-lg text-gray-500 mt-1">
-            {shoe.category.name}'s Shoes
+            {shoe.category.name}&apos;s Shoes
           </p>
 
           <div className="mt-4">

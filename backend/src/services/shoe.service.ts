@@ -1,9 +1,9 @@
-import { ShoeRepository } from "../repositories/shoe.repository";
+import { ShoeRepository } from "../repositories/shoe.repository.js";
 import type {
   CreateShoeSchemaType,
   GetShoesSchemaType,
   UpdateShoeSchemaType,
-} from "../schemas/shoe.schema";
+} from "../schemas/shoe.schema.js";
 
 export const ShoesService = {
   createShoe: async (data: CreateShoeSchemaType["body"]) => {

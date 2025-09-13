@@ -1,5 +1,5 @@
-import { db } from "../db";
-import { favorites } from "../models/favorites.model";
+import { db } from "../db/index.js";
+import { favorites } from "../models/favorites.model.js";
 import { eq, and, desc, sql } from "drizzle-orm";
 
 export const FavoritesRepository = {
@@ -7,6 +7,7 @@ export const FavoritesRepository = {
     const limit = parseInt(query.limit) || 10;
     const offset = parseInt(query.offset) || 0;
 
+    //@ts-ignore
     const userFavorites = await db.query.favorites.findMany({
       where: eq(favorites.userId, userId),
       orderBy: desc(favorites.createdAt),

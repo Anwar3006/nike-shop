@@ -17,6 +17,7 @@ const ShoeGrid = () => {
     size: searchParams.get("size") || undefined,
     color: searchParams.get("color") || undefined,
     price: searchParams.get("price") || undefined,
+    category: searchParams.get("category") || undefined,
     limit: "6", // Items per page
   };
 
@@ -30,7 +31,10 @@ const ShoeGrid = () => {
     isFetchingNextPage,
   } = useGetShoes(queryOptions);
 
-  const allShoes = data?.pages.flatMap((page) => page.data) || [];
+  const allShoes = useMemo(
+    () => data?.pages.flatMap((page) => page.data) || [],
+    [data]
+  );
 
   const colors = useMemo(
     () =>

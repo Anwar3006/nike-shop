@@ -1,8 +1,8 @@
 import { integer, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
-import { shoes } from "./shoes.model";
-import { user } from "./auth-model";
+import { shoes } from "./shoes.model.js";
+import { user } from "./auth-model.js";
 import { relations } from "drizzle-orm";
 
 export const reviews = pgTable("reviews", {

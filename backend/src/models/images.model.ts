@@ -1,8 +1,8 @@
 import { boolean, integer, pgTable, text, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
-import { shoes } from "./shoes.model";
-import { shoeVariants } from "./variants.model";
+import { shoes } from "./shoes.model.js";
+import { shoeVariants } from "./variants.model.js";
 import { relations } from "drizzle-orm";
 
 export const shoeImages = pgTable("shoe_images", {

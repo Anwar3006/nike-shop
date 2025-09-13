@@ -10,18 +10,22 @@ import {
   exists,
   inArray,
 } from "drizzle-orm";
-import { db } from "../db";
-import AppError from "../errors/AppError";
-import { shoeImages } from "../models/images.model";
-import { shoes } from "../models/shoes.model";
-import type { Shoe } from "../models/shoes.model";
-import { shoeVariants } from "../models/variants.model";
+import { db } from "../db/index.js";
+import AppError from "../errors/AppError.js";
+import { shoeImages } from "../models/images.model.js";
+import { shoes } from "../models/shoes.model.js";
+import type { Shoe } from "../models/shoes.model.js";
+import { shoeVariants } from "../models/variants.model.js";
 import type {
   CreateShoeSchemaType,
   GetShoesSchemaType,
   UpdateShoeSchemaType,
 } from "../schemas/shoe.schema";
 import type { PgColumn } from "drizzle-orm/pg-core";
+import { colors } from "../models/filters/colors.model.js";
+import { genders } from "../models/filters/genders.model.js";
+import { sizes } from "../models/filters/sizes.model.js";
+import { categories } from "../models/categories.model.js";
 
 export const ShoeRepository = {
   createShoe: async (shoeData: CreateShoeSchemaType["body"]): Promise<Shoe> => {
@@ -147,6 +151,7 @@ export const ShoeRepository = {
   },
 
   getShoeById: async (shoeId: string) => {
+    //@ts-ignore
     const shoe = await db.query.shoes.findFirst({
       where: eq(shoes.id, shoeId),
       with: {
@@ -171,6 +176,7 @@ export const ShoeRepository = {
   },
 
   getShoeBySlug: async (slug: string) => {
+    //@ts-ignore
     const shoe = await db.query.shoes.findFirst({
       where: eq(shoes.slug, slug),
       with: {
@@ -204,13 +210,32 @@ export const ShoeRepository = {
       size,
       minPrice,
       maxPrice,
+      category,
     } = options;
 
     const limit_ = parseInt(limit);
     const offset_ = parseInt(offset);
 
+    const [genderExists] = await db
+      .select()
+      .from(genders)
+      .where(eq(genders.slug, gender));
+    const [categoryExists] = await db
+      .select()
+      .from(categories)
+      .where(eq(categories.name, category));
+
+    // const [sizeLowerBound, sizeUpperBound] = size && size.split("-");
+    const [[colorExists]] = await Promise.all([
+      db.select().from(colors).where(eq(colors.hexCode, color)),
+      // db.select().from(sizes).where(),
+    ]);
+
     // Build base filter conditions for shoes table
-    const baseWhere = and(gender ? eq(shoes.genderId, gender) : undefined);
+    const baseWhere = and(
+      genderExists ? eq(shoes.genderId, genderExists.id) : undefined,
+      categoryExists ? eq(shoes.categoryId, categoryExists.id) : undefined
+    );
 
     // Handle variant-based filters (price, color, size) separately
     let variantFilteredShoeIds: string[] | undefined;
@@ -220,14 +245,16 @@ export const ShoeRepository = {
       const variantWhere = and(
         minPrice ? gte(shoeVariants.price, minPrice) : undefined,
         maxPrice ? lte(shoeVariants.price, maxPrice) : undefined,
-        color ? eq(shoeVariants.colorId, color) : undefined,
-        size ? eq(shoeVariants.sizeId, size) : undefined
+        colorExists ? eq(shoeVariants.colorId, colorExists.id) : undefined
+        // sizeLowerBound ? gte(sizes.value, sizeLowerBound) : undefined,
+        // sizeUpperBound ? lte(sizes.value, sizeUpperBound) : undefined
       );
 
       // Get shoe IDs that have variants matching the criteria
       const matchingVariants = await db
         .select({ shoeId: shoeVariants.shoeId })
         .from(shoeVariants)
+        .leftJoin(sizes, eq(shoeVariants.sizeId, sizes.id))
         .where(variantWhere);
 
       variantFilteredShoeIds = [
@@ -274,6 +301,7 @@ export const ShoeRepository = {
 
     // Fetch data and total count in parallel
     const [data, total] = await Promise.all([
+      //@ts-ignore
       db.query.shoes.findMany({
         where: finalWhere,
         // orderBy,

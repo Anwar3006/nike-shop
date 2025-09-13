@@ -1,11 +1,11 @@
 import { and, desc, eq, ilike, sql } from "drizzle-orm";
-import { db } from "../db";
+import { db } from "../db/index.js";
 import {
   popular_searches,
   search_clicks,
   search_queries,
-} from "../models/search.model";
-import { shoes } from "../models/shoes.model";
+} from "../models/search.model.js";
+import { shoes } from "../models/shoes.model.js";
 
 export const SearchRepository = {
   async getSearchResults(query: string) {
@@ -25,6 +25,7 @@ export const SearchRepository = {
       ...searchWords.map((word) => ilike(shoes.name, `%${word.toLowerCase()}%`))
     );
     try {
+      //@ts-ignore
       const results = await db.query.shoes.findMany({
         where: searchConditions,
         limit: 30,

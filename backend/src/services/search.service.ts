@@ -1,5 +1,5 @@
-import { SearchRepository } from "../repositories/search.repository";
-import { logger } from "../utils/logger";
+import { SearchRepository } from "../repositories/search.repository.js";
+import { logger } from "../utils/logger.js";
 
 export const SearchService = {
   async getSearchResults(query: string, userId?: string, ip_address?: string) {

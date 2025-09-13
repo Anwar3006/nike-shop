@@ -40,7 +40,7 @@ export interface ShoeVariant {
   salePrice?: string | null;
   inStock: number;
   weight?: number | null;
-  dimensions?: any;
+  dimensions?: Record<string, unknown>;
   color: {
     id: string;
     name: string;

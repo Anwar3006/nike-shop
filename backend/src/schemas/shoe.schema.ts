@@ -92,6 +92,7 @@ export const getShoesSchema = object({
     size: string().optional(),
     minPrice: string().optional(),
     maxPrice: string().optional(),
+    category: string().optional(),
   }),
 });
 export type GetShoesSchemaType = output<typeof getShoesSchema>;

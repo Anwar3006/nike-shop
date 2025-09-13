@@ -3,7 +3,7 @@ import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 import { user } from "./auth-model.js";
 import { relations } from "drizzle-orm";
-import { shoeVariants } from "./variants.model";
+import { shoeVariants } from "./variants.model.js";
 
 export const carts = pgTable("carts", {
   id: uuid("id").primaryKey().defaultRandom(),

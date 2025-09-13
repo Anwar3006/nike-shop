@@ -1,13 +1,13 @@
 import { boolean, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
-import { categories } from "./categories.model";
-import { genders } from "./filters/genders.model";
-import { brands } from "./brands.model";
-import { shoeVariants } from "./variants.model";
+import { categories } from "./categories.model.js";
+import { genders } from "./filters/genders.model.js";
+import { brands } from "./brands.model.js";
+import { shoeVariants } from "./variants.model.js";
 import { relations } from "drizzle-orm";
-import { reviews } from "./reviews.model";
-import { shoeImages } from "./images.model";
+import { reviews } from "./reviews.model.js";
+import { shoeImages } from "./images.model.js";
 
 export const shoes = pgTable("shoes", {
   id: uuid("id").primaryKey().defaultRandom(),

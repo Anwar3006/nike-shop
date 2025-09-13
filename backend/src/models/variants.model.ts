@@ -10,12 +10,12 @@ import {
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
-import { shoes } from "./shoes.model";
-import { colors } from "./filters/colors.model";
-import { sizes } from "./filters/sizes.model";
+import { shoes } from "./shoes.model.js";
+import { colors } from "./filters/colors.model.js";
+import { sizes } from "./filters/sizes.model.js";
 import { relations } from "drizzle-orm";
-import { shoeImages } from "./images.model";
-import { orderItems } from "./orders.model";
+import { shoeImages } from "./images.model.js";
+import { orderItems } from "./orders.model.js";
 
 export const shoeVariants = pgTable("shoe_variants", {
   id: uuid("id").primaryKey().defaultRandom(),

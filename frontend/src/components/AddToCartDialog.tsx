@@ -88,7 +88,7 @@ const AddToCartDialog = ({
 
   const handleSaveToCart = (data: AddToCartFormData) => {
     const selectedVariant = shoeData.variants.find(
-      (v) => v.color.id === data.color && v.size.name === data.size
+      (v) => v.color.id === data.color && v.size.value === data.size
     );
     if (!selectedVariant) {
       toast.error("This combination is not available.");
@@ -109,7 +109,7 @@ const AddToCartDialog = ({
 
   const handleOrderNow = (data: AddToCartFormData) => {
     const selectedVariant = shoeData.variants.find(
-      (v) => v.color.id === data.color && v.size.name === data.size
+      (v) => v.color.id === data.color && v.size.value === data.size
     );
     if (!selectedVariant) {
       toast.error("This combination is not available.");

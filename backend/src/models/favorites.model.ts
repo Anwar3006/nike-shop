@@ -7,8 +7,8 @@ import {
 } from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid";
 import { relations, sql } from "drizzle-orm";
-import { user } from "./auth-model";
-import { shoes } from "./shoes.model";
+import { user } from "./auth-model.js";
+import { shoes } from "./shoes.model.js";
 
 export const favorites = pgTable(
   "favorites",

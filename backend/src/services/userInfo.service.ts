@@ -1,5 +1,5 @@
-import { UserInfoRepository } from "../repositories/userInfo.repository";
-import type { AddressFormData } from "../schemas/userInfo.schema";
+import { UserInfoRepository } from "../repositories/userInfo.repository.js";
+import type { AddressFormData } from "../schemas/userInfo.schema.js";
 
 export const UserInfoService = {
   getUserInfo: async (userId: string) => {
