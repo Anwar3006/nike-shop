@@ -17,6 +17,7 @@ interface CardProps {
   price: number;
   colorCount?: number;
   className?: string;
+  colorVariantId?: string;
 }
 
 const Card: React.FC<CardProps> = ({
@@ -28,6 +29,7 @@ const Card: React.FC<CardProps> = ({
   price,
   colorCount,
   className,
+  colorVariantId,
 }) => {
   const router = useRouter();
 
@@ -36,7 +38,11 @@ const Card: React.FC<CardProps> = ({
     isLoading: isToggling,
     // error: toggleError,
   } = useToggleFavorite();
-  const { data: favorited, isPending, error } = useIsFavorite(id);
+  const {
+    data: favorited,
+    isPending,
+    error,
+  } = useIsFavorite({ shoeId: id, colorVariantId });
 
   const handleClick = () => {
     const slugName = name.replace(/\s+/g, "-").toLowerCase();
@@ -60,6 +66,7 @@ const Card: React.FC<CardProps> = ({
     try {
       await toggleFavorite({
         shoeId: id,
+        colorVariantId,
         isFavorite: favorited?.isFavorite ?? false,
         favoriteId: favorited?.favoriteId,
       });

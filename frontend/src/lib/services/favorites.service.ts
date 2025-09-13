@@ -61,12 +61,18 @@ const FavoritesService = {
   /**
    * Check if item is in favorites
    */
-  isFavorite: async (
-    shoeId: string
-  ): Promise<{ isFavorite: boolean; favoriteId?: string }> => {
+  isFavorite: async ({
+    shoeId,
+    colorVariantId,
+  }: {
+    shoeId: string;
+    colorVariantId?: string;
+  }): Promise<{ isFavorite: boolean; favoriteId?: string }> => {
     try {
       const params: Record<string, string> = { shoeId };
-
+      if (colorVariantId) {
+        params.colorVariantId = colorVariantId;
+      }
       const response = await axiosClient.get("/favorites/check", { params });
       console.log("Is favorite response:", response.data);
       return response.data;

@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 interface ShoeSizesProps {
-  sizes: { id: string; name: string }[];
+  sizes: { id: string; value: string }[];
   selectedSizeId: string | null;
   onSelectSize: (sizeId: string) => void;
 }
@@ -14,6 +14,8 @@ export default function ShoeSizes({
   selectedSizeId,
   onSelectSize,
 }: ShoeSizesProps) {
+  console.log("Sizes: ", sizes);
+
   return (
     <div>
       <div className="flex justify-between items-center">
@@ -37,7 +39,7 @@ export default function ShoeSizes({
                 "bg-primary text-primary-foreground hover:bg-primary/90"
             )}
           >
-            {size.name}
+            {size.value}
           </Button>
         ))}
       </div>

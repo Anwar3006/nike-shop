@@ -25,7 +25,7 @@ export default function ColorSelector({
   return (
     <div>
       <h3 className="text-lg font-medium text-gray-900">Color</h3>
-      <div className="grid grid-cols-4 sm:grid-cols-3 md:grid-cols-6 lg:grid-cols-8 gap-4 mt-4">
+      <div className="grid grid-cols-4 sm:grid-cols-3 md:grid-cols-6 gap-4 mt-4 px-3">
         {colors.map((color) => (
           <div
             key={color.id}
@@ -40,8 +40,9 @@ export default function ColorSelector({
             <Image
               src={getColorImage(color.id)}
               alt={color.name}
-              layout="fill"
-              objectFit="cover"
+              fill
+              sizes="100%"
+              className="object-cover"
             />
           </div>
         ))}

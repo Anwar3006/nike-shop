@@ -273,18 +273,20 @@ async function seedColors() {
   logger.info("🎨 Seeding colors...");
 
   // Extract unique colors from seed data
-  const uniqueColors = new Set<string>();
+  const uniqueColors = new Map<string, string>();
   seedData.forEach((shoe) => {
     shoe.colors.forEach((color) => {
-      uniqueColors.add(color.dominantColor);
+      uniqueColors.set(color.name, color.dominantColor);
     });
   });
 
-  const colorData = Array.from(uniqueColors).map((colorName) => ({
-    name: colorName,
-    slug: createSlug(colorName),
-    hexCode: COLOR_HEX_MAP[colorName] || "#808080", // Default to gray if not found
-  }));
+  const colorData = Array.from(uniqueColors).map(
+    ({ 0: colorName, 1: dominantColor }) => ({
+      name: createSlug(colorName),
+      slug: createSlug(colorName),
+      hexCode: COLOR_HEX_MAP[dominantColor] || "#808080", // Default to gray if not found
+    })
+  );
 
   const insertedColors = await db.insert(colors).values(colorData).returning();
   logger.info(`✅ Inserted ${insertedColors.length} colors`);
@@ -440,7 +442,8 @@ async function seedShoesAndVariants(
 
     // Create variants for each color/size combination
     for (const colorVariant of shoeData.colors) {
-      const colorId = colorMap.get(colorVariant.dominantColor);
+      const slugColorName = createSlug(colorVariant.name);
+      const colorId = colorMap.get(slugColorName);
 
       if (!colorId) {
         logger.warn(`Color not found: ${colorVariant.dominantColor}`);
@@ -489,8 +492,8 @@ async function seedShoesAndVariants(
           isFirstVariant = false;
         }
 
-        // Create images for this variant (first few images from color variant)
-        const maxImages = Math.min(3, colorVariant.images.length);
+        // Create images for this variant
+        const maxImages = Math.max(3, colorVariant.images.length);
         for (let i = 0; i < maxImages; i++) {
           await db.insert(shoeImages).values({
             shoeId: insertedShoe.id,

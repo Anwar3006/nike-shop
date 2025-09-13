@@ -31,19 +31,31 @@ export const FavoriteItem = ({ favorite }: FavoriteItemProps) => {
         item.value.shoeId === favorite.shoe.id
     ) || false;
 
+  const favoritedVariant = favorite.shoe.variants.find(
+    (v) => v.id === favorite.colorVariantId
+  );
+
   const handleRemoveFavorite = () => {
-    removeFavorite({ favoriteId: favorite.id, shoeId: favorite.shoeId });
+    removeFavorite({
+      favoriteId: favorite.id,
+      shoeId: favorite.shoeId,
+      colorVariantId: favorite.colorVariantId,
+    });
   };
 
   const handleAddToCart = async (params: AddToCartParams) => {
+    if (!favoritedVariant) return;
     try {
       await addToCart({
         cartItem: {
           shoeId: params.shoeId,
+          variantId: favoritedVariant.id,
           name: favorite.shoe.name,
           image:
-            favorite.shoe.variants[0]?.images[0]?.url || "/placeholder.png",
-          price: favorite.shoe.variants[0]?.price || 0,
+            favoritedVariant.images[0]?.url ||
+            favorite.shoe.variants[0]?.images[0]?.url ||
+            "/placeholder.png",
+          price: parseFloat(favoritedVariant.price) || 0,
           quantity: params.quantity ?? 1,
           size: params.size,
           color: params.color,
@@ -69,10 +81,15 @@ export const FavoriteItem = ({ favorite }: FavoriteItemProps) => {
   };
 
   const primaryImage =
+    favoritedVariant?.images[0]?.url ||
     favorite.shoe.variants.flatMap((v) => v.images)[0]?.url ||
     "/placeholder.png";
 
-  const price = favorite.shoe.variants[0]?.price || 0;
+  const price = favoritedVariant
+    ? parseFloat(favoritedVariant.price)
+    : favorite.shoe.variants[0]?.price
+    ? parseFloat(favorite.shoe.variants[0].price)
+    : 0;
 
   return (
     <div className="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
@@ -111,12 +128,18 @@ export const FavoriteItem = ({ favorite }: FavoriteItemProps) => {
               image: primaryImage,
               price: price,
               availableSizes:
-                favorite.shoe.variants?.map((v) => v.size.name) || [],
+                favorite.shoe.variants?.map((v) => v.size.value) || [],
               availableColors:
-                favorite.shoe.variants?.map((v) => ({
-                  ...v.color,
-                  hex: v.color.hex,
-                })) || [],
+                favorite.shoe.variants
+                  ?.map((v) => ({
+                    ...v.color,
+                    hex: v.color.hex,
+                  }))
+                  .filter(
+                    (c, i, self) =>
+                      i === self.findIndex((color) => color.id === c.id)
+                  ) || [],
+              variants: favorite.shoe.variants,
             }}
             onAddToCart={handleAddToCart}
             onOrderNow={handleOrderNow}

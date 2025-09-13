@@ -1,9 +1,10 @@
 import { notFound } from "next/navigation";
 import { Shoe } from "@/types/shoes";
-import ShoeDetails from "./shoe-details";
+import ShoeDetails from "@/app/(collections)/collections/[category]/[slug]/shoe-details";
 import ShoesService from "@/lib/services/shoes.service";
 import { Button } from "@/components/ui/button";
 import { Star } from "lucide-react";
+import { Review } from "@/types/shoes";
 
 interface ShoePageProps {
   params: Promise<{
@@ -119,7 +120,12 @@ function RelatedShoesSection() {
   );
 }
 
-function CustomerReviewsSection() {
+function CustomerReviewsSection({ reviews }: { reviews: Review[] }) {
+  const averageRating =
+    reviews?.length > 0
+      ? reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length
+      : 0;
+
   return (
     <section className="bg-gray-50 py-16">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -127,83 +133,67 @@ function CustomerReviewsSection() {
           <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
             What Our Customers Say
           </h2>
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <div className="flex items-center gap-1">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <Star
-                  key={star}
-                  className="h-5 w-5 fill-yellow-400 text-yellow-400"
-                />
-              ))}
+          {reviews?.length > 0 && (
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <div className="flex items-center gap-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <Star
+                    key={star}
+                    className={`h-5 w-5 ${
+                      star <= averageRating
+                        ? "text-yellow-400 fill-yellow-400"
+                        : "text-gray-300"
+                    }`}
+                  />
+                ))}
+              </div>
+              <span className="text-gray-600 ml-2">
+                {averageRating.toFixed(1)} out of 5 ({reviews?.length} reviews)
+              </span>
             </div>
-            <span className="text-gray-600 ml-2">
-              4.8 out of 5 (2,847 reviews)
-            </span>
-          </div>
+          )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          <div className="bg-white p-6 rounded-lg shadow-sm">
-            <div className="flex items-center gap-1 mb-3">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <Star
-                  key={star}
-                  className="h-4 w-4 fill-yellow-400 text-yellow-400"
-                />
-              ))}
-            </div>
-            <p className="text-gray-700 mb-4">
-              &quot;Amazing comfort and style! These are my go-to sneakers for
-              everything from workouts to casual outings.&quot;
-            </p>
-            <div className="text-sm text-gray-500">
-              <span className="font-medium">Jessica K.</span> • Verified
-              Purchase
-            </div>
+        {reviews?.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {reviews.slice(0, 3).map((review) => (
+              <div
+                key={review.id}
+                className="bg-white p-6 rounded-lg shadow-sm"
+              >
+                <div className="flex items-center gap-1 mb-3">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star
+                      key={star}
+                      className={`h-4 w-4 ${
+                        star <= review.rating
+                          ? "text-yellow-400 fill-yellow-400"
+                          : "text-gray-300"
+                      }`}
+                    />
+                  ))}
+                </div>
+                <p className="text-gray-700 mb-4">
+                  &quot;{review.comment}&quot;
+                </p>
+                <div className="text-sm text-gray-500">
+                  <span className="font-medium">{review.user.name}</span> •
+                  Verified Purchase
+                </div>
+              </div>
+            ))}
           </div>
+        ) : (
+          <div className="text-center text-gray-500">No reviews yet.</div>
+        )}
 
-          <div className="bg-white p-6 rounded-lg shadow-sm">
-            <div className="flex items-center gap-1 mb-3">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <Star
-                  key={star}
-                  className="h-4 w-4 fill-yellow-400 text-yellow-400"
-                />
-              ))}
-            </div>
-            <p className="text-gray-700 mb-4">
-              &quot;Perfect fit and the quality is outstanding. Nike never
-              disappoints with their Air Max line!&quot;
-            </p>
-            <div className="text-sm text-gray-500">
-              <span className="font-medium">Marcus T.</span> • Verified Purchase
-            </div>
+        {reviews?.length > 3 && (
+          <div className="text-center mt-12">
+            <Button variant="outline" size="lg" className="px-8">
+              Read All Reviews
+            </Button>
           </div>
-
-          <div className="bg-white p-6 rounded-lg shadow-sm">
-            <div className="flex items-center gap-1 mb-3">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <Star
-                  key={star}
-                  className="h-4 w-4 fill-yellow-400 text-yellow-400"
-                />
-              ))}
-            </div>
-            <p className="text-gray-700 mb-4">
-              &quot;Love the retro vibe and the cushioning is incredible. Highly
-              recommend for anyone looking for style and comfort.&quot;
-            </p>
-            <div className="text-sm text-gray-500">
-              <span className="font-medium">Riley M.</span> • Verified Purchase
-            </div>
-          </div>
-        </div>
-
-        <div className="text-center mt-12">
-          <Button variant="outline" size="lg" className="px-8">
-            Read All Reviews
-          </Button>
-        </div>
+        )}
       </div>
     </section>
   );
@@ -257,7 +247,7 @@ export default async function ShoePage({ params }: ShoePageProps) {
     <div className="min-h-screen">
       <ShoeDetails shoe={shoe} />
       <RelatedShoesSection />
-      <CustomerReviewsSection />
+      <CustomerReviewsSection reviews={shoe.reviews} />
       <NewsletterSection />
     </div>
   );

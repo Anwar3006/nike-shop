@@ -15,10 +15,26 @@ export interface ShoeImage {
   id: string;
   url: string;
   isPrimary: boolean;
+  shoeId: string;
+  variantId?: string | null;
+  sortOrder: number;
+}
+
+export interface Review {
+  id: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+  user: {
+    id: string;
+    name: string;
+    image?: string;
+  };
 }
 
 export interface ShoeVariant {
   id: string;
+  shoeId: string;
   sku: string;
   price: string; // numeric from database comes as string
   salePrice?: string | null;
@@ -32,7 +48,7 @@ export interface ShoeVariant {
   };
   size: {
     id: string;
-    name: string;
+    value: string;
   };
   images: ShoeImage[];
   createdAt: string;
@@ -58,6 +74,8 @@ export interface Shoe {
     name: string;
   };
   variants: ShoeVariant[];
+  images: ShoeImage[];
+  reviews: Review[];
   defaultVariant?: ShoeVariant | null;
   createdAt: string;
   updatedAt: string;

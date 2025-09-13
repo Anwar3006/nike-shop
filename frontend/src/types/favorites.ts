@@ -4,6 +4,7 @@ export interface FavoriteItem {
   id: string;
   userId: string;
   shoeId: string;
+  colorVariantId?: string;
   createdAt: string;
   shoe: Shoe;
 }
@@ -11,6 +12,7 @@ export interface FavoriteItem {
 export interface AddFavoriteRequest {
   shoeId: string;
   userId: string;
+  colorVariantId?: string;
 }
 
 export interface GetFavoritesResponse {

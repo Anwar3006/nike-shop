@@ -1,5 +1,6 @@
 export interface CartItem {
   shoeId: string;
+  variantId: string;
   name: string;
   image: string;
   price: number;
@@ -11,6 +12,7 @@ export interface CartItem {
 
 export interface AddToCartParams {
   shoeId: string;
+  variantId: string;
   name: string;
   image: string;
   price: number;

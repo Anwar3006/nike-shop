@@ -34,6 +34,7 @@ import { Minus, Plus } from "lucide-react";
 import { AddToCartFormData, addToCartSchema } from "@/schemas/cart.schema";
 import Image from "next/image";
 import { toast } from "sonner";
+import { ShoeVariant } from "@/types/shoes";
 
 type AddToCartDialogProps = {
   toggleDialog: (open: boolean) => void;
@@ -45,9 +46,14 @@ type AddToCartDialogProps = {
     price: number;
     availableSizes: string[];
     availableColors: Array<{ id: string; name: string; hex: string }>;
+    variants: ShoeVariant[];
   };
-  onAddToCart: (data: AddToCartFormData & { shoeId: string }) => void;
-  onOrderNow: (data: AddToCartFormData & { shoeId: string }) => void;
+  onAddToCart: (
+    data: AddToCartFormData & { shoeId: string; variantId: string }
+  ) => void;
+  onOrderNow: (
+    data: AddToCartFormData & { shoeId: string; variantId: string }
+  ) => void;
 };
 
 const AddToCartDialog = ({
@@ -81,12 +87,20 @@ const AddToCartDialog = ({
   };
 
   const handleSaveToCart = (data: AddToCartFormData) => {
+    const selectedVariant = shoeData.variants.find(
+      (v) => v.color.id === data.color && v.size.name === data.size
+    );
+    if (!selectedVariant) {
+      toast.error("This combination is not available.");
+      return;
+    }
     const selectedColor = shoeData.availableColors.find(
       (c) => c.id === data.color
     );
     onAddToCart({
       ...data,
       shoeId: shoeData.id,
+      variantId: selectedVariant.id,
       color: selectedColor?.name || "",
     });
     toggleDialog(false);
@@ -94,12 +108,20 @@ const AddToCartDialog = ({
   };
 
   const handleOrderNow = (data: AddToCartFormData) => {
+    const selectedVariant = shoeData.variants.find(
+      (v) => v.color.id === data.color && v.size.name === data.size
+    );
+    if (!selectedVariant) {
+      toast.error("This combination is not available.");
+      return;
+    }
     const selectedColor = shoeData.availableColors.find(
       (c) => c.id === data.color
     );
     onOrderNow({
       ...data,
       shoeId: shoeData.id,
+      variantId: selectedVariant.id,
       color: selectedColor?.name || "",
     });
     toggleDialog(false);

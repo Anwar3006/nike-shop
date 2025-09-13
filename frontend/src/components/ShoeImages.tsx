@@ -21,8 +21,8 @@ export default function ShoeImages({ images }: ShoeImagesProps) {
   }, [images]);
 
   return (
-    <div className="flex flex-col-reverse lg:flex-row gap-4">
-      <div className="flex lg:flex-col gap-2 overflow-x-auto lg:overflow-x-visible lg:p-1 ">
+    <div className="flex flex-col lg:flex-row gap-4">
+      <div className="flex p-1 lg:flex-col gap-2 overflow-x-auto lg:overflow-x-visible lg:p-1 ">
         {images.map((image) => (
           <div
             key={image.id}
@@ -46,9 +46,9 @@ export default function ShoeImages({ images }: ShoeImagesProps) {
         <Image
           src={mainImage}
           alt="Main shoe image"
-          layout="fill"
-          objectFit="cover"
-          className="transition-opacity duration-500"
+          fill
+          sizes="100%"
+          className="transition-opacity duration-500 object-cover"
         />
       </div>
     </div>
