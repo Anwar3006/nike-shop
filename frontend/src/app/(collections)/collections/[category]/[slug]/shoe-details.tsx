@@ -8,7 +8,7 @@ import ColorSelector from "@/components/ColorSelector";
 import { Button } from "@/components/ui/button";
 import { useAddToCart } from "@/hooks/cache/use-cart";
 import { toast } from "sonner";
-import { Loader2, Star } from "lucide-react";
+import { Heart, Loader2, ShoppingCart, Star } from "lucide-react";
 import { useAddFavorite } from "@/hooks/api/use-favorites";
 import { useGetUserInfo } from "@/hooks/api/use-userInfo";
 import {
@@ -104,16 +104,28 @@ export default function ShoeDetails({ shoe }: ShoeDetailsProps) {
         shoe.reviews.length
       : 0;
 
+  const percentageOff =
+    selectedVariant?.salePrice &&
+    parseFloat(selectedVariant.salePrice) < parseFloat(selectedVariant.price)
+      ? (
+          (parseInt(selectedVariant.salePrice) /
+            parseInt(selectedVariant.price)) *
+          100
+        ).toFixed(2)
+      : null;
+
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 font-bevellier">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-        <NewShoeImages images={currentImages} isHighlyRated={shoe.isHighlyRated} />
+        <NewShoeImages images={currentImages} isHighlyRated={true} />
 
         <div>
           <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-gray-900">
             {shoe.name}
           </h1>
-          <p className="text-lg text-gray-500 mt-1">{shoe.category.name}'s Shoes</p>
+          <p className="text-lg text-gray-500 mt-1">
+            {shoe.category.name}'s Shoes
+          </p>
 
           <div className="mt-4">
             {selectedVariant?.salePrice &&
@@ -132,8 +144,12 @@ export default function ShoeDetails({ shoe }: ShoeDetailsProps) {
                 ${(currentPrice / 100).toFixed(2)}
               </p>
             )}
-            {shoe.discount && (
-                <p className="text-sm text-green-600 font-semibold mt-1">{shoe.discount}</p>
+            {percentageOff ? (
+              <p className="text-sm text-green-600 font-semibold mt-1">
+                Extra {percentageOff}% off. Grab while they last.
+              </p>
+            ) : (
+              <div className="mt-1 h-5" />
             )}
           </div>
 
@@ -148,8 +164,13 @@ export default function ShoeDetails({ shoe }: ShoeDetailsProps) {
 
           <div className="mt-6">
             <div className="flex justify-between items-center">
-                <h3 className="text-lg font-medium text-gray-900">Select Size</h3>
-                <a href="#" className="text-sm font-medium text-primary hover:text-primary/80">Size Guide</a>
+              <h3 className="text-lg font-medium text-gray-900">Select Size</h3>
+              <a
+                href="#"
+                className="text-sm font-medium text-primary hover:text-primary/80"
+              >
+                Size Guide
+              </a>
             </div>
             <ShoeSizes
               sizes={availableSizes}
@@ -161,7 +182,7 @@ export default function ShoeDetails({ shoe }: ShoeDetailsProps) {
           <div className="mt-8 grid grid-cols-1 gap-4">
             <Button
               size="lg"
-              className="w-full rounded-full h-14 text-lg"
+              className="w-full rounded-full h-14 text-lg flex items-center gap-2"
               disabled={
                 !selectedSizeId ||
                 !selectedVariant ||
@@ -170,6 +191,7 @@ export default function ShoeDetails({ shoe }: ShoeDetailsProps) {
               }
               onClick={handleAddToCart}
             >
+              <ShoppingCart size={20} />
               {isPending ? "Adding..." : "Add to Bag"}
             </Button>
 
@@ -179,6 +201,7 @@ export default function ShoeDetails({ shoe }: ShoeDetailsProps) {
               className="w-full rounded-full h-14 text-lg"
               onClick={() => handleAddToFavorites(shoe.id, selectedVariant?.id)}
             >
+              <Heart size={20} />
               {isFavoritePending ? (
                 <Loader2 className="mr-2 animate-spin" />
               ) : (
@@ -193,10 +216,13 @@ export default function ShoeDetails({ shoe }: ShoeDetailsProps) {
               <AccordionContent>
                 <p className="mb-4">{shoe.description}</p>
                 <ul className="list-disc pl-5 space-y-1">
-                    <li>Padded collar</li>
-                    <li>Foam midsole</li>
-                    <li>Shown: {selectedVariant?.color.name}</li>
-                    <li>Style: {shoe.styleCode}</li>
+                  <li>Padded collar</li>
+                  <li>Foam midsole</li>
+                  <li>Shown: {selectedVariant?.color.name}</li>
+                  <li>
+                    Style:{" "}
+                    {shoe.defaultVariant?.sku.split("-")[0].toUpperCase()}
+                  </li>
                 </ul>
               </AccordionContent>
             </AccordionItem>
@@ -207,24 +233,48 @@ export default function ShoeDetails({ shoe }: ShoeDetailsProps) {
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-3">
-              <AccordionTrigger>Reviews ({shoe.reviews?.length || 0})</AccordionTrigger>
+              <AccordionTrigger>
+                Reviews ({shoe.reviews?.length || 0})
+              </AccordionTrigger>
               <AccordionContent>
                 {shoe.reviews?.length > 0 ? (
                   <div>
                     <div className="flex items-center gap-2 mb-4">
                       <div className="flex items-center">
-                        {[1,2,3,4,5].map(star => <Star key={star} className={`w-5 h-5 ${star <= averageRating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} />)}
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star
+                            key={star}
+                            className={`w-5 h-5 ${
+                              star <= averageRating
+                                ? "text-yellow-400 fill-yellow-400"
+                                : "text-gray-300"
+                            }`}
+                          />
+                        ))}
                       </div>
-                      <span className="text-gray-600">{averageRating.toFixed(1)} out of 5</span>
+                      <span className="text-gray-600">
+                        {averageRating.toFixed(1)} out of 5
+                      </span>
                     </div>
                     <div>
-                      {shoe.reviews.slice(0,3).map(review => (
+                      {shoe.reviews.slice(0, 3).map((review) => (
                         <div key={review.id} className="border-t py-4">
                           <div className="flex items-center gap-1 mb-1">
-                            {[1,2,3,4,5].map(star => <Star key={star} className={`w-4 h-4 ${star <= review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} />)}
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <Star
+                                key={star}
+                                className={`w-4 h-4 ${
+                                  star <= review.rating
+                                    ? "text-yellow-400 fill-yellow-400"
+                                    : "text-gray-300"
+                                }`}
+                              />
+                            ))}
                           </div>
                           <p className="text-gray-800">{review.comment}</p>
-                          <p className="text-sm text-gray-500 mt-2">- {review.user.name}</p>
+                          <p className="text-sm text-gray-500 mt-2">
+                            - {review.user.name}
+                          </p>
                         </div>
                       ))}
                     </div>
@@ -235,7 +285,6 @@ export default function ShoeDetails({ shoe }: ShoeDetailsProps) {
               </AccordionContent>
             </AccordionItem>
           </Accordion>
-
         </div>
       </div>
     </div>

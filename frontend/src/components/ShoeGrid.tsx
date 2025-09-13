@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useMemo } from "react";
 import Card from "./Card";
 import { useGetShoes } from "@/hooks/api/use-shoes";
 import { useSearchParams } from "next/navigation";
@@ -30,6 +30,24 @@ const ShoeGrid = () => {
     isFetchingNextPage,
   } = useGetShoes(queryOptions);
 
+  const allShoes = data?.pages.flatMap((page) => page.data) || [];
+
+  const colors = useMemo(
+    () =>
+      allShoes.map((shoe) => {
+        const tempSet = new Set();
+        const tempMap = new Map();
+        shoe.variants.forEach((variant) => {
+          if (variant.color) {
+            tempSet.add(variant.color.name);
+          }
+        });
+        tempMap.set(shoe.id, Array.from(tempSet));
+        return tempMap;
+      }),
+    [allShoes]
+  );
+
   if (isLoading) {
     return <ShoesSkeleton length={6} />;
   }
@@ -38,8 +56,8 @@ const ShoeGrid = () => {
     return <Error title="Shoes" error={error} />;
   }
 
-  const allShoes = data?.pages.flatMap((page) => page.data) || [];
-  console.log("allShoes: ", allShoes);
+  console.log("colors: ", colors);
+  console.log("allshoes: ", allShoes);
   return (
     <div className="gap-y-4">
       {allShoes.length > 0 ? (
@@ -64,7 +82,10 @@ const ShoeGrid = () => {
                   name={product.name}
                   category={product.category.name}
                   price={price}
-                  colorCount={product.variants.length}
+                  colorCount={
+                    colors.find((c) => c.has(product.id))?.get(product.id)
+                      ?.length
+                  }
                   className="w-full max-w-sm"
                 />
               </div>

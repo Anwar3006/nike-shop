@@ -188,7 +188,7 @@ export const ShoeRepository = {
     });
 
     if (!shoe) {
-      throw new AppError("Shoe not found", 404);
+      throw new Error("Shoe not found");
     }
 
     return shoe;

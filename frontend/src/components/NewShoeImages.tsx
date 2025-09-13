@@ -42,12 +42,12 @@ export default function NewShoeImages({
   return (
     <div className="flex flex-col-reverse lg:flex-row gap-4">
       {/* Thumbnails */}
-      <div className="flex lg:flex-col gap-2 overflow-x-auto lg:overflow-y-auto lg:h-[500px] p-1">
+      <div className="flex lg:flex-col gap-2 overflow-x-auto w-auto lg:overflow-x-hidden lg:overflow-y-auto lg:h-[500px] px-3 py-1 scrollbar-hide">
         {images.map((image, index) => (
           <div
             key={image.id}
             className={cn(
-              "relative w-20 h-20 rounded-lg overflow-hidden cursor-pointer flex-shrink-0",
+              "relative w-16 h-16 rounded-lg overflow-hidden cursor-pointer flex-shrink-0",
               mainImage === image.url && "ring-2 ring-primary"
             )}
             onClick={() => {

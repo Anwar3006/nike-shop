@@ -7,6 +7,7 @@ import { Button } from "./ui/button";
 import { Heart } from "lucide-react";
 import { useIsFavorite, useToggleFavorite } from "@/hooks/api/use-favorites";
 import { toast } from "sonner";
+import slugify from "slugify";
 
 interface CardProps {
   id: string;
@@ -45,7 +46,11 @@ const Card: React.FC<CardProps> = ({
   } = useIsFavorite({ shoeId: id, colorVariantId });
 
   const handleClick = () => {
-    const slugName = name.replace(/\s+/g, "-").toLowerCase();
+    const slugName = slugify(name, {
+      lower: true,
+      strict: true,
+      replacement: "-",
+    });
     const slugCategory = (
       category.split("'")[0] || category.split(" ")[0]
     ).toLowerCase();
