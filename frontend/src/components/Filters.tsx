@@ -41,6 +41,11 @@ const filterGroups = [
     options: ["men", "women", "kids", "unisex"],
   },
   {
+    name: "Category",
+    key: "category",
+    options: ["Casual", "Lifestyle", "Basketball", "Running"],
+  },
+  {
     name: "Color",
     key: "color",
     options: [

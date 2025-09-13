@@ -8,6 +8,7 @@ export interface ShoesQueryOptions {
   size?: string;
   color?: string;
   price?: string;
+  category?: string;
 }
 
 // API Response Types

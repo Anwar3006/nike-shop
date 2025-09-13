@@ -8,6 +8,9 @@
     "db:push": "drizzle-kit push:pg",
     "build": "rimraf dist && tsc",
     "start": "node ./dist/app.js",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "render:build": "npm ci && npm run db:generate && npm run db:migrate && npm run build",
     "seed": "tsx src/db/seed/runner.ts",
     "scrape": "tsx src/db/seed/scraper2.ts"
   },

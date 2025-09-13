@@ -29,6 +29,7 @@ const ShoesService = {
         params.minPrice = splitPrice[0] + "00";
         params.maxPrice = splitPrice[1] + "00";
       }
+      if (options.category) params.category = options.category;
 
       console.log("options: ", options);
       console.log("params: ", params);
