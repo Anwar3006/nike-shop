@@ -5,6 +5,7 @@ import ShoesService from "@/lib/services/shoes.service";
 import { Button } from "@/components/ui/button";
 import { Star } from "lucide-react";
 import { Review } from "@/types/shoes";
+import Image from "next/image";
 
 interface ShoePageProps {
   params: Promise<{
@@ -23,97 +24,80 @@ const getShoeBySlug = async (slug: string): Promise<Shoe | null> => {
   }
 };
 
-// Mock data for "You Might Also Like" section
 const relatedShoes = [
   {
     id: "1",
     name: "Nike Air Force 1 Mid '07",
     price: 9830,
-    image: "/api/placeholder/300/300",
+    image: "/shoes/shoe-1.jpg",
     colors: 6,
-    isNewArrival: false,
+    isBestSeller: true,
     discount: null,
   },
   {
     id: "2",
     name: "Nike Court Vision Low Next Nature",
     price: 9830,
-    image: "/api/placeholder/300/300",
+    image: "/shoes/shoe-2.webp",
     colors: 4,
-    isNewArrival: false,
+    isBestSeller: false,
     discount: "Extra 20% off",
   },
   {
     id: "3",
     name: "Nike Dunk Low Retro",
     price: 9830,
-    image: "/api/placeholder/300/300",
+    image: "/shoes/shoe-3.webp",
     colors: 6,
-    isNewArrival: false,
+    isBestSeller: false,
     discount: "Extra 10% off",
-  },
-  {
-    id: "4",
-    name: "Nike Air Max 97",
-    price: 17000,
-    image: "/api/placeholder/300/300",
-    colors: 3,
-    isNewArrival: true,
-    discount: null,
   },
 ];
 
 function RelatedShoesSection() {
   return (
-    <section className="bg-white py-16">
+    <section className="bg-gray-50 py-16">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-12">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
-            You Might Also Like
-          </h2>
-          <p className="text-gray-600">
-            Discover more styles that complement your taste
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-8">
+          You Might Also Like
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {relatedShoes.map((shoe) => (
             <div key={shoe.id} className="group cursor-pointer">
-              <div className="relative bg-gray-50 rounded-lg overflow-hidden mb-4">
-                {shoe.isNewArrival && (
-                  <span className="absolute top-4 left-4 bg-black text-white text-xs px-2 py-1 rounded z-10">
-                    New
-                  </span>
-                )}
-                {shoe.discount && (
-                  <span className="absolute top-4 right-4 bg-green-600 text-white text-xs px-2 py-1 rounded z-10">
-                    {shoe.discount}
-                  </span>
-                )}
-                <div className="aspect-square bg-gray-100 flex items-center justify-center">
-                  <span className="text-gray-400 text-sm">Shoe Image</span>
+              <div className="relative bg-white rounded-lg overflow-hidden mb-4 border border-gray-200">
+                <div className="absolute top-4 left-4 z-10">
+                    {shoe.isBestSeller && (
+                        <span className="bg-white text-black text-xs px-3 py-1 rounded-full">
+                            Best Seller
+                        </span>
+                    )}
+                    {shoe.discount && !shoe.isBestSeller && (
+                        <span className="bg-blue-600 text-white text-xs px-3 py-1 rounded-full">
+                            {shoe.discount}
+                        </span>
+                    )}
                 </div>
+                <Image
+                  src={shoe.image}
+                  alt={shoe.name}
+                  width={400}
+                  height={400}
+                  className="w-full h-full object-cover group-hover:opacity-80 transition-opacity"
+                />
               </div>
 
-              <div className="space-y-2">
-                <h3 className="font-semibold text-gray-900 group-hover:text-gray-600 transition-colors">
-                  {shoe.name}
-                </h3>
+              <div className="space-y-1">
+                <h3 className="font-semibold text-gray-900">{shoe.name}</h3>
+                <p className="text-gray-600 text-sm">Men's Shoes</p>
                 <p className="text-gray-600 text-sm">
                   {shoe.colors} Colour{shoe.colors !== 1 ? "s" : ""}
                 </p>
-                <p className="font-semibold text-gray-900">
-                  ${shoe.price / 100}
+                <p className="font-semibold text-gray-900 pt-2">
+                  ${(shoe.price / 100).toFixed(2)}
                 </p>
               </div>
             </div>
           ))}
-        </div>
-
-        <div className="text-center mt-12">
-          <Button variant="outline" size="lg" className="px-8">
-            View All Similar Products
-          </Button>
         </div>
       </div>
     </section>
@@ -127,109 +111,30 @@ function CustomerReviewsSection({ reviews }: { reviews: Review[] }) {
       : 0;
 
   return (
-    <section className="bg-gray-50 py-16">
+    <section className="bg-white py-16">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
-            What Our Customers Say
-          </h2>
-          {reviews?.length > 0 && (
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <div className="flex items-center gap-1">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star
-                    key={star}
-                    className={`h-5 w-5 ${
-                      star <= averageRating
-                        ? "text-yellow-400 fill-yellow-400"
-                        : "text-gray-300"
-                    }`}
-                  />
-                ))}
-              </div>
-              <span className="text-gray-600 ml-2">
-                {averageRating.toFixed(1)} out of 5 ({reviews?.length} reviews)
-              </span>
-            </div>
-          )}
-        </div>
-
-        {reviews?.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {reviews.slice(0, 3).map((review) => (
-              <div
-                key={review.id}
-                className="bg-white p-6 rounded-lg shadow-sm"
-              >
-                <div className="flex items-center gap-1 mb-3">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star
-                      key={star}
-                      className={`h-4 w-4 ${
-                        star <= review.rating
-                          ? "text-yellow-400 fill-yellow-400"
-                          : "text-gray-300"
-                      }`}
-                    />
-                  ))}
+        <div className="flex justify-between items-center mb-8">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                Reviews ({reviews?.length || 0})
+            </h2>
+            {reviews?.length > 0 && (
+                <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                        <Star
+                            key={star}
+                            className={`h-5 w-5 ${
+                            star <= averageRating
+                                ? "text-yellow-400 fill-yellow-400"
+                                : "text-gray-300"
+                            }`}
+                        />
+                        ))}
+                    </div>
                 </div>
-                <p className="text-gray-700 mb-4">
-                  &quot;{review.comment}&quot;
-                </p>
-                <div className="text-sm text-gray-500">
-                  <span className="font-medium">{review.user.name}</span> •
-                  Verified Purchase
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center text-gray-500">No reviews yet.</div>
-        )}
-
-        {reviews?.length > 3 && (
-          <div className="text-center mt-12">
-            <Button variant="outline" size="lg" className="px-8">
-              Read All Reviews
-            </Button>
-          </div>
-        )}
-      </div>
-    </section>
-  );
-}
-
-function NewsletterSection() {
-  return (
-    <section className="bg-black text-white py-16">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto">
-          <h2 className="text-2xl sm:text-3xl font-bold mb-4">
-            Stay In The Know
-          </h2>
-          <p className="text-gray-300 mb-8">
-            Be the first to hear about new releases, exclusive offers, and the
-            latest Nike news.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-            <input
-              type="email"
-              placeholder="Enter your email"
-              className="flex-1 px-4 py-3 rounded bg-gray-800 text-white placeholder-gray-400 border border-gray-700 focus:border-white focus:outline-none"
-            />
-            <Button
-              size="lg"
-              className="bg-white text-black hover:bg-gray-100 px-8"
-            >
-              Subscribe
-            </Button>
-          </div>
-
-          <p className="text-gray-400 text-sm mt-4">
-            By signing up, you agree to our Privacy Policy and Terms of Service.
-          </p>
+            )}
         </div>
+        {/* This is handled by the accordion now */}
       </div>
     </section>
   );
@@ -244,11 +149,9 @@ export default async function ShoePage({ params }: ShoePageProps) {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-white">
       <ShoeDetails shoe={shoe} />
       <RelatedShoesSection />
-      <CustomerReviewsSection reviews={shoe.reviews} />
-      <NewsletterSection />
     </div>
   );
 }

@@ -23,30 +23,28 @@ export default function ColorSelector({
   };
 
   return (
-    <div>
-      <h3 className="text-lg font-medium text-gray-900">Color</h3>
-      <div className="grid grid-cols-4 sm:grid-cols-3 md:grid-cols-6 gap-4 mt-4 px-3">
-        {colors.map((color) => (
-          <div
-            key={color.id}
-            className={cn(
-              "relative w-16 h-16 rounded-md overflow-hidden cursor-pointer",
-              selectedColorId === color.id
-                ? "ring-2 ring-primary ring-offset-2"
-                : ""
-            )}
-            onClick={() => onSelectColor(color.id)}
-          >
-            <Image
-              src={getColorImage(color.id)}
-              alt={color.name}
-              fill
-              sizes="100%"
-              className="object-cover"
-            />
-          </div>
-        ))}
-      </div>
+    <div className="flex flex-wrap gap-2">
+      {colors.map((color) => (
+        <div
+          key={color.id}
+          className={cn(
+            "relative w-16 h-16 rounded-md overflow-hidden cursor-pointer border",
+            selectedColorId === color.id
+              ? "ring-2 ring-black ring-offset-2"
+              : "border-gray-200"
+          )}
+          onClick={() => onSelectColor(color.id)}
+          title={color.name}
+        >
+          <Image
+            src={getColorImage(color.id)}
+            alt={color.name}
+            fill
+            sizes="5vw"
+            className="object-cover"
+          />
+        </div>
+      ))}
     </div>
   );
 }
