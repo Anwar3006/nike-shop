@@ -81,18 +81,28 @@ export const updateShoeSchema = object({
 
 export type UpdateShoeSchemaType = output<typeof updateShoeSchema>;
 
+// Updated GetShoes Schema to handle range inputs properly
 export const getShoesSchema = object({
   query: object({
-    limit: string().nonoptional(),
-    offset: string().nonoptional(),
+    limit: string().optional().default("10"),
+    offset: string().optional().default("0"),
 
-    sort: string().optional(),
+    sort: string().optional().default("created_at.desc"),
     color: string().optional(),
     gender: string().optional(),
-    size: string().optional(),
-    minPrice: string().optional(),
-    maxPrice: string().optional(),
+    size: string().optional(), // Can accept range like "7-10" or single value "8.5"
     category: string().optional(),
+
+    // Support both legacy separate min/max and new range format
+    price: string().optional(), // New: accepts ranges like "50-150" or single values like "100"
+    minPrice: string().optional(), // Legacy: kept for backward compatibility
+    maxPrice: string().optional(), // Legacy: kept for backward compatibility
+
+    // New: Support for searching by shoe name/description
+    search: string().optional(),
+
+    // New: Support for filtering by availability
+    inStock: string().optional(), // "true" or "false"
   }),
 });
 export type GetShoesSchemaType = output<typeof getShoesSchema>;
