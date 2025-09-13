@@ -10,7 +10,7 @@
     "start": "node ./dist/app.js",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "render:build": "npm ci && npm run db:generate && npm run db:migrate && npm run build",
+    "render:build": "npm ci && npm run build && npm run db:generate && npm run db:migrate",
     "seed": "tsx src/db/seed/runner.ts",
     "scrape": "tsx src/db/seed/scraper2.ts"
   },
