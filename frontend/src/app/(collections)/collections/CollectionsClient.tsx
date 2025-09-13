@@ -4,9 +4,16 @@ import ShoeGrid from "@/components/ShoeGrid";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 
-const CollectionsClient = () => {
+const CollectionsClient = ({
+  filters,
+}: {
+  filters?: {
+    [k: string]: string;
+  };
+}) => {
   const searchParams = useSearchParams();
-  const resolvedSearchParams = Object.fromEntries(searchParams.entries());
+  const resolvedSearchParams =
+    filters || Object.fromEntries(searchParams.entries());
   const router = useRouter();
   const pathname = usePathname();
 
@@ -26,6 +33,9 @@ const CollectionsClient = () => {
       value,
     })
   );
+
+  // const page = resolvedSearchParams.page || "1";
+  // const per_page = resolvedSearchParams.per_page || "12";
 
   return (
     <div className="h-full overflow-y-auto">
@@ -61,8 +71,18 @@ const CollectionsClient = () => {
         </div>
 
         {/* Products Grid */}
-        <Suspense fallback={<div>Loading shoes...</div>}>
-          <ShoeGrid />
+        <Suspense
+          fallback={
+            <div className="flex items-center justify-center size-full animate-pulse">
+              Loading shoes...
+            </div>
+          }
+        >
+          <ShoeGrid
+          // filters={resolvedSearchParams}
+          // page={page}
+          // per_page={per_page}
+          />
         </Suspense>
       </div>
     </div>

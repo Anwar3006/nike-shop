@@ -1,4 +1,5 @@
-import { output, z } from "zod";
+import { z } from "zod";
+import type { output } from "zod";
 
 export const addFavoriteSchema = z.object({
   body: z.object({

@@ -7,6 +7,7 @@ import { Button } from "./ui/button";
 import { Heart } from "lucide-react";
 import { useIsFavorite, useToggleFavorite } from "@/hooks/api/use-favorites";
 import { toast } from "sonner";
+import slugify from "slugify";
 
 interface CardProps {
   id: string;
@@ -17,6 +18,7 @@ interface CardProps {
   price: number;
   colorCount?: number;
   className?: string;
+  colorVariantId?: string;
 }
 
 const Card: React.FC<CardProps> = ({
@@ -28,6 +30,7 @@ const Card: React.FC<CardProps> = ({
   price,
   colorCount,
   className,
+  colorVariantId,
 }) => {
   const router = useRouter();
 
@@ -36,10 +39,18 @@ const Card: React.FC<CardProps> = ({
     isLoading: isToggling,
     // error: toggleError,
   } = useToggleFavorite();
-  const { data: favorited, isPending, error } = useIsFavorite(id);
+  const {
+    data: favorited,
+    isPending,
+    error,
+  } = useIsFavorite({ shoeId: id, colorVariantId });
 
   const handleClick = () => {
-    const slugName = name.replace(/\s+/g, "-").toLowerCase();
+    const slugName = slugify(name, {
+      lower: true,
+      strict: true,
+      replacement: "-",
+    });
     const slugCategory = (
       category.split("'")[0] || category.split(" ")[0]
     ).toLowerCase();
@@ -60,6 +71,7 @@ const Card: React.FC<CardProps> = ({
     try {
       await toggleFavorite({
         shoeId: id,
+        colorVariantId,
         isFavorite: favorited?.isFavorite ?? false,
         favoriteId: favorited?.favoriteId,
       });

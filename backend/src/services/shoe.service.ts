@@ -1,71 +1,38 @@
 import { ShoeRepository } from "../repositories/shoe.repository.js";
-import {
+import type {
   CreateShoeSchemaType,
   GetShoesSchemaType,
   UpdateShoeSchemaType,
 } from "../schemas/shoe.schema.js";
-import { logger } from "../utils/logger.js";
-
-type GetShoesOptions = GetShoesSchemaType["query"];
 
 export const ShoesService = {
   createShoe: async (data: CreateShoeSchemaType["body"]) => {
-    try {
-      const newShoe = await ShoeRepository.createShoe(data);
-      return newShoe;
-    } catch (error) {
-      logger.error(error, "Error when creating shoe");
-      throw error;
-    }
+    const newShoe = await ShoeRepository.createShoe(data);
+    return newShoe;
   },
 
   updateShoe: async (shoeId: string, data: UpdateShoeSchemaType["body"]) => {
-    try {
-      const updatedShoe = await ShoeRepository.updateShoe(shoeId, data);
-      return updatedShoe;
-    } catch (error) {
-      logger.error(error, "Error when updating shoe");
-      throw error;
-    }
+    const updatedShoe = await ShoeRepository.updateShoe(shoeId, data);
+    return updatedShoe;
   },
 
   deleteShoe: async (shoeId: string) => {
-    try {
-      const deletedShoe = await ShoeRepository.deleteShoe(shoeId);
-      return deletedShoe;
-    } catch (error) {
-      logger.error(error, "Error when deleting shoe");
-      throw error;
-    }
+    const deletedShoe = await ShoeRepository.deleteShoe(shoeId);
+    return deletedShoe;
   },
 
   getShoeById: async (shoeId: string) => {
-    try {
-      const shoe = await ShoeRepository.getShoeById(shoeId);
-      return shoe;
-    } catch (error) {
-      logger.error(error, "Error when getting shoe");
-      throw error;
-    }
+    const shoe = await ShoeRepository.getShoeById(shoeId);
+    return shoe;
   },
 
   getShoeBySlug: async (slug: string) => {
-    try {
-      const shoe = await ShoeRepository.getShoeBySlug(slug);
-      return shoe;
-    } catch (error) {
-      logger.error(error, "Error when getting shoe by slug");
-      throw error;
-    }
+    const shoe = await ShoeRepository.getShoeBySlug(slug);
+    return shoe;
   },
 
-  getShoes: async (options: GetShoesOptions) => {
-    try {
-      const shoes = await ShoeRepository.getShoes(options);
-      return shoes;
-    } catch (error) {
-      logger.error(error, "Error when getting shoes");
-      throw error;
-    }
+  getShoes: async (options: GetShoesSchemaType["query"]) => {
+    const shoes = await ShoeRepository.getShoes(options);
+    return shoes;
   },
 };

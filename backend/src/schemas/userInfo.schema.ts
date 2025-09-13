@@ -1,5 +1,6 @@
-import z, { boolean, email, object, output, string } from "zod";
+import z, { boolean, email, object, string } from "zod";
 
+import type { output } from "zod";
 export const updateUserInfoSchema = object({
   body: object({
     firstName: string().min(1, "Firstname is required"),

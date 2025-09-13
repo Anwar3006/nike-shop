@@ -11,43 +11,83 @@ export interface ShoesQueryOptions {
 }
 
 // API Response Types
-export interface Shoe {
+export interface ShoeImage {
   id: string;
-  name:string;
-  description: string;
-  category: string;
-  baseImage: string;
-  basePrice: number;
-  colors: Array<{
-    name: string;
-    dominantColor: string;
-    size: string[];
-    styleNumber: string;
-    images: string[];
-  }>;
-  gender: "men" | "women" | "kids" | "unisex";
-  inStock?: boolean;
+  url: string;
+  isPrimary: boolean;
+  shoeId: string;
+  variantId?: string | null;
+  sortOrder: number;
 }
 
-export interface Shoes {
+export interface Review {
   id: string;
-  name: string;
-  baseImage: string;
-  category: string;
-  price: number;
-  colors: Array<{
+  rating: number;
+  comment: string;
+  createdAt: string;
+  user: {
+    id: string;
+    name: string;
+    image?: string;
+  };
+}
+
+export interface ShoeVariant {
+  id: string;
+  shoeId: string;
+  sku: string;
+  price: string; // numeric from database comes as string
+  salePrice?: string | null;
+  inStock: number;
+  weight?: number | null;
+  dimensions?: Record<string, unknown>;
+  color: {
+    id: string;
     name: string;
     hex: string;
-  }>;
+  };
+  size: {
+    id: string;
+    value: string;
+  };
+  images: ShoeImage[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Shoe {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  isPublished: boolean;
+  brand: {
+    id: string;
+    name: string;
+  };
+  category: {
+    id: string;
+    name: string;
+  };
+  gender: {
+    id: string;
+    name: string;
+  };
+  variants: ShoeVariant[];
+  images: ShoeImage[];
+  reviews: Review[];
+  defaultVariant?: ShoeVariant | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface GetShoesApiResponse {
-  data: Shoes[];
+  data: Shoe[];
   meta: {
     total: number;
     limit: number;
     offset: number;
     hasNext: boolean;
-    nextPage: number | undefined;
+    hasPrev: boolean;
   };
 }

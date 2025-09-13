@@ -48,7 +48,12 @@ export const useAddFavorite = () => {
     mutationFn: (data) => FavoritesService.addFavorite(data),
     onSuccess: (data, variables) => {
       // ✅ Update cache with real data from server
-      const queryKey = ["is-favorite", userId, variables.shoeId];
+      const queryKey = [
+        "is-favorite",
+        userId,
+        variables.shoeId,
+        variables.colorVariantId,
+      ];
       queryClient.setQueryData(queryKey, {
         isFavorite: true,
         favoriteId: data.data.id,
@@ -89,11 +94,16 @@ export const useRemoveFavorite = () => {
   return useMutation<
     { success: boolean; message: string },
     Error,
-    { favoriteId: string; shoeId: string }
+    { favoriteId: string; shoeId: string; colorVariantId?: string }
   >({
     mutationFn: ({ favoriteId }) => FavoritesService.removeFavorite(favoriteId),
     onSuccess: (data, variables) => {
-      const queryKey = ["is-favorite", userId, variables.shoeId];
+      const queryKey = [
+        "is-favorite",
+        userId,
+        variables.shoeId,
+        variables.colorVariantId,
+      ];
       queryClient.setQueryData(queryKey, {
         isFavorite: false,
         favoriteId: undefined,
@@ -125,13 +135,19 @@ export const useRemoveFavorite = () => {
 /**
  * Hook for checking if an item is in favorites
  */
-export const useIsFavorite = (shoeId: string) => {
+export const useIsFavorite = ({
+  shoeId,
+  colorVariantId,
+}: {
+  shoeId: string;
+  colorVariantId?: string;
+}) => {
   const { data: session } = useSession();
   const userId = session?.user?.id;
 
   return useQuery<{ isFavorite: boolean; favoriteId?: string }, Error>({
-    queryKey: ["is-favorite", userId, shoeId],
-    queryFn: () => FavoritesService.isFavorite(shoeId),
+    queryKey: ["is-favorite", userId, shoeId, colorVariantId],
+    queryFn: () => FavoritesService.isFavorite({ shoeId, colorVariantId }),
     enabled: !!userId && !!shoeId,
     staleTime: 0,
     refetchOnWindowFocus: false,
@@ -149,10 +165,12 @@ export const useToggleFavorite = () => {
 
   const toggleFavorite = async ({
     shoeId,
+    colorVariantId,
     isFavorite,
     favoriteId,
   }: {
     shoeId: string;
+    colorVariantId?: string;
     isFavorite: boolean;
     favoriteId?: string;
   }) => {
@@ -167,10 +185,14 @@ export const useToggleFavorite = () => {
 
     if (isFavorite && favoriteId) {
       // Remove from favorites
-      return removeFavorite.mutateAsync({ favoriteId, shoeId });
+      return removeFavorite.mutateAsync({
+        favoriteId,
+        shoeId,
+        colorVariantId,
+      });
     } else {
       // Add to favorites
-      return addFavorite.mutateAsync({ shoeId, userId });
+      return addFavorite.mutateAsync({ shoeId, userId, colorVariantId });
     }
   };
 

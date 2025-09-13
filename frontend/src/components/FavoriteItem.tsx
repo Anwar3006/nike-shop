@@ -25,25 +25,37 @@ export const FavoriteItem = ({ favorite }: FavoriteItemProps) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
-  // console.log("Cart Data: ", cart);
   const isInCart =
     cart?.some(
       (item: { itemKey: string; value: CartItem }) =>
         item.value.shoeId === favorite.shoe.id
     ) || false;
 
+  const favoritedVariant = favorite.shoe.variants.find(
+    (v) => v.id === favorite.colorVariantId
+  );
+
   const handleRemoveFavorite = () => {
-    removeFavorite({ favoriteId: favorite.id, shoeId: favorite.shoeId });
+    removeFavorite({
+      favoriteId: favorite.id,
+      shoeId: favorite.shoeId,
+      colorVariantId: favorite.colorVariantId,
+    });
   };
 
   const handleAddToCart = async (params: AddToCartParams) => {
+    if (!favoritedVariant) return;
     try {
       await addToCart({
         cartItem: {
           shoeId: params.shoeId,
+          variantId: favoritedVariant.id,
           name: favorite.shoe.name,
-          image: favorite.shoe.baseImage,
-          price: favorite.shoe.basePrice / 100,
+          image:
+            favoritedVariant.images[0]?.url ||
+            favorite.shoe.variants[0]?.images[0]?.url ||
+            "/placeholder.png",
+          price: parseFloat(favoritedVariant.price) || 0,
           quantity: params.quantity ?? 1,
           size: params.size,
           color: params.color,
@@ -68,11 +80,22 @@ export const FavoriteItem = ({ favorite }: FavoriteItemProps) => {
     }
   };
 
+  const primaryImage =
+    favoritedVariant?.images[0]?.url ||
+    favorite.shoe.variants.flatMap((v) => v.images)[0]?.url ||
+    "/placeholder.png";
+
+  const price = favoritedVariant
+    ? parseFloat(favoritedVariant.price)
+    : favorite.shoe.variants[0]?.price
+    ? parseFloat(favorite.shoe.variants[0].price)
+    : 0;
+
   return (
     <div className="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
       <div className="relative">
         <Image
-          src={favorite.shoe.baseImage}
+          src={primaryImage}
           alt={favorite.shoe.name}
           width={400}
           height={300}
@@ -89,10 +112,10 @@ export const FavoriteItem = ({ favorite }: FavoriteItemProps) => {
           {favorite.shoe.name}
         </h3>
         <p className="text-sm text-gray-500 mb-2">
-          {favorite.shoe.categoryName}
+          {favorite.shoe.category.name}
         </p>
         <p className="text-lg font-bold text-gray-900 mb-4">
-          ${(favorite.shoe.basePrice / 100).toFixed(2)}
+          ${price.toFixed(2)}
         </p>
 
         <div className="flex gap-2">
@@ -102,19 +125,21 @@ export const FavoriteItem = ({ favorite }: FavoriteItemProps) => {
             shoeData={{
               id: favorite.shoe.id,
               name: favorite.shoe.name,
-              image: favorite.shoe.baseImage,
-              price: favorite.shoe.basePrice / 100,
-              availableSizes: favorite.shoe.availableSizes || [
-                "6",
-                "7",
-                "8",
-                "9",
-                "10",
-              ],
-              availableColors: [
-                { id: "black", name: "Black", hex: "#000000" },
-                { id: "white", name: "White", hex: "#FFFFFF" },
-              ],
+              image: primaryImage,
+              price: price,
+              availableSizes:
+                favorite.shoe.variants?.map((v) => v.size.value) || [],
+              availableColors:
+                favorite.shoe.variants
+                  ?.map((v) => ({
+                    ...v.color,
+                    hex: v.color.hex,
+                  }))
+                  .filter(
+                    (c, i, self) =>
+                      i === self.findIndex((color) => color.id === c.id)
+                  ) || [],
+              variants: favorite.shoe.variants,
             }}
             onAddToCart={handleAddToCart}
             onOrderNow={handleOrderNow}

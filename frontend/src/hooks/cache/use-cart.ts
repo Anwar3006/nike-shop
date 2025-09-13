@@ -37,6 +37,7 @@ export const useAddToCart = () => {
         quantity: number;
         size: string;
         color?: string;
+        variantId: string;
       };
     }
   >({

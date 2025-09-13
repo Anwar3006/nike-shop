@@ -34,31 +34,7 @@ import { Minus, Plus } from "lucide-react";
 import { AddToCartFormData, addToCartSchema } from "@/schemas/cart.schema";
 import Image from "next/image";
 import { toast } from "sonner";
-
-// Mock data - replace with actual shoe data
-const AVAILABLE_SIZES = [
-  "US 6",
-  "US 6.5",
-  "US 7",
-  "US 7.5",
-  "US 8",
-  "US 8.5",
-  "US 9",
-  "US 9.5",
-  "US 10",
-  "US 10.5",
-  "US 11",
-  "US 11.5",
-  "US 12",
-];
-
-const AVAILABLE_COLORS = [
-  { id: "black", name: "Black", hex: "#000000" },
-  { id: "white", name: "White", hex: "#FFFFFF" },
-  { id: "red", name: "Red", hex: "#DC2626" },
-  { id: "blue", name: "Blue", hex: "#2563EB" },
-  { id: "gray", name: "Gray", hex: "#6B7280" },
-];
+import { ShoeVariant } from "@/types/shoes";
 
 type AddToCartDialogProps = {
   toggleDialog: (open: boolean) => void;
@@ -68,11 +44,16 @@ type AddToCartDialogProps = {
     name: string;
     image: string;
     price: number;
-    availableSizes?: string[];
-    availableColors?: Array<{ id: string; name: string; hex: string }>;
+    availableSizes: string[];
+    availableColors: Array<{ id: string; name: string; hex: string }>;
+    variants: ShoeVariant[];
   };
-  onAddToCart: (data: AddToCartFormData & { shoeId: string }) => void;
-  onOrderNow: (data: AddToCartFormData & { shoeId: string }) => void;
+  onAddToCart: (
+    data: AddToCartFormData & { shoeId: string; variantId: string }
+  ) => void;
+  onOrderNow: (
+    data: AddToCartFormData & { shoeId: string; variantId: string }
+  ) => void;
 };
 
 const AddToCartDialog = ({
@@ -96,7 +77,6 @@ const AddToCartDialog = ({
 
   const { watch, setValue } = form;
   const quantity = watch("quantity");
-  console.log("Form Data: ", form.getValues());
 
   const handleQuantityChange = (increment: boolean) => {
     const currentQuantity = quantity;
@@ -107,23 +87,51 @@ const AddToCartDialog = ({
   };
 
   const handleSaveToCart = (data: AddToCartFormData) => {
-    onAddToCart({ ...data, shoeId: shoeData.id });
+    const selectedVariant = shoeData.variants.find(
+      (v) => v.color.id === data.color && v.size.value === data.size
+    );
+    if (!selectedVariant) {
+      toast.error("This combination is not available.");
+      return;
+    }
+    const selectedColor = shoeData.availableColors.find(
+      (c) => c.id === data.color
+    );
+    onAddToCart({
+      ...data,
+      shoeId: shoeData.id,
+      variantId: selectedVariant.id,
+      color: selectedColor?.name || "",
+    });
     toggleDialog(false);
     form.reset();
   };
 
   const handleOrderNow = (data: AddToCartFormData) => {
-    onOrderNow({ ...data, shoeId: shoeData.id });
+    const selectedVariant = shoeData.variants.find(
+      (v) => v.color.id === data.color && v.size.value === data.size
+    );
+    if (!selectedVariant) {
+      toast.error("This combination is not available.");
+      return;
+    }
+    const selectedColor = shoeData.availableColors.find(
+      (c) => c.id === data.color
+    );
+    onOrderNow({
+      ...data,
+      shoeId: shoeData.id,
+      variantId: selectedVariant.id,
+      color: selectedColor?.name || "",
+    });
     toggleDialog(false);
     form.reset();
   };
+
   const onFormError = (errors: unknown) => {
     console.error("Form Errors:", errors);
     toast.error("Please fill out all required fields.", {
-      description:
-        "Select a size and color to continue.\n" +
-        "Current Form Values: " +
-        JSON.stringify(form.getValues()),
+      description: "Select a size and color to continue.",
     });
   };
 
@@ -131,9 +139,6 @@ const AddToCartDialog = ({
     toggleDialog(false);
     form.reset();
   };
-
-  const availableSizes = shoeData.availableSizes || AVAILABLE_SIZES;
-  const availableColors = shoeData.availableColors || AVAILABLE_COLORS;
 
   return (
     <Dialog open={open} onOpenChange={toggleDialog}>
@@ -227,7 +232,7 @@ const AddToCartDialog = ({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {availableSizes.map((size) => (
+                      {shoeData.availableSizes.map((size) => (
                         <SelectItem key={size} value={size}>
                           {size}
                         </SelectItem>
@@ -252,7 +257,7 @@ const AddToCartDialog = ({
                       defaultValue={field.value}
                       className="grid grid-cols-3 gap-3"
                     >
-                      {availableColors.map((color) => (
+                      {shoeData.availableColors.map((color) => (
                         <div
                           key={color.id}
                           className="flex items-center space-x-2"
@@ -263,7 +268,7 @@ const AddToCartDialog = ({
                             className="sr-only"
                           />
                           <Label
-                            htmlFor={color.id} // This links the label to the radio item
+                            htmlFor={color.id}
                             className={`
                               flex flex-col items-center gap-1 p-2 rounded-lg border-2 cursor-pointer
                               transition-colors hover:bg-gray-50
@@ -273,7 +278,7 @@ const AddToCartDialog = ({
                                   : "border-gray-200"
                               }
                             `}
-                            onClick={() => field.onChange(color.id)} // Ensure clicking the label selects the radio item
+                            onClick={() => field.onChange(color.id)}
                           >
                             <div
                               className="w-6 h-6 rounded-full border"

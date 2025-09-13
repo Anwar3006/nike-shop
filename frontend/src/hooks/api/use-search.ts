@@ -19,7 +19,12 @@ export const useSearch = ({ query, enabled = true }: UseSearchOptions) => {
     queryFn: ({ pageParam = 0 }) =>
       SearchService.getSearchResults(query, pageParam as number),
     initialPageParam: 0,
-    getNextPageParam: (lastPage) => lastPage.meta.nextPage,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.meta.hasNext) {
+        return lastPage.meta.offset + lastPage.meta.limit;
+      }
+      return undefined;
+    },
     enabled: enabled && !!query,
   });
 };

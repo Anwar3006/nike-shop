@@ -1,17 +1,15 @@
 import Stripe from "stripe";
 import { STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET } from "../config/default.js";
 import { db } from "../db/index.js";
-import {
-  colorVariant,
-  OrderItemInsert,
-  orderItems,
-  orders,
-  shoeSizes,
-  sizes,
-} from "../models/index.js";
+import { orderItems, orders } from "../models/orders.model.js";
+import type { NewOrderItem } from "../models/orders.model.js";
 import { and, eq, sql } from "drizzle-orm";
 import { logger } from "../utils/logger.js";
 import AppError from "../errors/AppError.js";
+import { shoeVariants } from "../models/variants.model.js";
+import { colors } from "../models/filters/colors.model.js";
+import { sizes } from "../models/filters/sizes.model.js";
+import { payments } from "../models/payments.model.js";
 
 const stripe = new Stripe(STRIPE_SECRET_KEY!, {
   apiVersion: "2025-08-27.basil",
@@ -22,64 +20,52 @@ export const createPaymentIntent = async (
   amount: number,
   userId: string,
   shippingAddressId: string,
-  cartItem: CartItemData[]
+  cartItems: CartItemData[]
 ) => {
-  const paymentIntent = await stripe.paymentIntents.create({
-    amount: amount,
-    currency: "usd",
-    automatic_payment_methods: {
-      enabled: true,
-    },
-  });
+  let paymentIntent: Stripe.PaymentIntent;
 
   await db.transaction(async (tx) => {
     try {
       // Step 1: Fetch details and verify stock for all cart items
       const detailedCartItems = await Promise.all(
-        cartItem.map(async (item) => {
-          const itemColor =
-            item.color.charAt(0).toUpperCase() + item.color.slice(1);
-          const [color_variant] = await tx
+        cartItems.map(async (item) => {
+          const [color] = await tx
             .select()
-            .from(colorVariant)
-            .where(
-              and(
-                eq(colorVariant.shoeId, item.shoeId),
-                eq(colorVariant.dominantColor, itemColor)
-              )
-            );
+            .from(colors)
+            .where(eq(colors.name, item.color));
+          const [size] = await tx
+            .select()
+            .from(sizes)
+            .where(eq(sizes.value, item.size));
 
-          if (!color_variant) {
+          if (!color || !size) {
             throw new AppError(
-              `Color variant not found for shoe ${item.shoeId} with color ${itemColor}`,
+              `Invalid color or size for item ${item.name}`,
               400
             );
           }
 
-          const [shoeSizeData] = await tx
+          const [variant] = await tx
             .select()
-            .from(shoeSizes)
+            .from(shoeVariants)
             .where(
               and(
-                eq(shoeSizes.colorVariantId, color_variant.id),
-                eq(sizes.size, item.size)
+                eq(shoeVariants.shoeId, item.shoeId),
+                eq(shoeVariants.colorId, color.id),
+                eq(shoeVariants.sizeId, size.id)
               )
-            )
-            .leftJoin(sizes, eq(shoeSizes.sizeId, sizes.id));
+            );
 
-          if (
-            !shoeSizeData?.shoe_sizes ||
-            shoeSizeData.shoe_sizes.quantity < item.quantity
-          ) {
+          if (!variant || variant.inStock < item.quantity) {
             throw new AppError(
-              `Not enough stock for ${item.name} (Size: ${item.size}, Color: ${item.color}). Available: ${shoeSizeData.shoe_sizes?.quantity}, Requested: ${item.quantity}`,
+              `Not enough stock for ${item.name} (Size: ${item.size}, Color: ${item.color}). Available: ${variant?.inStock}, Requested: ${item.quantity}`,
               400
             );
           }
           return {
             ...item,
-            colorVariantId: color_variant.id,
-            sizeId: shoeSizeData.shoe_sizes.sizeId,
+            shoeVariantId: variant.id,
+            priceAtPurchase: variant.price,
           };
         })
       );
@@ -89,9 +75,9 @@ export const createPaymentIntent = async (
         .insert(orders)
         .values({
           userId,
-          totalAmount: amount,
+          totalAmount: String(amount),
           shippingAddressId,
-          paymentIntentId: paymentIntent.id,
+          billingAddressId: shippingAddressId, // Assuming shipping and billing are the same for now
           status: "pending",
         })
         .returning();
@@ -100,16 +86,25 @@ export const createPaymentIntent = async (
         throw new AppError("Failed to create order", 500);
       }
 
-      // Step 3: Create order items and decrement stock
-      const orderItemsToInsert: OrderItemInsert[] = detailedCartItems.map(
-        (item) => ({
-          name: item.name,
-          image: item.image,
+      paymentIntent = await stripe.paymentIntents.create({
+        amount: amount,
+        currency: "usd",
+        automatic_payment_methods: {
+          enabled: true,
+        },
+        metadata: {
+          userId,
           orderId: order.id,
-          colorVariantId: item.colorVariantId,
-          sizeId: item.sizeId,
+        },
+      });
+
+      // Step 3: Create order items and decrement stock
+      const orderItemsToInsert: NewOrderItem[] = detailedCartItems.map(
+        (item) => ({
+          orderId: order.id,
+          shoeVariantId: item.shoeVariantId,
           quantity: item.quantity,
-          price: item.price * item.quantity * 100,
+          priceAtPurchase: item.priceAtPurchase,
         })
       );
 
@@ -117,16 +112,11 @@ export const createPaymentIntent = async (
 
       for (const item of detailedCartItems) {
         await tx
-          .update(shoeSizes)
+          .update(shoeVariants)
           .set({
-            quantity: sql`${shoeSizes.quantity} - ${item.quantity}`,
+            inStock: sql`${shoeVariants.inStock} - ${item.quantity}`,
           })
-          .where(
-            and(
-              eq(shoeSizes.colorVariantId, item.colorVariantId),
-              eq(shoeSizes.sizeId, item.sizeId)
-            )
-          );
+          .where(eq(shoeVariants.id, item.shoeVariantId));
       }
     } catch (error: unknown) {
       logger.error("Error during payment transaction, rolling back: " + error);
@@ -157,10 +147,18 @@ export const handleStripeWebhook = async (signature: string, body: Buffer) => {
       logger.info(`PaymentIntent ${paymentIntent.id} was successful!`);
 
       // Find the order in the database and update its status
-      await db
-        .update(orders)
-        .set({ status: "processing" })
-        .where(eq(orders.paymentIntentId, paymentIntent.id));
+
+      await db.transaction(async (tx) => {
+        await tx
+          .update(orders)
+          .set({ status: "completed" })
+          .where(eq(orders.id, paymentIntent.metadata.orderId));
+
+        await tx
+          .update(payments)
+          .set({ status: "completed", paidAt: new Date(), method: "stripe" })
+          .where(eq(payments.transactionId, paymentIntent.id));
+      });
 
       break;
     case "payment_intent.payment_failed":

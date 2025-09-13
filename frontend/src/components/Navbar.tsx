@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Loader2, Menu, User2, X } from "lucide-react";
-import { authClient, useSession } from "@/lib/auth-client";
+
 import { Button } from "./ui/button";
 import { usePathname, useRouter } from "next/navigation";
 import { createRedirectUrl } from "@/utils/auth-redirect";
@@ -13,9 +13,9 @@ import { useCartSize } from "@/hooks/cache/use-cart";
 import { useGetUserInfo } from "@/hooks/api/use-userInfo";
 
 const navLinks = [
-  { href: "/collections/men", label: "Men" },
-  { href: "/collections/women", label: "Women" },
-  { href: "/collections/kids", label: "Kids" },
+  { href: "/collections/men?gender=men", label: "Men" },
+  { href: "/collections/women?gender=women", label: "Women" },
+  { href: "/collections/kids?gender=kids", label: "Kids" },
   { href: "/collections", label: "Collections" },
   { href: "/contact-us", label: "Contact" },
 ];

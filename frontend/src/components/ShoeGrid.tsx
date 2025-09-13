@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useMemo } from "react";
 import Card from "./Card";
 import { useGetShoes } from "@/hooks/api/use-shoes";
 import { useSearchParams } from "next/navigation";
@@ -17,6 +17,7 @@ const ShoeGrid = () => {
     size: searchParams.get("size") || undefined,
     color: searchParams.get("color") || undefined,
     price: searchParams.get("price") || undefined,
+    category: searchParams.get("category") || undefined,
     limit: "6", // Items per page
   };
 
@@ -30,6 +31,27 @@ const ShoeGrid = () => {
     isFetchingNextPage,
   } = useGetShoes(queryOptions);
 
+  const allShoes = useMemo(
+    () => data?.pages.flatMap((page) => page.data) || [],
+    [data]
+  );
+
+  const colors = useMemo(
+    () =>
+      allShoes.map((shoe) => {
+        const tempSet = new Set();
+        const tempMap = new Map();
+        shoe.variants.forEach((variant) => {
+          if (variant.color) {
+            tempSet.add(variant.color.name);
+          }
+        });
+        tempMap.set(shoe.id, Array.from(tempSet));
+        return tempMap;
+      }),
+    [allShoes]
+  );
+
   if (isLoading) {
     return <ShoesSkeleton length={6} />;
   }
@@ -38,25 +60,41 @@ const ShoeGrid = () => {
     return <Error title="Shoes" error={error} />;
   }
 
-  const allShoes = data?.pages.flatMap((page) => page.data) || [];
-  console.log("allShoes: ", allShoes);
+  console.log("colors: ", colors);
+  console.log("allshoes: ", allShoes);
   return (
     <div className="gap-y-4">
       {allShoes.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {allShoes.map((product) => (
-            <div key={product.id} className="flex justify-center">
-              <Card
-                id={product.id}
-                imgSrc={product.baseImage}
-                name={product.name}
-                category={product.category}
-                price={product.price}
-                colorCount={product.colors.length}
-                className="w-full max-w-sm"
-              />
-            </div>
-          ))}
+          {allShoes.map((product) => {
+            const primaryImage =
+              product.variants
+                .flatMap((v) => v.images)
+                .find((img) => img.isPrimary)?.url ||
+              product.variants[0]?.images[0]?.url ||
+              "/placeholder.png";
+
+            const price = product.variants[0]?.price
+              ? parseFloat(product.variants[0].price)
+              : 0;
+
+            return (
+              <div key={product.id} className="flex justify-center">
+                <Card
+                  id={product.id}
+                  imgSrc={primaryImage}
+                  name={product.name}
+                  category={product.category.name}
+                  price={price}
+                  colorCount={
+                    colors.find((c) => c.has(product.id))?.get(product.id)
+                      ?.length
+                  }
+                  className="w-full max-w-sm"
+                />
+              </div>
+            );
+          })}
         </div>
       ) : (
         <div className="text-center py-16">

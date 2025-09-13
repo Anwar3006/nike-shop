@@ -7,6 +7,7 @@ import { Suspense } from "react";
 
 import Navbar from "@/components/Navbar";
 import Filters from "@/components/Filters";
+import Breadcrumbs from "@/components/Breadcrumbs";
 
 export default function CollectionsLayout({
   children,
@@ -23,10 +24,16 @@ export default function CollectionsLayout({
 
         <div className="flex flex-1 relative">
           {!isDetailsPage && <Filters />}
-          <main className={cn("flex-1 min-h-0", !isDetailsPage && "lg:ml-80")}>
+          <main
+            className={cn(
+              "flex-1 min-h-0 px-4 pt-4",
+              !isDetailsPage && "lg:ml-80"
+            )}
+          >
             <div className="lg:hidden">
               <SidebarTrigger />
             </div>
+            <Breadcrumbs />
             <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
           </main>
         </div>
