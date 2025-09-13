@@ -1,7 +1,7 @@
-import React from "react";
+import CollectionsClient from "../CollectionsClient";
 
 const WomenPage = () => {
-  return <div>Women</div>;
+  return <CollectionsClient />;
 };
 
 export default WomenPage;

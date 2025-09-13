@@ -27,6 +27,9 @@ const CollectionsClient = () => {
     })
   );
 
+  const page = resolvedSearchParams.page || "1";
+  const per_page = resolvedSearchParams.per_page || "12";
+
   return (
     <div className="h-full overflow-y-auto">
       <div className="p-6 pb-24">
@@ -68,7 +71,11 @@ const CollectionsClient = () => {
             </div>
           }
         >
-          <ShoeGrid />
+          <ShoeGrid
+            filters={resolvedSearchParams}
+            page={page}
+            per_page={per_page}
+          />
         </Suspense>
       </div>
     </div>

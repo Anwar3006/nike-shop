@@ -13,9 +13,9 @@ import { useCartSize } from "@/hooks/cache/use-cart";
 import { useGetUserInfo } from "@/hooks/api/use-userInfo";
 
 const navLinks = [
-  { href: "/collections/men", label: "Men" },
-  { href: "/collections/women", label: "Women" },
-  { href: "/collections/kids", label: "Kids" },
+  { href: "/collections/men?gender=men", label: "Men" },
+  { href: "/collections/women?gender=women", label: "Women" },
+  { href: "/collections/kids?gender=kids", label: "Kids" },
   { href: "/collections", label: "Collections" },
   { href: "/contact-us", label: "Contact" },
 ];
