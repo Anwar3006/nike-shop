@@ -14,35 +14,22 @@ export default function ShoeSizes({
   selectedSizeId,
   onSelectSize,
 }: ShoeSizesProps) {
-  console.log("Sizes: ", sizes);
-
   return (
-    <div>
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-medium text-gray-900">Size</h3>
-        <a
-          href="#"
-          className="text-sm font-medium text-primary hover:text-primary/90"
+    <div className="grid grid-cols-4 gap-2 mt-4">
+      {sizes.map((size) => (
+        <Button
+          key={size.id}
+          variant="outline"
+          onClick={() => onSelectSize(size.id)}
+          className={cn(
+            "w-full h-12 text-base",
+            selectedSizeId === size.id &&
+              "bg-black text-white hover:bg-black/90"
+          )}
         >
-          Size Guide
-        </a>
-      </div>
-      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-4 gap-2 mt-4">
-        {sizes.map((size) => (
-          <Button
-            key={size.id}
-            variant={selectedSizeId === size.id ? "default" : "outline"}
-            onClick={() => onSelectSize(size.id)}
-            className={cn(
-              "w-full",
-              selectedSizeId === size.id &&
-                "bg-primary text-primary-foreground hover:bg-primary/90"
-            )}
-          >
-            {size.value}
-          </Button>
-        ))}
-      </div>
+          {size.value}
+        </Button>
+      ))}
     </div>
   );
 }

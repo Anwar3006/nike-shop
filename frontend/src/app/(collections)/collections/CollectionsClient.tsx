@@ -61,7 +61,13 @@ const CollectionsClient = () => {
         </div>
 
         {/* Products Grid */}
-        <Suspense fallback={<div>Loading shoes...</div>}>
+        <Suspense
+          fallback={
+            <div className="flex items-center justify-center size-full animate-pulse">
+              Loading shoes...
+            </div>
+          }
+        >
           <ShoeGrid />
         </Suspense>
       </div>
