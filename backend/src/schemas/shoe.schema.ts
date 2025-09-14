@@ -30,7 +30,8 @@ export const createShoeSchema = object({
         // Size availability and pricing for this variant
         sizeAvailability: array(
           object({
-            sizeId: number().int().positive("Size ID is required"),
+            sizeId: string().uuid("Size ID is required"),
+            sku: string().min(1, "SKU is required"),
             price: number().int().positive("Price must be positive"), // Can override base price
             quantity: number()
               .int()
@@ -65,9 +66,10 @@ export const updateShoeSchema = object({
         ).optional(),
         sizeAvailability: array(
           object({
-            sizeId: number().int().positive(),
-            price: number().int().positive(),
-            quantity: number().int().min(0).default(0),
+            sizeId: string().uuid().optional(),
+            sku: string().min(1).optional(),
+            price: number().int().positive().optional(),
+            quantity: number().int().min(0).optional(),
           })
         ).optional(),
       })

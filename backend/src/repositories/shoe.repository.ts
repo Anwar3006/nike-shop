@@ -237,25 +237,51 @@ export const ShoeRepository = {
       }
 
       for (const variant of colorVariants) {
-        const { images, ...variantData } = variant;
-        const [newVariant] = await tx
-          .insert(shoeVariants)
-          .values({ ...variantData, shoeId: shoe.id })
-          .returning();
+        const { images, sizeAvailability, name, dominantColor } = variant;
 
-        if (!newVariant) {
-          throw new AppError("Could not create shoe variant", 500);
+        // Here, you would typically find or create a 'color' record
+        // For simplicity, let's assume a colorId is fetched or created based on dominantColor
+        // This part needs to be adapted based on how colors are managed in your system
+        const colorRecord = await tx
+          .select()
+          .from(colors)
+          .where(eq(colors.name, dominantColor))
+          .limit(1);
+        const colorId = colorRecord[0]?.id; // This is a simplification.
+
+        if (!colorId) {
+          throw new AppError(`Color ${dominantColor} not found`, 400);
         }
 
-        if (images && images.length > 0) {
-          await tx.insert(shoeImages).values(
-            images.map((image) => ({
-              ...image,
-              url: image.imageUrl,
+        for (const size of sizeAvailability) {
+          const { sizeId, sku, price, quantity } = size;
+
+          const [newVariant] = await tx
+            .insert(shoeVariants)
+            .values({
               shoeId: shoe.id,
-              variantId: newVariant.id,
-            }))
-          );
+              colorId: colorId,
+              sizeId: sizeId,
+              sku: sku,
+              price: price.toString(),
+              inStock: quantity,
+            })
+            .returning();
+
+          if (!newVariant) {
+            throw new AppError("Could not create shoe variant", 500);
+          }
+
+          if (images && images.length > 0) {
+            await tx.insert(shoeImages).values(
+              images.map((image) => ({
+                url: image.imageUrl,
+                altText: image.altText,
+                shoeId: shoe.id,
+                variantId: newVariant.id, // Link image to the new variant
+              }))
+            );
+          }
         }
       }
 
@@ -278,50 +304,69 @@ export const ShoeRepository = {
 
       if (colorVariants) {
         for (const variant of colorVariants) {
-          const { images, id: variantId, ...variantData } = variant;
+          const {
+            images,
+            id: variantId,
+            sizeAvailability,
+            dominantColor,
+          } = variant;
 
-          if (variantId) {
-            // Update existing variant
-            await tx
-              .update(shoeVariants)
-              .set(variantData)
-              .where(eq(shoeVariants.id, variantId));
+          const colorRecord = await tx
+            .select()
+            .from(colors)
+            .where(eq(colors.name, dominantColor!))
+            .limit(1);
+          const colorId = colorRecord[0]?.id;
 
-            if (images) {
-              // Replace images for the variant
-              await tx
-                .delete(shoeImages)
-                .where(eq(shoeImages.variantId, variantId));
+          if (!colorId) {
+            throw new AppError(`Color ${dominantColor} not found`, 400);
+          }
 
-              if (images && images.length > 0) {
-                await tx.insert(shoeImages).values(
-                  images.map((image) => ({
-                    ...image,
-                    url: image.imageUrl,
-                    shoeId: shoeId,
-                    variantId: variantId,
-                  }))
-                );
+          if (sizeAvailability) {
+            for (const size of sizeAvailability) {
+              const { sizeId, sku, price, quantity } = size;
+              const variantData = {
+                price: price?.toString(),
+                inStock: quantity,
+                sku,
+                sizeId,
+                colorId,
+              };
+
+              // Filter out undefined values
+              Object.keys(variantData).forEach(
+                (key) =>
+                  variantData[key as keyof typeof variantData] === undefined &&
+                  delete variantData[key as keyof typeof variantData]
+              );
+
+              if (variantId) {
+                // Update existing variant
+                await tx
+                  .update(shoeVariants)
+                  .set(variantData)
+                  .where(eq(shoeVariants.id, variantId));
+              } else {
+                // Create new variant
+                await tx
+                  .insert(shoeVariants)
+                  .values({ ...variantData, shoeId });
               }
             }
-          } else {
-            // Create new variant
-            const [newVariant] = await tx
-              .insert(shoeVariants)
-              .values({ ...variantData, shoeId: shoeId })
-              .returning();
+          }
 
-            if (!newVariant) {
-              throw new AppError("Could not create shoe variant", 500);
-            }
-
-            if (images && images.length > 0) {
+          if (images && variantId) {
+            // Replace images for the variant
+            await tx
+              .delete(shoeImages)
+              .where(eq(shoeImages.variantId, variantId));
+            if (images.length > 0) {
               await tx.insert(shoeImages).values(
                 images.map((image) => ({
-                  ...image,
                   url: image.imageUrl,
+                  altText: image.altText,
                   shoeId: shoeId,
-                  variantId: newVariant.id,
+                  variantId: variantId,
                 }))
               );
             }

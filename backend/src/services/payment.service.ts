@@ -151,7 +151,7 @@ export const handleStripeWebhook = async (signature: string, body: Buffer) => {
       await db.transaction(async (tx) => {
         await tx
           .update(orders)
-          .set({ status: "completed" })
+          .set({ status: "paid" })
           .where(eq(orders.id, paymentIntent.metadata.orderId));
 
         await tx
