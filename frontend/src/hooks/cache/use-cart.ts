@@ -7,7 +7,7 @@ import { toast } from "sonner";
 
 // GET cart items
 export const useGetCart = () => {
-  const { data: session } = useSession();
+  const { data: session, isPending } = useSession();
   const userId = session?.user?.id;
 
   return useQuery({
@@ -16,7 +16,7 @@ export const useGetCart = () => {
       const response = await axios.get("/api/cart");
       return response.data;
     },
-    enabled: !!userId,
+    enabled: !!isPending && !!userId,
   });
 };
 
@@ -145,7 +145,7 @@ export const useRemoveFromCart = () => {
 
 // GET cart size
 export const useCartSize = () => {
-  const { data: session } = useSession();
+  const { data: session, isPending } = useSession();
   const userId = session?.user?.id;
 
   return useQuery({
@@ -159,7 +159,7 @@ export const useCartSize = () => {
         return 0;
       }
     },
-    enabled: !!userId,
+    enabled: !!isPending && !!userId,
   });
 };
 

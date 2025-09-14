@@ -142,13 +142,13 @@ export const useIsFavorite = ({
   shoeId: string;
   colorVariantId?: string;
 }) => {
-  const { data: session } = useSession();
+  const { data: session, isPending } = useSession();
   const userId = session?.user?.id;
 
   return useQuery<{ isFavorite: boolean; favoriteId?: string }, Error>({
     queryKey: ["is-favorite", userId, shoeId, colorVariantId],
     queryFn: () => FavoritesService.isFavorite({ shoeId, colorVariantId }),
-    enabled: !!userId && !!shoeId,
+    enabled: !!isPending && !!userId && !!shoeId,
     staleTime: 0,
     refetchOnWindowFocus: false,
   });
@@ -192,6 +192,14 @@ export const useToggleFavorite = () => {
       });
     } else {
       // Add to favorites
+      if (!userId) {
+        toast.error("❌Please sign in😪", {
+          id: ToastID.LOGIN_ERROR,
+          description: "You need to be logged in to save favorites.",
+          duration: 8000,
+        });
+        return;
+      }
       return addFavorite.mutateAsync({ shoeId, userId, colorVariantId });
     }
   };

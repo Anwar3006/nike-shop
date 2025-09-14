@@ -7,13 +7,13 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 export const useGetUserInfo = () => {
-  const { data: session } = useSession();
+  const { data: session, isPending } = useSession();
   const userId = session?.user?.id;
 
   return useQuery({
     queryKey: ["userInfo", userId],
     queryFn: () => UserInfoService.getUserInfo(),
-    enabled: !!userId,
+    enabled: !!isPending && !!userId,
     // refetchOnWindowFocus: false,
   });
 };
