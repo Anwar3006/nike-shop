@@ -10,7 +10,7 @@
     "db:push": "tsx --tsconfig tsconfig.json node_modules/.bin/drizzle-kit push",
     "db:generate": "tsx --tsconfig tsconfig.json node_modules/.bin/drizzle-kit generate",
     "db:migrate": "tsx --tsconfig tsconfig.json node_modules/.bin/drizzle-kit migrate",
-    "render:build": "NODE_ENV=production npm ci && npm run build && npm run db:generate && npm run db:migrate",
+    "render:build": "NODE_ENV=production npm install && npm run build && npm run db:generate && npm run db:migrate",
     "seed": "tsx src/db/seed/runner.ts",
     "scrape": "tsx src/db/seed/scraper2.ts"
   },
