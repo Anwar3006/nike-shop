@@ -1,14 +1,17 @@
-import { array, number, object, string } from "zod";
+import { array, boolean, number, object, string } from "zod";
 import type { output } from "zod";
 
 export const createShoeSchema = object({
   body: object({
     // Basic shoe information
     name: string().min(1, "Name is required"),
+    slug: string(),
     description: string().optional(),
-    categoryId: number().int().positive("Category is required"), // "1 = Women's Shoes", "2 = Men's Shoes", etc.
-    styleNumber: string().optional(), // "HM9451-600"
-    basePrice: number().int().positive("Base price must be positive"),
+    categoryId: string("Category is required"),
+    genderId: string("Gender is required"),
+    brandId: string("Brand is required"),
+    isPublished: boolean().default(false).optional(),
+    defaultVariantId: string("Default variant is required"),
 
     // Color variants - each shoe needs at least one variant
     colorVariants: array(
@@ -46,7 +49,7 @@ export const updateShoeSchema = object({
   body: object({
     name: string().min(1).optional(),
     description: string().optional(),
-    categoryId: number().int().positive().optional(),
+    categoryId: string().optional(),
     styleNumber: string().min(4).optional(),
     basePrice: number().int().positive().optional(),
     colorVariants: array(

@@ -251,6 +251,7 @@ export const ShoeRepository = {
           await tx.insert(shoeImages).values(
             images.map((image) => ({
               ...image,
+              url: image.imageUrl,
               shoeId: shoe.id,
               variantId: newVariant.id,
             }))
@@ -291,13 +292,17 @@ export const ShoeRepository = {
               await tx
                 .delete(shoeImages)
                 .where(eq(shoeImages.variantId, variantId));
-              await tx.insert(shoeImages).values(
-                images.map((image) => ({
-                  ...image,
-                  shoeId: shoeId,
-                  variantId: variantId,
-                }))
-              );
+
+              if (images && images.length > 0) {
+                await tx.insert(shoeImages).values(
+                  images.map((image) => ({
+                    ...image,
+                    url: image.imageUrl,
+                    shoeId: shoeId,
+                    variantId: variantId,
+                  }))
+                );
+              }
             }
           } else {
             // Create new variant
@@ -314,6 +319,7 @@ export const ShoeRepository = {
               await tx.insert(shoeImages).values(
                 images.map((image) => ({
                   ...image,
+                  url: image.imageUrl,
                   shoeId: shoeId,
                   variantId: newVariant.id,
                 }))

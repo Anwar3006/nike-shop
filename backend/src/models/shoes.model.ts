@@ -56,4 +56,4 @@ export const shoesRelations = relations(shoes, ({ one, many }) => ({
 export const insertShoeSchema = createInsertSchema(shoes);
 export const selectShoesSchema = createSelectSchema(shoes);
 export type Shoe = z.infer<typeof selectShoesSchema>;
-export type NewShoe = z.infer<typeof insertShoeSchema>;
+export type NewShoe = Shoe;
