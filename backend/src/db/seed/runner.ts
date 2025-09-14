@@ -333,32 +333,38 @@ async function seedUsers() {
   logger.info("👤 Seeding users...");
 
   const insertedUsers = [];
-  SAMPLE_USERS.forEach(async (user) => {
-    const { user: insertedUser } = await auth.api.signUpEmail({
-      body: {
-        name: user.name,
-        email: user.email,
-        password: user.password,
-        image: user.imageUrl,
-        dob: user.dob,
-      },
-    });
+  // Use for...of instead of forEach for proper async handling
+  for (const userData of SAMPLE_USERS) {
+    try {
+      const { user: insertedUser } = await auth.api.signUpEmail({
+        body: {
+          name: userData.name,
+          email: userData.email,
+          password: userData.password,
+          image: userData.imageUrl,
+          dob: userData.dob,
+        },
+      });
 
-    //select one Address
-    const addressToInsert =
-      SAMPLE_ADDRESSES[Math.floor(Math.random() * SAMPLE_ADDRESSES.length)];
+      // Select one Address
+      const addressToInsert =
+        SAMPLE_ADDRESSES[Math.floor(Math.random() * SAMPLE_ADDRESSES.length)];
 
-    await db
-      .insert(address)
-      .values({
-        ...addressToInsert,
-        userId: insertedUser.id,
-      })
-      .returning();
-    insertedUsers.push(insertedUser);
-  });
+      await db
+        .insert(address)
+        .values({
+          ...addressToInsert,
+          userId: insertedUser.id,
+        })
+        .returning();
 
-  // const insertedUsers = await db.insert({user}).values(SAMPLE_USERS).returning();
+      insertedUsers.push(insertedUser);
+    } catch (error) {
+      logger.error(`Failed to create user ${userData.email}:  ${error}`);
+      // Continue with other users instead of failing completely
+    }
+  }
+
   logger.info(`✅ Inserted ${insertedUsers.length} users`);
   return insertedUsers;
 }
@@ -380,6 +386,9 @@ async function seedUsers() {
 /**
  * Seed shoes, variants, and images
  */
+/**
+ * Seed shoes, variants, and images - OPTIMIZED VERSION with batching
+ */
 async function seedShoesAndVariants(
   brandMap: Map<string, string>,
   categoryMap: Map<string, string>,
@@ -395,124 +404,183 @@ async function seedShoesAndVariants(
   let totalVariants = 0;
   let totalImages = 0;
 
-  for (const shoeData of seedData) {
-    const categoryValues = Array.from(categoryMap.keys());
-    const randomCategory =
-      categoryValues[Math.floor(Math.random() * categoryValues.length)];
-    const defaultCategoryId = categoryMap.get(randomCategory)!;
+  // Process in batches to avoid memory/timeout issues
+  const BATCH_SIZE = 5; // Process 5 shoes at a time
 
-    // Determine gender and category
-    const genderSlug =
-      shoeData.category === "men"
-        ? "Men"
-        : shoeData.category === "women"
-        ? "Women"
-        : shoeData.category === "kids"
-        ? "Kids"
-        : "Unisex";
-    const genderId = genderMap.get(genderSlug)!;
+  for (let i = 0; i < seedData.length; i += BATCH_SIZE) {
+    const batch = seedData.slice(i, i + BATCH_SIZE);
 
-    // Create shoe record
-    const [insertedShoe] = await db
-      .insert(shoes)
-      .values({
-        name: shoeData.name,
-        slug: createSlug(shoeData.name),
-        description: shoeData.description,
-        categoryId: defaultCategoryId,
-        genderId: genderId,
-        brandId: nikeBrandId,
-        isPublished: true,
-      })
-      .returning();
+    logger.info(
+      `Processing shoes batch ${Math.floor(i / BATCH_SIZE) + 1}/${Math.ceil(
+        seedData.length / BATCH_SIZE
+      )}`
+    );
 
-    totalShoes++;
+    // Use transaction for each batch
+    await db.transaction(async (tx) => {
+      for (const shoeData of batch) {
+        try {
+          const categoryValues = Array.from(categoryMap.keys());
+          const randomCategory =
+            categoryValues[Math.floor(Math.random() * categoryValues.length)];
+          const defaultCategoryId = categoryMap.get(randomCategory)!;
 
-    // Create base shoe image (first image from first color)
-    await db.insert(shoeImages).values({
-      shoeId: insertedShoe.id,
-      url: shoeData.baseImage,
-      sortOrder: 0,
-      isPrimary: true,
-    });
-    totalImages++;
+          // Determine gender and category
+          const genderSlug =
+            shoeData.category === "men"
+              ? "Men"
+              : shoeData.category === "women"
+              ? "Women"
+              : shoeData.category === "kids"
+              ? "Kids"
+              : "Unisex";
+          const genderId = genderMap.get(genderSlug)!;
 
-    let defaultVariantId: string | null = null;
-    let isFirstVariant = true;
+          // Create shoe record
+          const [insertedShoe] = await tx
+            .insert(shoes)
+            .values({
+              name: shoeData.name,
+              slug: createSlug(shoeData.name),
+              description: shoeData.description,
+              categoryId: defaultCategoryId,
+              genderId: genderId,
+              brandId: nikeBrandId,
+              isPublished: true,
+            })
+            .returning();
 
-    // Create variants for each color/size combination
-    for (const colorVariant of shoeData.colors) {
-      const slugColorName = createSlug(colorVariant.name);
-      const colorId = colorMap.get(slugColorName);
+          totalShoes++;
 
-      if (!colorId) {
-        logger.warn(`Color not found: ${colorVariant.dominantColor}`);
-        continue;
-      }
-
-      for (const sizeValue of colorVariant.size) {
-        const sizeId = sizeMap.get(sizeValue);
-
-        if (!sizeId) {
-          logger.warn(`Size not found: ${sizeValue}`);
-          continue;
-        }
-
-        const sku = generateSKU(
-          colorVariant.styleNumber,
-          createSlug(colorVariant.dominantColor),
-          sizeValue
-        );
-        const salePrice = getRandomSalePrice(shoeData.price);
-
-        const [insertedVariant] = await db
-          .insert(shoeVariants)
-          .values({
+          // Create base shoe image (first image from first color)
+          await tx.insert(shoeImages).values({
             shoeId: insertedShoe.id,
-            sku: sku,
-            price: shoeData.price.toString(),
-            salePrice: salePrice ? salePrice.toString() : null,
-            colorId: colorId,
-            sizeId: sizeId,
-            inStock: getRandomStock(),
-            weight: Math.random() * 2 + 0.5, // Random weight between 0.5-2.5 lbs
-            dimensions: {
-              length: Math.floor(Math.random() * 5) + 28, // 28-32 cm
-              width: Math.floor(Math.random() * 3) + 10, // 10-12 cm
-              height: Math.floor(Math.random() * 3) + 8, // 8-10 cm
-            },
-          })
-          .returning();
-
-        totalVariants++;
-
-        // Set first variant as default
-        if (isFirstVariant) {
-          defaultVariantId = insertedVariant.id;
-          isFirstVariant = false;
-        }
-
-        // Create images for this variant
-        const maxImages = Math.max(3, colorVariant.images.length);
-        for (let i = 0; i < maxImages; i++) {
-          await db.insert(shoeImages).values({
-            shoeId: insertedShoe.id,
-            variantId: insertedVariant.id,
-            url: colorVariant.images[i],
-            sortOrder: i + 1,
-            isPrimary: i === 0,
+            url: shoeData.baseImage,
+            sortOrder: 0,
+            isPrimary: true,
           });
           totalImages++;
+
+          let defaultVariantId: string | null = null;
+          let isFirstVariant = true;
+
+          // Prepare batch data for variants and images
+          const variantBatchData = [];
+          const imageBatchData = [];
+
+          // Create variants for each color/size combination
+          for (const colorVariant of shoeData.colors) {
+            const slugColorName = createSlug(colorVariant.name);
+            const colorId = colorMap.get(slugColorName);
+
+            if (!colorId) {
+              logger.warn(`Color not found: ${colorVariant.dominantColor}`);
+              continue;
+            }
+
+            for (const sizeValue of colorVariant.size) {
+              const sizeId = sizeMap.get(sizeValue);
+
+              if (!sizeId) {
+                logger.warn(`Size not found: ${sizeValue}`);
+                continue;
+              }
+
+              const sku = generateSKU(
+                colorVariant.styleNumber,
+                createSlug(colorVariant.dominantColor),
+                sizeValue
+              );
+              const salePrice = getRandomSalePrice(shoeData.price);
+
+              variantBatchData.push({
+                shoeId: insertedShoe.id,
+                sku: sku,
+                price: shoeData.price.toString(),
+                salePrice: salePrice ? salePrice.toString() : null,
+                colorId: colorId,
+                sizeId: sizeId,
+                inStock: getRandomStock(),
+                weight: Math.random() * 2 + 0.5,
+                dimensions: {
+                  length: Math.floor(Math.random() * 5) + 28,
+                  width: Math.floor(Math.random() * 3) + 10,
+                  height: Math.floor(Math.random() * 3) + 8,
+                },
+              });
+            }
+          }
+
+          // Insert variants in batch
+          if (variantBatchData.length > 0) {
+            const insertedVariants = await tx
+              .insert(shoeVariants)
+              .values(variantBatchData)
+              .returning();
+
+            totalVariants += insertedVariants.length;
+
+            // Set first variant as default
+            if (insertedVariants.length > 0) {
+              defaultVariantId = insertedVariants[0].id;
+            }
+
+            // Prepare image data for all variants
+            let variantIndex = 0;
+            for (const colorVariant of shoeData.colors) {
+              const slugColorName = createSlug(colorVariant.name);
+              const colorId = colorMap.get(slugColorName);
+
+              if (!colorId) continue;
+
+              for (const sizeValue of colorVariant.size) {
+                const sizeId = sizeMap.get(sizeValue);
+                if (!sizeId) continue;
+
+                const variant = insertedVariants[variantIndex];
+                if (!variant) continue;
+
+                // Create images for this variant
+                const maxImages = Math.min(3, colorVariant.images.length);
+                for (let i = 0; i < maxImages; i++) {
+                  if (colorVariant.images[i]) {
+                    imageBatchData.push({
+                      shoeId: insertedShoe.id,
+                      variantId: variant.id,
+                      url: colorVariant.images[i],
+                      sortOrder: i + 1,
+                      isPrimary: i === 0,
+                    });
+                  }
+                }
+                variantIndex++;
+              }
+            }
+
+            // Insert images in batch
+            if (imageBatchData.length > 0) {
+              await tx.insert(shoeImages).values(imageBatchData);
+              totalImages += imageBatchData.length;
+            }
+
+            // Update shoe with default variant
+            if (defaultVariantId) {
+              await tx
+                .update(shoes)
+                .set({ defaultVariantId })
+                .where(eq(shoes.id, insertedShoe.id));
+            }
+          }
+        } catch (error) {
+          logger.error(`Error processing shoe ${shoeData.name}: ${error}`);
+          // Continue with next shoe instead of failing the entire batch
         }
       }
-    }
+    });
 
-    // Update shoe with default variant
-    if (defaultVariantId) {
-      await db
-        .update(shoes)
-        .set({ defaultVariantId })
-        .where(eq(shoes.id, insertedShoe.id));
+    // Add a small delay between batches to avoid overwhelming the database
+    if (i + BATCH_SIZE < seedData.length) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
     }
   }
 
