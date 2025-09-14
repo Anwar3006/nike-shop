@@ -8,10 +8,10 @@
     "build": "npx rimraf dist && tsc",
     "start": "node ./dist/app.js",
     "db:push": "tsx --tsconfig tsconfig.json node_modules/.bin/drizzle-kit push",
-    "db:generate": "tsx --tsconfig tsconfig.json node_modules/.bin/drizzle-kit generate",
-    "db:migrate": "tsx --tsconfig tsconfig.json node_modules/.bin/drizzle-kit migrate",
-    "render:build": "NODE_ENV=production npm install && npm run build && npm run db:generate && npm run db:migrate",
-    "seed": "NODE_ENV=production tsx src/db/seed/runner.ts",
+    "db:generate": "npx tsx --tsconfig tsconfig.json node_modules/.bin/drizzle-kit generate",
+    "db:migrate": "npx tsx --tsconfig tsconfig.json node_modules/.bin/drizzle-kit migrate",
+    "render:build": "NODE_ENV=production npm ci && npm run build && npm run db:generate && npm run db:migrate",
+    "seed": "NODE_ENV=production npx tsx src/db/seed/runner.ts",
     "scrape": "tsx src/db/seed/scraper2.ts"
   },
   "dependencies": {
@@ -39,7 +39,9 @@
     "stripe": "^18.5.0",
     "ts-node": "^10.9.2",
     "ws": "^8.18.3",
-    "zod": "^4.1.0"
+    "zod": "^4.1.0",
+    "tsx": "^4.20.4",
+    "drizzle-kit": "^0.31.4"
   },
   "devDependencies": {
     "@types/body-parser": "^1.19.6",
@@ -55,10 +57,8 @@
     "@types/pg": "^8.15.5",
     "@types/pino": "^7.0.4",
     "@types/ws": "^8.18.1",
-    "drizzle-kit": "^0.31.4",
     "rimraf": "^6.0.1",
     "ts-node-dev": "^2.0.0",
-    "tsx": "^4.20.4",
     "typescript": "^5.9.2"
   }
 }
