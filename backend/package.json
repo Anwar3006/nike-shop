@@ -5,7 +5,7 @@
   "main": "src/index.ts",
   "scripts": {
     "dev": "tsx watch src/app.ts",
-    "build": "rimraf dist && tsc",
+    "build": "npx rimraf dist && tsc",
     "start": "node ./dist/app.js",
     "db:push": "tsx --tsconfig tsconfig.json node_modules/.bin/drizzle-kit push",
     "db:generate": "tsx --tsconfig tsconfig.json node_modules/.bin/drizzle-kit generate",
