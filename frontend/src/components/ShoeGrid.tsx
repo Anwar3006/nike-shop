@@ -6,8 +6,13 @@ import { useSearchParams } from "next/navigation";
 import ShoesSkeleton from "./ShoesSkeleton";
 import Error from "./Error";
 import { Button } from "./ui/button";
+import { GetShoesApiResponse } from "@/types/shoes";
 
-const ShoeGrid = () => {
+const ShoeGrid = ({
+  initialShoes,
+}: {
+  initialShoes: GetShoesApiResponse;
+}) => {
   const searchParams = useSearchParams();
 
   // Build query options from URL params
@@ -29,7 +34,13 @@ const ShoeGrid = () => {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useGetShoes(queryOptions);
+  } = useGetShoes({
+    ...queryOptions,
+    initialData: {
+      pages: [initialShoes],
+      pageParams: [0],
+    },
+  });
 
   const allShoes = useMemo(
     () => data?.pages.flatMap((page) => page.data) || [],

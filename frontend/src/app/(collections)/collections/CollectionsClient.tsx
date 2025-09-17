@@ -3,10 +3,13 @@ import Sort from "@/components/Sort";
 import ShoeGrid from "@/components/ShoeGrid";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
+import { GetShoesApiResponse } from "@/types/shoes";
 
 const CollectionsClient = ({
+  initialShoes,
   filters,
 }: {
+  initialShoes: GetShoesApiResponse;
   filters?: {
     [k: string]: string;
   };
@@ -79,9 +82,10 @@ const CollectionsClient = ({
           }
         >
           <ShoeGrid
-          // filters={resolvedSearchParams}
-          // page={page}
-          // per_page={per_page}
+            initialShoes={initialShoes}
+            // filters={resolvedSearchParams}
+            // page={page}
+            // per_page={per_page}
           />
         </Suspense>
       </div>
