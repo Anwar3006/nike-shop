@@ -3,10 +3,13 @@ import Sort from "@/components/Sort";
 import ShoeGrid from "@/components/ShoeGrid";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
+import { GetShoesApiResponse } from "@/types/shoes";
 
 const CollectionsClient = ({
+  initialShoes,
   filters,
 }: {
+  initialShoes: GetShoesApiResponse;
   filters?: {
     [k: string]: string;
   };
@@ -33,9 +36,6 @@ const CollectionsClient = ({
       value,
     })
   );
-
-  // const page = resolvedSearchParams.page || "1";
-  // const per_page = resolvedSearchParams.per_page || "12";
 
   return (
     <div className="h-full overflow-y-auto">
@@ -78,11 +78,7 @@ const CollectionsClient = ({
             </div>
           }
         >
-          <ShoeGrid
-          // filters={resolvedSearchParams}
-          // page={page}
-          // per_page={per_page}
-          />
+          <ShoeGrid initialShoes={initialShoes} />
         </Suspense>
       </div>
     </div>

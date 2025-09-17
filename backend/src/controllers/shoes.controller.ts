@@ -79,6 +79,7 @@ export const ShoesController = {
       res: Response,
       next: NextFunction
     ) => {
+      console.log("Query params:", req.query);
       const shoes = await ShoesService.getShoes(req.query);
       res.status(200).json({
         success: true,

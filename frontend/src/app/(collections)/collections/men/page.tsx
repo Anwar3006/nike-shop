@@ -1,7 +1,17 @@
 import CollectionsClient from "../CollectionsClient";
+import ShoesService from "@/lib/services/shoes.service";
+import { ShoesQueryOptions } from "@/types/shoes";
 
-const MenPage = () => {
-  return <CollectionsClient />;
+interface MenPageProps {
+  searchParams: ShoesQueryOptions;
+}
+
+const MenPage = async ({ searchParams }: MenPageProps) => {
+  const params = await searchParams;
+  const initialShoes = await ShoesService.getShoes({
+    ...params,
+  });
+  return <CollectionsClient initialShoes={initialShoes} />;
 };
 
 export default MenPage;

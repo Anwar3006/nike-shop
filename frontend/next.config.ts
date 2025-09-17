@@ -24,6 +24,21 @@ const nextConfig: NextConfig = {
         hostname: "atlas-content-cdn.pixelsquid.com",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "bowtiesandbones.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "s1.dswcdn.com",
+        pathname: "/**",
+      },
     ],
   },
 };

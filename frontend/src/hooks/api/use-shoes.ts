@@ -1,18 +1,20 @@
 import ShoesService from "@/lib/services/shoes.service";
 import { GetShoesApiResponse, ShoesQueryOptions } from "@/types/shoes";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { InfiniteData, useInfiniteQuery } from "@tanstack/react-query";
 
 // const shoesQueryClient = useQueryClient();
 interface UseShoesOptions
   extends Omit<ShoesQueryOptions, "pageParam" | "offset"> {
   enabled?: boolean; // Control when query runs
   staleTime?: number; // How long data stays fresh
+  initialData?: InfiniteData<GetShoesApiResponse>;
 }
 
 export const useGetShoes = (options: UseShoesOptions) => {
   const {
     enabled = true,
     staleTime = 5 * 60 * 1000,
+    initialData,
     ...queryOptions
   } = options;
 
@@ -30,6 +32,7 @@ export const useGetShoes = (options: UseShoesOptions) => {
       }
       return undefined;
     },
+    initialData,
     enabled,
     staleTime,
     refetchOnWindowFocus: false,

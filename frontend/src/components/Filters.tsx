@@ -43,7 +43,7 @@ const filterGroups = [
   {
     name: "Category",
     key: "category",
-    options: ["Casual", "Lifestyle", "Basketball", "Running"],
+    options: ["Casual", "Lifestyle", "Basketball", "Running", "Training"],
   },
   {
     name: "Color",
