@@ -31,9 +31,6 @@ const ShoesService = {
       }
       if (options.category) params.category = options.category;
 
-      console.log("options: ", options);
-      console.log("params: ", params);
-
       const shoes = await axiosClient.get("/shoes", {
         params: params,
       });

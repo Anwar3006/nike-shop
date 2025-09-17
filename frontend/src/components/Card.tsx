@@ -67,7 +67,7 @@ const Card: React.FC<CardProps> = ({
     e.stopPropagation();
 
     if (isPending || isToggling) return;
-    console.log("Favorited:", favorited);
+
     try {
       await toggleFavorite({
         shoeId: id,
@@ -82,7 +82,6 @@ const Card: React.FC<CardProps> = ({
   };
 
   const formattedPrice = Number(Math.round(price / 100)).toFixed(2);
-  console.log("Favorited:", favorited, id);
 
   return (
     <div

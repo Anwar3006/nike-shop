@@ -7,9 +7,9 @@ interface WomenPageProps {
 }
 
 const WomenPage = async ({ searchParams }: WomenPageProps) => {
+  const params = await searchParams;
   const initialShoes = await ShoesService.getShoes({
-    ...searchParams,
-    category: "women",
+    ...params,
   });
   return <CollectionsClient initialShoes={initialShoes} />;
 };

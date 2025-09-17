@@ -8,11 +8,7 @@ import Error from "./Error";
 import { Button } from "./ui/button";
 import { GetShoesApiResponse } from "@/types/shoes";
 
-const ShoeGrid = ({
-  initialShoes,
-}: {
-  initialShoes: GetShoesApiResponse;
-}) => {
+const ShoeGrid = ({ initialShoes }: { initialShoes: GetShoesApiResponse }) => {
   const searchParams = useSearchParams();
 
   // Build query options from URL params
@@ -71,8 +67,6 @@ const ShoeGrid = ({
     return <Error title="Shoes" error={error} />;
   }
 
-  console.log("colors: ", colors);
-  console.log("allshoes: ", allShoes);
   return (
     <div className="gap-y-4">
       {allShoes.length > 0 ? (
