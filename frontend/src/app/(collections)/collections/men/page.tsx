@@ -3,7 +3,7 @@ import ShoesService from "@/lib/services/shoes.service";
 import { ShoesQueryOptions } from "@/types/shoes";
 
 interface MenPageProps {
-  searchParams: ShoesQueryOptions;
+  searchParams: Promise<ShoesQueryOptions>;
 }
 
 const MenPage = async ({ searchParams }: MenPageProps) => {

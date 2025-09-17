@@ -4,11 +4,12 @@ import ShoesService from "@/lib/services/shoes.service";
 import { ShoesQueryOptions } from "@/types/shoes";
 
 interface CollectionsPageProps {
-  searchParams: ShoesQueryOptions;
+  searchParams: Promise<ShoesQueryOptions>;
 }
 
 const CollectionsPage = async ({ searchParams }: CollectionsPageProps) => {
-  const initialShoes = await ShoesService.getShoes(searchParams);
+  const params = await searchParams;
+  const initialShoes = await ShoesService.getShoes(params);
 
   return (
     <Suspense

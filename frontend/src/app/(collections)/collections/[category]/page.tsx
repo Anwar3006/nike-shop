@@ -1,3 +1,4 @@
+import ShoesService from "@/lib/services/shoes.service";
 import CollectionsClient from "../CollectionsClient";
 
 interface CategoryPageProps extends PageProps<"/collections/[category]"> {
@@ -14,7 +15,9 @@ const CategoryPage = async ({ params, searchParams }: CategoryPageProps) => {
   const searchParams_ = await searchParams;
   const filters = { ...searchParams_, category };
 
-  return <CollectionsClient filters={filters} />;
+  const initialShoes = await ShoesService.getShoes(searchParams_);
+
+  return <CollectionsClient initialShoes={initialShoes} filters={filters} />;
 };
 
 export default CategoryPage;
