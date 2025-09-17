@@ -142,15 +142,6 @@ const TrendingCard = ({
 }) => {
   const [currentImage, setCurrentImage] = useState(0);
 
-  // Early return with proper check
-  if (!imgUrls || imgUrls.length === 0) {
-    return (
-      <div className="max-h-96 flex items-center justify-center bg-gray-100">
-        <span className="text-gray-500">No images available</span>
-      </div>
-    );
-  }
-
   useEffect(() => {
     // Don't start timer if only one image
     if (imgUrls.length <= 1) return;
@@ -161,6 +152,15 @@ const TrendingCard = ({
 
     return () => clearInterval(timer);
   }, [imgUrls.length]); // Add dependency
+
+  // Early return with proper check
+  if (!imgUrls || imgUrls.length === 0) {
+    return (
+      <div className="max-h-96 flex items-center justify-center bg-gray-100">
+        <span className="text-gray-500">No images available</span>
+      </div>
+    );
+  }
 
   return (
     <div className="max-h-96 relative overflow-hidden rounded-2xl">
